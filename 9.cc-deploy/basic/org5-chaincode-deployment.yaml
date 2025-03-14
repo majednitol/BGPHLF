@@ -1,0 +1,30 @@
+---
+#---------------- Chaincode Deployment ---------------------
+apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: chaincode-basic-org5
+  labels:
+    app: chaincode-basic-org5
+spec:
+  selector:
+    matchLabels:
+      app: chaincode-basic-org5
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chaincode-basic-org5
+    spec:
+      containers:
+        - image: majedur708/hlf-api:12.8
+          name: chaincode-basic-org5
+          imagePullPolicy: Always
+          env:
+            - name: CHAINCODE_ID
+              value: "basic:daa5c2e878931985e209c03331ece56f1006d6b079ea23a7fdc2e0e4a25fd835"
+            - name: CHAINCODE_SERVER_ADDRESS
+              value: "0.0.0.0:7052"
+          ports:
+            - containerPort: 7052

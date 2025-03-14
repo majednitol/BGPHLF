@@ -1,0 +1,26 @@
+{
+    "name": "api",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon app.js"
+    },
+    "dependencies": {
+        "@grpc/grpc-js": "^1.12.5",
+        "@hyperledger/fabric-gateway": "^1.7.1",
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
+        "crypto": "^1.0.1",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "fabric-ca-client": "^2.2.20",
+        "fabric-network": "^2.2.20",
+        "google-auth-library": "^9.15.1",
+        "http-errors": "^2.0.0",
+        "jsonwebtoken": "^9.0.2",
+        "morgan": "^1.10.0",
+        "nano": "^10.1.4",
+        "nodemon": "^3.1.9",
+        "perf_hooks": "^0.0.1",
+        "util": "^0.12.5"
+    }
+}

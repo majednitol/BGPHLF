@@ -1,0 +1,18 @@
+// packaging 
+1.go to nfs_clientshare/chaincode/basic/packaging
+2.tar cfz code.tar.gz connection.json && tar cfz basic-org1.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
+  //update connection.json [for org2 and org3]
+4.
+6.tar cfz code.tar.gz connection.json && tar cfz basic-org2.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
+
+  //update connection.json [for org2 and org3]
+
+12.tar cfz code.tar.gz connection.json && tar cfz basic-org3.tgz code.tar.gz metadata.json
+
+// install chaincode package [need to install for 3 org ]
+go to peer cli ;;;; cd opt/gopath/src/github.com/chaincode/basic/packaging
+peer lifecycle chaincode install basic-org1.tgz  [need to store package identifier for cc deoloy]
+peer lifecycle chaincode install basic-org2.tgz
+peer lifecycle chaincode install basic-org3.tgz
+
+
