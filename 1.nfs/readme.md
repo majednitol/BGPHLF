@@ -25,3 +25,11 @@
 cd usr/share/nginx/html
 
 sudo cp -R prerequsite/* ../nfs_clientshare
+
+## minikube NFS (local deployment)
+minikube start --disk-size=20g --memory=7835 --cpus=8
+sudo chmod -R 777 /Users/majedurrahman/nfs_share      
+minikube start --mount --mount-string="/Users/majedurrahman/nfs_share:/mnt/data"
+minikube delete
+minikube stop
+ minikube mount /Users/majedurrahman/nfs_share:/mnt/data  

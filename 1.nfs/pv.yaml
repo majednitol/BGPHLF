@@ -9,7 +9,9 @@ spec:
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  nfs:
-    path: /mnt/nfs_share/
-    server: 128.199.31.157
+  hostPath: 
+    path: /mnt/data/ 
+    type: DirectoryOrCreate
+
+    
    
