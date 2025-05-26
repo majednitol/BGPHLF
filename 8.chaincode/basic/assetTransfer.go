@@ -20,6 +20,31 @@ type serverConfig struct {
 	CCID    string
 	Address string
 }
+type Member struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Country    string `json:"country"`
+	Email      string `json:"email"`
+	Approved   bool   `json:"approved"`
+}
+
+type ResourceRequest struct {
+	RequestID  string `json:"requestId"`
+	MemberID   string `json:"memberId"`
+	Type       string `json:"type"`     // "ip" or "asn"
+	Details    string `json:"details"`  // CIDR or ASN count
+	Status     string `json:"status"`   // "pending", "approved", "rejected"
+	ReviewedBy string `json:"reviewedBy,omitempty"`
+}
+
+type Allocation struct {
+	ID        string `json:"id"`
+	MemberID  string `json:"memberId"`
+	Type      string `json:"type"`
+	Value     string `json:"value"`
+	IssuedBy  string `json:"issuedBy"`
+	Timestamp string `json:"timestamp"`
+}
 
 type SmartContract struct {
 	contractapi.Contract
@@ -71,6 +96,85 @@ func getRIROrg(ctx contractapi.TransactionContextInterface) (string, error) {
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	return nil
 }
+
+func (s *SmartContract) RegisterMember(ctx contractapi.TransactionContextInterface, id, name, country, email string) error {
+	member := Member{ID: id, Name: name, Country: country, Email: email, Approved: false}
+	data, _ := json.Marshal(member)
+	return ctx.GetStub().PutState("MEMBER_"+id, data)
+}
+
+func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterface, id string) error {
+	msp, _ := ctx.GetClientIdentity().GetMSPID()
+	if msp != "Org1MSP" {
+		return fmt.Errorf("only AFRINIC (Org1) can approve members")
+	}
+
+	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + id)
+	if err != nil || memberBytes == nil {
+		return fmt.Errorf("member not found")
+	}
+	var member Member
+	_ = json.Unmarshal(memberBytes, &member)
+	member.Approved = true
+	data, _ := json.Marshal(member)
+	return ctx.GetStub().PutState("MEMBER_"+id, data)
+}
+
+// ========== Resource Request & Approval ==========
+
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, reqType, details string) error {
+	request := ResourceRequest{
+		RequestID: reqID,
+		MemberID:  memberID,
+		Type:      strings.ToLower(reqType),
+		Details:   details,
+		Status:    "pending",
+	}
+	data, _ := json.Marshal(request)
+	return ctx.GetStub().PutState("REQ_"+reqID, data)
+}
+
+func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterface, reqID, decision, reviewedBy string) error {
+	if decision != "approved" && decision != "rejected" {
+		return fmt.Errorf("invalid decision")
+	}
+
+	msp, _ := ctx.GetClientIdentity().GetMSPID()
+	if msp != "Org1MSP" {
+		return fmt.Errorf("only AFRINIC (Org1) can review requests")
+	}
+
+	reqBytes, err := ctx.GetStub().GetState("REQ_" + reqID)
+	if err != nil || reqBytes == nil {
+		return fmt.Errorf("request not found")
+	}
+
+	var request ResourceRequest
+	_ = json.Unmarshal(reqBytes, &request)
+	request.Status = decision
+	request.ReviewedBy = reviewedBy
+	data, _ := json.Marshal(request)
+	return ctx.GetStub().PutState("REQ_"+reqID, data)
+}
+
+func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterface, allocationID, memberID, typ, value, timestamp string) error {
+	msp, _ := ctx.GetClientIdentity().GetMSPID()
+	if msp != "Org1MSP" {
+		return fmt.Errorf("only AFRINIC can assign resources")
+	}
+
+	alloc := Allocation{
+		ID:        allocationID,
+		MemberID:  memberID,
+		Type:      typ,
+		Value:     value,
+		IssuedBy:  msp,
+		Timestamp: timestamp,
+	}
+	data, _ := json.Marshal(alloc)
+	return ctx.GetStub().PutState("ALLOC_"+allocationID, data)
+}
+
 
 func (s *SmartContract) RegisterCompany(ctx contractapi.TransactionContextInterface, comapanyID, companyName, rir, metadata string) error {
 	mspid, _ := getRIROrg(ctx)
