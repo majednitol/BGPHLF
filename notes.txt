@@ -1,0 +1,311 @@
+peer0-org1
+basic:74c8d4bd2ae76e91d7160817ba7ae55323303c8cd95380f048e8fc96a45552d7
+peer0-org2
+package identifier: basic:d91c9cccc7039cf189ed1ab866bde9908cc53566d75e3a6a669ac656fa438735
+peer0-org3
+package identifier: basic:0350fb30336aff894681530659cbad9d158eb7c3788162fb0da390b53a8fb092
+
+approve chaincode peer0-org1
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:1d2d535d9ff6af25f1653e0d488702101f158cdb22eee45c9cd4f966898a1f5e --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+
+
+approve chaincode peer0-org2
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:2a332682960f15aa636130bb7d02a6fcbde95ee41b2139b9d829a725bb2ce604 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+
+
+approve chaincode peer0-org3
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:b87be65bfb4da660b51ede92aeb8bc8adc68cc700396f5b699f139df8033ff4f --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+
+approve chaincode peer0-org4
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id   basic:a74326083314f439cd096477c41c8c734c2a6e241a7eb90baa945418c8c43aac --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+
+approve chaincode peer0-org5
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:90b220a6f993136d5b8436e6c05fee50723e74b14a4b887e44ef2a54a8bd7a44 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+
+approve chaincode peer0-org6
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:b1c70f91ca616c20bde2528f2a6075c234da48cb1c5b2e052edb6f9e6bd62021 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+
+checkcommitreadiness
+peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name basic --version 1.0 --init-required --sequence 1 -o -orderer:7050 --tls --cafile $ORDERER_CA
+
+
+commit chaincode
+peer lifecycle chaincode commit \
+  -o orderer:7050 \
+  --channelID mychannel \
+  --name basic \
+  --version 1.0 \
+  --sequence 1 \
+  --init-required \
+  --tls true \
+  --cafile $ORDERER_CA \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt
+
+
+//verfying
+peer lifecycle chaincode querycommitted -C mychannel
+
+ InitLedger command
+
+peer chaincode invoke \
+  -o orderer:7050 \
+  --isInit \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"Args":["InitLedger"]}' \
+  --waitForEvent
+
+
+invoke command (test cases)
+
+🔐 1️⃣ Register User with Affiliation
+fabric-ca-client register \
+  --id.name user1 \
+  --id.secret user1pw \
+  --id.type client \
+  --id.affiliation arin.business.technical \
+  --id.attrs "hf.Registrar.Roles=client, hf.Registrar.Attributes=*, hf.Revoker=true, hf.GenCRL=true, hf.AffiliationMgr=true" \
+  --tls.certfiles /organizations/fabric-ca/org2/tls-cert.pem
+
+
+🧾 2️⃣ Enroll the User
+fabric-ca-client enroll \
+  -u https://user1:user1pw@ca-org2:8054 \
+  --tls.certfiles /organizations/fabric-ca/org2/tls-cert.pem
+
+1️⃣ Register Company
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"function":"RegisterCompany","Args":["BRAC", "BRAC Ltd", "APNIC", "meta=gov_org"]}' \
+  --waitForEvent
+
+
+  2️⃣ Register User
+  peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"function":"RegisterUser","Args":["user1", "technical", "BRAC", "2025-05-23T10:00:00Z"]}' \
+  --waitForEvent
+  3️⃣ Login User
+
+  peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"function":"LoginUser","Args":["user1"]}' \
+  --waitForEvent
+
+
+  🔍 Query User
+  peer chaincode query \
+  -C mychannel \
+  -n basic \
+  -c '{"function":"GetUser","Args":["user1"]}'
+
+  🔍 Query Company
+  peer chaincode query \
+  -C mychannel \
+  -n basic \
+  -c '{"function":"GetCompany","Args":["BRAC"]}'
+
+
+### 1. **AssignPrefix**
+
+Assign an IP prefix (only Org1MSP allowed):
+
+
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"Args":["AssignPrefix","195.168.1.0/24","Org4MSP","2025-05-22T10:00:00Z"]}' \
+  --waitForEvent
+
+---
+5️⃣ Sub-Assign Prefix (By RIR to Company)
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  -c '{"function":"SubAssignPrefix","Args":["10.0.0.0/8", "10.10.0.0/16", "BRAC", "2025-05-23T10:10:00Z"]}' \
+  --waitForEvent
+### 2. **RegisterAS**
+
+Register an AS number with a public key:
+
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  -c '{"Args":["RegisterAS","64514444","publicKeyExampleHere"]}' \
+  --waitForEvent
+
+
+
+---
+
+### 3. **AnnounceRoute**
+
+Announce a route with a path (ASN path as JSON array):
+
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  -c '{"Args":["AnnounceRoute","64512","195.168.1.0/24","[\"64512\",\"64513\",\"64514\"]"]}' \
+  --waitForEvent
+
+
+---
+
+### 4. **ValidatePath**
+
+Validate an AS path against the stored route:
+
+
+peer chaincode query \
+  -C mychannel \
+  -n basic \
+  -c '{"Args":["ValidatePath","195.168.1.0/24","[\"64512\",\"64513\",\"64514\"]"]}'
+
+
+---
+
+### 5. **RevokeRoute**
+
+Revoke a route by ASN and prefix:
+
+
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  -c '{"Args":["RevokeRoute","64512","192.168.1.0/24"]}' \
+  --waitForEvent
+
+
+---
+
+### 6. **GetPrefixAssignment**
+
+Query prefix assignment info:
+
+
+peer chaincode query \
+  -C mychannel \
+  -n basic \
+  -c '{"Args":["getRIROrg"]}'
+
+
+
+
+// access couch db
+kubectl port-forward services/peer0-org1 5984:5984 [http://localhost:5984/_utils/]
+kubectl port-forward services/peer0-org2 5983:5984 
+
+// create connection profile for client
+go to nfs_clientshare
+
+./scripts/ccp.sh 

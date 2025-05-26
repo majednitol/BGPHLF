@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-org5
+spec:
+  selector:
+    matchLabels:
+      app: ca-org5
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ca-org5
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
+      containers:
+
+        - name: ca-org5
+          image: hyperledger/fabric-ca:1.5.13
+          imagePullPolicy: "Always"
+          command:
+            [
+              "fabric-ca-server" ,
+              "start", "-b" ,"admin:adminpw","--port","12054", "-d"
+            ]
+          resources:
+            requests:
+              memory: "300Mi"
+              cpu: "300m"
+            limits:
+              memory: "500Mi"
+              cpu: "350m"
+          env:
+           - name: FABRIC_CA_SERVER_CA_NAME
+             value: ca-org5
+           - name: FABRIC_CA_SERVER_TLS_ENABLED
+             value: "true"
+           - name: FABRIC_CA_SERVER_CSR_CN
+             value: "ca-org5"
+           - name: FABRIC_CA_SERVER_CSR_HOSTS
+             value: "ca-org5"
+          volumeMounts:
+            - name: data
+              mountPath: /etc/hyperledger/fabric-ca-server
+              subPath: organizations/fabric-ca/org5

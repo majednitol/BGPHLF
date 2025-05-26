@@ -1,0 +1,16 @@
+./scripts/createAppChannel.sh  [Received block: 0]
+
+peer channel join -b ./channel-artifacts/mychannel.block    [Successfully submitted proposal to join channel]
+
+//need to join other peer [same command]
+
+// updateAnchorPeer  [Successfully submitted channel update]
+./scripts/updateAnchorPeer.sh Org1MSP (org1)
+./scripts/updateAnchorPeer.sh Org2MSP (org2)
+./scripts/updateAnchorPeer.sh Org3MSP (org3)
+./scripts/updateAnchorPeer.sh Org4MSP (org4)
+./scripts/updateAnchorPeer.sh Org5MSP (org5)
+./scripts/updateAnchorPeer.sh Org6MSP (org5)
+
+
+

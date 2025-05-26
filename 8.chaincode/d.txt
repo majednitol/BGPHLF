@@ -1,0 +1,338 @@
+// package main
+
+// import (
+// 	"encoding/json"
+// 	"fmt"
+// 	"log"
+// 	"os"
+// 	"strings"
+
+// 	"github.com/hyperledger/fabric-chaincode-go/shim"
+// 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+// )
+
+// type serverConfig struct {
+// 	CCID    string
+// 	Address string
+// }
+
+// // ========== SmartContract Struct ==========
+
+// type SmartContract struct {
+// 	contractapi.Contract
+// }
+
+// // ========== Data Models ==========
+
+// type AS struct {
+// 	ASN       string `json:"asn"`
+// 	PublicKey string `json:"publicKey"`
+// }
+
+// type Route struct {
+// 	Prefix     string   `json:"prefix"`
+// 	Origin     string   `json:"origin"`
+// 	Path       []string `json:"path"`
+// 	AssignedBy string   `json:"assignedBy"`
+// }
+
+// type PrefixAssignment struct {
+// 	Prefix     string `json:"prefix"`
+// 	AssignedTo string `json:"assignedTo"`
+// 	AssignedBy string `json:"assignedBy"`
+// 	Timestamp  string `json:"timestamp"`
+// }
+
+// type Org struct {   // brac , gp
+// 	ID       string `json:"id"`
+// 	RIR      string `json:"rir"`     // e.g., apnic, arin
+// 	Creator  string `json:"creator"` // mspid
+// 	Metadata string `json:"metadata"`
+// }
+
+// type User struct {
+// 	ID        string `json:"id"`
+// 	OrgID     string `json:"orgId"`
+// 	Role      string `json:"role"` // technical, financial, member
+// 	RIR       string `json:"rir"`
+// 	MSPID     string `json:"mspid"`
+// 	Timestamp string `json:"timestamp"`
+// }
+
+// // ========== Utility Functions ==========
+
+// func getClientOrg(ctx contractapi.TransactionContextInterface) (string, error) {
+// 	mspid, err := ctx.GetClientIdentity().GetMSPID()
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to get MSP ID: %v", err)
+// 	}
+// 	return strings.ToLower(mspid), nil
+// }
+
+// // ========== Init ==========
+
+// func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
+// 	return nil
+// }
+
+// // ========== Register Organization ==========
+
+// func (s *SmartContract) RegisterOrg(ctx contractapi.TransactionContextInterface, orgID, rir, metadata string) error {
+// 	mspid, _ := getClientOrg(ctx)
+
+// 	key := "ORG_" + strings.ToLower(orgID)
+// 	exists, _ := ctx.GetStub().GetState(key)
+// 	if exists != nil {
+// 		return fmt.Errorf("organization %s already exists", orgID)
+// 	}
+
+// 	org := Org{
+// 		ID:       orgID,
+// 		RIR:      rir,
+// 		Creator:  mspid,
+// 		Metadata: metadata,
+// 	}
+// 	data, _ := json.Marshal(org)
+// 	return ctx.GetStub().PutState(key, data)
+// }
+
+// // ========== Register User ==========
+
+// func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, role, orgID, rir, timestamp string) error {
+// 	role = strings.ToLower(role)
+// 	if role != "technical" && role != "financial" && role != "member" {
+// 		return fmt.Errorf("invalid role")
+// 	}
+
+// 	mspid, _ := getClientOrg(ctx)
+// 	orgKey := "ORG_" + strings.ToLower(orgID)
+// 	orgBytes, err := ctx.GetStub().GetState(orgKey)
+// 	if err != nil || orgBytes == nil {
+// 		return fmt.Errorf("organization %s not found", orgID)
+// 	}
+
+// 	user := User{
+// 		ID:        userID,
+// 		OrgID:     orgID,
+// 		Role:      role,
+// 		RIR:       rir,
+// 		MSPID:     mspid,
+// 		Timestamp: timestamp,
+// 	}
+// 	data, _ := json.Marshal(user)
+// 	return ctx.GetStub().PutState("USER_"+userID, data)
+// }
+
+// // ========== Login User ==========
+
+// func (s *SmartContract) LoginUser(ctx contractapi.TransactionContextInterface, userID string) (string, error) {
+// 	mspid, _ := getClientOrg(ctx)
+
+// 	userBytes, err := ctx.GetStub().GetState("USER_" + userID)
+// 	if err != nil || userBytes == nil {
+// 		return "", fmt.Errorf("user not found")
+// 	}
+
+// 	var user User
+// 	_ = json.Unmarshal(userBytes, &user)
+
+// 	if strings.ToLower(user.MSPID) != mspid {
+// 		return "", fmt.Errorf("MSP mismatch: unauthorized")
+// 	}
+
+// 	return fmt.Sprintf("LOGIN SUCCESS: %s (%s - %s)", user.ID, user.Role, user.OrgID), nil
+// }
+
+// // ========== Assign Prefix (Only RONO) ==========
+
+// func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, prefix, assignedTo, timestamp string) error {
+// 	mspID, err := getClientOrg(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if mspID != "ronomsp" {
+// 		return fmt.Errorf("unauthorized: only RONO can assign prefixes")
+// 	}
+
+// 	orgKey := "ORG_" + strings.ToLower(assignedTo)
+// 	orgBytes, err := ctx.GetStub().GetState(orgKey)
+// 	if err != nil || orgBytes == nil {
+// 		return fmt.Errorf("assigned organization %s does not exist", assignedTo)
+// 	}
+
+// 	key := "PREFIX_" + prefix
+// 	if exists, _ := ctx.GetStub().GetState(key); exists != nil {
+// 		return fmt.Errorf("prefix %s already assigned", prefix)
+// 	}
+
+// 	assignment := PrefixAssignment{
+// 		Prefix:     prefix,
+// 		AssignedTo: assignedTo,
+// 		AssignedBy: mspID,
+// 		Timestamp:  timestamp,
+// 	}
+
+// 	data, _ := json.Marshal(assignment)
+// 	err = ctx.GetStub().PutState(key, data)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return ctx.GetStub().SetEvent("PrefixAssigned", data)
+// }
+
+// // ========== Get Prefix Assignment ==========
+
+// func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextInterface, prefix string) (*PrefixAssignment, error) {
+// 	bytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
+// 	if err != nil || bytes == nil {
+// 		return nil, fmt.Errorf("no assignment found for prefix %s", prefix)
+// 	}
+// 	var assignment PrefixAssignment
+// 	_ = json.Unmarshal(bytes, &assignment)
+// 	return &assignment, nil
+// }
+
+// // ========== Register AS ==========
+
+// func (s *SmartContract) RegisterAS(ctx contractapi.TransactionContextInterface, asn, publicKey string) error {
+// 	as := AS{ASN: asn, PublicKey: publicKey}
+// 	asBytes, _ := json.Marshal(as)
+// 	return ctx.GetStub().PutState("AS_"+asn, asBytes)
+// }
+
+// // ========== Announce Route ==========
+
+// func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, asn, prefix string, pathJSON string) error {
+// 	orgMSP, err := getClientOrg(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	existingAS, err := ctx.GetStub().GetState("AS_" + asn)
+// 	if err != nil || existingAS == nil {
+// 		return fmt.Errorf("AS %s not registered", asn)
+// 	}
+
+// 	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
+// 	if err != nil || prefixMetaBytes == nil {
+// 		return fmt.Errorf("prefix %s has not been assigned", prefix)
+// 	}
+// 	var assignment PrefixAssignment
+// 	_ = json.Unmarshal(prefixMetaBytes, &assignment)
+// 	if strings.ToLower(assignment.AssignedTo) != orgMSP {
+// 		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, orgMSP)
+// 	}
+
+// 	var path []string
+// 	err = json.Unmarshal([]byte(pathJSON), &path)
+// 	if err != nil {
+// 		return fmt.Errorf("invalid path format")
+// 	}
+
+// 	for _, pathASN := range path {
+// 		asBytes, err := ctx.GetStub().GetState("AS_" + pathASN)
+// 		if err != nil || asBytes == nil {
+// 			return fmt.Errorf("ASN %s in path is not registered", pathASN)
+// 		}
+// 	}
+
+// 	route := Route{
+// 		Prefix:     prefix,
+// 		Origin:     asn,
+// 		Path:       path,
+// 		AssignedBy: orgMSP,
+// 	}
+// 	routeBytes, _ := json.Marshal(route)
+// 	return ctx.GetStub().PutState("ROUTE_"+prefix, routeBytes)
+// }
+
+// // ========== Validate Path ==========
+
+// func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
+// 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
+// 	if err != nil || routeBytes == nil {
+// 		return "", fmt.Errorf("no route found for prefix %s", prefix)
+// 	}
+
+// 	var onChainRoute Route
+// 	_ = json.Unmarshal(routeBytes, &onChainRoute)
+
+// 	var incomingPath []string
+// 	err = json.Unmarshal([]byte(pathJSON), &incomingPath)
+// 	if err != nil {
+// 		return "", fmt.Errorf("invalid path format")
+// 	}
+
+// 	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
+// 		return "INVALID: AS path mismatch", nil
+// 	}
+// 	return fmt.Sprintf("VALID: AS path verified, assigned by %s", onChainRoute.AssignedBy), nil
+// }
+
+// // ========== Revoke Route ==========
+
+// func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
+// 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
+// 	if err != nil || routeBytes == nil {
+// 		return fmt.Errorf("no route to revoke")
+// 	}
+// 	var route Route
+// 	_ = json.Unmarshal(routeBytes, &route)
+
+// 	if route.Origin != asn {
+// 		return fmt.Errorf("only origin AS %s can revoke this route", route.Origin)
+// 	}
+// 	return ctx.GetStub().DelState("ROUTE_" + prefix)
+// }
+
+// // ========== GetUser ==========
+
+// func (s *SmartContract) GetUser(ctx contractapi.TransactionContextInterface, userID string) (*User, error) {
+// 	bytes, err := ctx.GetStub().GetState("USER_" + userID)
+// 	if err != nil || bytes == nil {
+// 		return nil, fmt.Errorf("user %s not found", userID)
+// 	}
+// 	var user User
+// 	_ = json.Unmarshal(bytes, &user)
+// 	return &user, nil
+// }
+
+// // ========== GetOrg ==========
+
+// func (s *SmartContract) GetOrg(ctx contractapi.TransactionContextInterface, orgID string) (*Org, error) {
+// 	bytes, err := ctx.GetStub().GetState("ORG_" + strings.ToLower(orgID))
+// 	if err != nil || bytes == nil {
+// 		return nil, fmt.Errorf("org %s not found", orgID)
+// 	}
+// 	var org Org
+// 	_ = json.Unmarshal(bytes, &org)
+// 	return &org, nil
+// }
+
+// // ========== Main Entrypoint ==========
+
+// func main() {
+// 	config := serverConfig{
+// 		CCID:    os.Getenv("CHAINCODE_ID"),
+// 		Address: os.Getenv("CHAINCODE_SERVER_ADDRESS"),
+// 	}
+
+// 	chaincode, err := contractapi.NewChaincode(&SmartContract{})
+// 	if err != nil {
+// 		log.Panicf("error creating chaincode: %s", err)
+// 	}
+
+// 	server := &shim.ChaincodeServer{
+// 		CCID:    config.CCID,
+// 		Address: config.Address,
+// 		CC:      chaincode,
+// 		TLSProps: shim.TLSProperties{
+// 			Disabled: true,
+// 		},
+// 	}
+
+// 	if err := server.Start(); err != nil {
+// 		log.Panicf("error starting chaincode: %s", err)
+// 	}
+// }
