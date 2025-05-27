@@ -41,7 +41,7 @@ type ResourceRequest struct {
 	RIR        string  `json:"rir"`
 	ReviewedBy string  `json:"reviewedBy,omitempty"`
 	Timestamp  string  `json:"timestamp"`
-	Company    Company `json:"company"`
+	
 }
 
 type Allocation struct {
@@ -51,7 +51,6 @@ type Allocation struct {
 	Value     string  `json:"value"`
 	IssuedBy  string  `json:"issuedBy"`
 	Timestamp string  `json:"timestamp"`
-	Company   Company `json:"company"`
 }
 
 type SmartContract struct {
@@ -112,10 +111,75 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	return nil
 }
 
-func (s *SmartContract) RegisterMember(ctx contractapi.TransactionContextInterface, id, name, country, email string) error {
-	member := Member{ID: id, Name: name, Country: country, Email: email, Approved: false}
-	data, _ := json.Marshal(member)
-	return ctx.GetStub().PutState("MEMBER_"+id, data)
+func (s *SmartContract) RegisterCompanyWithMember(
+	ctx contractapi.TransactionContextInterface,
+	companyID string,
+	legalEntityName string,
+	industryType string,
+	addressLine1 string,
+	city string,
+	state string,
+	postcode string,
+	economy string,
+	phone string,
+	orgEmail string,
+	abuseEmail string,
+	isMemberOfNIR string,
+	memberID string,
+	memberName string,
+	memberCountry string,
+	memberEmail string,
+) error {
+	// Check if company already exists
+	companyKey := "ORG_" + companyID
+	exists, _ := ctx.GetStub().GetState(companyKey)
+	if exists != nil {
+		return fmt.Errorf("organization %s already exists", companyID)
+	}
+
+	// Convert string to bool
+	memberOfNIR := strings.ToLower(isMemberOfNIR) == "true"
+
+	// Create company struct
+	company := Company{
+
+		ID:                companyID,
+		LegalEntityName:   legalEntityName,
+		IndustryType:      industryType,
+		AddressLine1:      addressLine1,
+		City:              city,
+		State:             state,
+		Postcode:          postcode,
+		Economy:           economy,
+		Phone:             phone,
+		OrganizationEmail: orgEmail,
+		NetworkAbuseEmail: abuseEmail,
+		IsMemberOfNIR:     memberOfNIR,
+	}
+
+	// Store company
+	companyBytes, _ := json.Marshal(company)
+	if err := ctx.GetStub().PutState(companyKey, companyBytes); err != nil {
+		return fmt.Errorf("failed to store company: %v", err)
+	}
+
+	// Create member with the company embedded
+	member := Member{
+		ID:       memberID,
+		Name:     memberName,
+		Country:  memberCountry,
+		Email:    memberEmail,
+		Approved: false,
+		Company:  company,
+	}
+
+	memberKey := "MEMBER_" + memberID
+	memberBytes, _ := json.Marshal(member)
+	if err := ctx.GetStub().PutState(memberKey, memberBytes); err != nil {
+		return fmt.Errorf("failed to store member: %v", err)
+	}
+
+	return nil
 }
 
 func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterface, id string) error {
@@ -233,48 +297,7 @@ func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterfa
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, data)
 }
 
-func (s *SmartContract) RegisterCompany(
-	ctx contractapi.TransactionContextInterface,
-	companyID string,
-	legalEntityName string,
-	industryType string,
-	addressLine1 string,
-	city string,
-	state string,
-	postcode string,
-	economy string,
-	phone string,
-	orgEmail string,
-	abuseEmail string,
-	isMemberOfNIR string,
-) error {
 
-	key := "ORG_" + companyID
-	exists, _ := ctx.GetStub().GetState(key)
-	if exists != nil {
-		return fmt.Errorf("organization %s already exists", companyID)
-	}
-
-	memberOfNIR := strings.ToLower(isMemberOfNIR) == "true"
-
-	org := Company{
-		ID:                companyID,
-		LegalEntityName:   legalEntityName,
-		IndustryType:      industryType,
-		AddressLine1:      addressLine1,
-		City:              city,
-		State:             state,
-		Postcode:          postcode,
-		Economy:           economy,
-		Phone:             phone,
-		OrganizationEmail: orgEmail,
-		NetworkAbuseEmail: abuseEmail,
-		IsMemberOfNIR:     memberOfNIR,
-	}
-
-	orgBytes, _ := json.Marshal(org)
-	return ctx.GetStub().PutState(key, orgBytes)
-}
 
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {
 	if dept != "technical" && dept != "financial" && dept != "member" {
