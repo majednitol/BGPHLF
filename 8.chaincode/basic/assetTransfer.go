@@ -76,7 +76,7 @@ type PrefixAssignment struct {
 	AssignedBy string `json:"assignedBy"`
 	Timestamp  string `json:"timestamp"`
 }
-
+ 
 type Company struct {
 	ID                    string `json:"id"`
 	LegalEntityName       string `json:"legal_entity_name"`
