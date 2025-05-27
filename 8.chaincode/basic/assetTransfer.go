@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: Apache-2.0
 */
-
+ 
 package main
 
 import (
@@ -28,7 +28,6 @@ type Member struct {
 	Approved bool    `json:"approved"`
 	Company  Company `json:"company"`
 }
-
 type ResourceRequest struct {
 	RequestID  string  `json:"requestId"`
 	MemberID   string  `json:"memberId"`
@@ -43,7 +42,6 @@ type ResourceRequest struct {
 	Timestamp  string  `json:"timestamp"`
 	Company    Company `json:"company"`
 }
-
 type Allocation struct {
 	ID        string  `json:"id"`
 	MemberID  string  `json:"memberId"`
