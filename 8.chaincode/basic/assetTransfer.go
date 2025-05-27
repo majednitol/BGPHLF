@@ -554,3 +554,4 @@ func main() {
 		log.Panicf("error starting chaincode: %s", err)
 	}
 }
+
