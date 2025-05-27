@@ -463,25 +463,57 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 }
 
 func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
+	
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
-	if err != nil || routeBytes == nil {
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve route for prefix %s: %v", prefix, err)
+	}
+	if routeBytes == nil {
 		return "", fmt.Errorf("no route found for prefix %s", prefix)
 	}
 
 	var onChainRoute Route
-	_ = json.Unmarshal(routeBytes, &onChainRoute)
+	if err := json.Unmarshal(routeBytes, &onChainRoute); err != nil {
+		return "", fmt.Errorf("failed to unmarshal stored route data: %v", err)
+	}
 
+	//  Parse the input path
 	var incomingPath []string
-	err = json.Unmarshal([]byte(pathJSON), &incomingPath)
-	if err != nil {
-		return "", fmt.Errorf("invalid path format")
+	if err := json.Unmarshal([]byte(pathJSON), &incomingPath); err != nil {
+		return "", fmt.Errorf("invalid path JSON format: %v", err)
+	}
+	if len(incomingPath) == 0 {
+		return "", fmt.Errorf("AS path cannot be empty")
 	}
 
-	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
-		return "INVALID: AS path mismatch", nil
+	for _, asn := range incomingPath {
+		query := fmt.Sprintf(`{"selector":{"type":"asn","value":"%s"}}`, asn)
+		iter, err := ctx.GetStub().GetQueryResult(query)
+		if err != nil {
+			return "", fmt.Errorf("error querying ASN %s: %v", asn, err)
+		}
+		defer iter.Close()
+
+		found := false
+		for iter.HasNext() {
+			_, err := iter.Next()
+			if err == nil {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return "", fmt.Errorf("ASN %s in the path is not assigned", asn)
+		}
 	}
-	return fmt.Sprintf("VALID: AS path verified, assigned by %s", onChainRoute.AssignedBy), nil
+
+	//  Compare with the announced path
+	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
+		return "INVALID: AS path mismatch with announced route", nil
+	}
+	return fmt.Sprintf("VALID: AS path verified, announced by %s", onChainRoute.AssignedBy), nil
 }
+
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
