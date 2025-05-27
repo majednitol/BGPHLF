@@ -309,3 +309,157 @@ kubectl port-forward services/peer0-org2 5983:5984
 go to nfs_clientshare
 
 ./scripts/ccp.sh 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Based on your previous commands and pattern, here's the **full version of all `peer chaincode invoke` commands** including **TLS, all six orgs, and required peer and cert info** to work in your multi-org Hyperledger Fabric network:
+
+---
+
+### ✅ 1. **RegisterMember**
+
+```bash
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  --peerAddresses peer0-org6:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  -c '{"Args":["RegisterMember","brac001","BRAC","BD","brac@example.com"]}' \
+  --waitForEvent
+```
+
+---
+
+### ✅ 2. **ApproveMember**
+
+```bash
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  --peerAddresses peer0-org6:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  -c '{"Args":["ApproveMember","brac001"]}' \
+  --waitForEvent
+```
+
+---
+
+### ✅ 3. **RequestResource**
+
+```bash
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  --peerAddresses peer0-org6:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  -c '{"Args":["RequestResource","req001","brac001","ip","192.0.2.0/24"]}' \
+  --waitForEvent
+```
+
+---
+
+### ✅ 4. **ReviewRequest**
+
+```bash
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  --peerAddresses peer0-org6:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  -c '{"Args":["ReviewRequest","req001","approved","admin@afrinic"]}' \
+  --waitForEvent
+```
+
+---
+
+### ✅ 5. **AssignResource**
+
+```bash
+peer chaincode invoke \
+  -o orderer:7050 \
+  --tls true \
+  --cafile $ORDERER_CA \
+  -C mychannel \
+  -n basic \
+  --peerAddresses peer0-org1:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses peer0-org2:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-org3:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
+  --peerAddresses peer0-org4:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
+  --peerAddresses peer0-org5:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
+  --peerAddresses peer0-org6:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  -c '{"Args":["AssignResource","alloc001","brac001","ip","192.0.2.0/24","2025-05-24T12:00:00Z"]}' \
+  --waitForEvent
+```
+
+peer chaincode invoke -n basic -C mychannel -c '{"Args":["RequestResource","req123","brac001","ipv4","192.0.2.0",1,"20250524","BD","afrinic","2025-05-27T12:00:00Z"]}'
+

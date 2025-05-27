@@ -21,20 +21,25 @@ type serverConfig struct {
 	Address string
 }
 type Member struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Country    string `json:"country"`
-	Email      string `json:"email"`
-	Approved   bool   `json:"approved"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Country  string `json:"country"`
+	Email    string `json:"email"`
+	Approved bool   `json:"approved"`
 }
 
 type ResourceRequest struct {
 	RequestID  string `json:"requestId"`
 	MemberID   string `json:"memberId"`
-	Type       string `json:"type"`     // "ip" or "asn"
-	Details    string `json:"details"`  // CIDR or ASN count
-	Status     string `json:"status"`   // "pending", "approved", "rejected"
+	Type       string `json:"type"`    // asn, ipv4, ipv6
+	Start      string `json:"start"`   // e.g., 192.0.2.0 or ASN start
+	Value      int    `json:"value"`   // number of IPs or ASNs
+	Date       string `json:"date"`    // e.g., 20250524
+	Status     string `json:"status"`  // allocated, reserved, etc.
+	Country    string `json:"country"`
+	RIR        string `json:"rir"`
 	ReviewedBy string `json:"reviewedBy,omitempty"`
+	Timestamp  string `json:"timestamp"`
 }
 
 type Allocation struct {
@@ -80,7 +85,7 @@ type Company struct {
 type User struct {
 	UserID     string `json:"userid"`
 	ComapanyID string `json:"companyId"`
-	Department       string `json:"department"`  // technical, financial, member
+	Department string `json:"department"` // technical, financial, member
 	Timestamp  string `json:"timestamp"`
 }
 
@@ -91,7 +96,6 @@ func getRIROrg(ctx contractapi.TransactionContextInterface) (string, error) {
 	}
 	return mspid, nil
 }
-
 
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	return nil
@@ -122,56 +126,101 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, reqType, details string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType, start string, value int, date, country, rir, timestamp string) error {
+	// Validate type
+	resType = strings.ToLower(resType)
+	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
+		return fmt.Errorf("invalid resource type: %s", resType)
+	}
+
 	request := ResourceRequest{
 		RequestID: reqID,
 		MemberID:  memberID,
-		Type:      strings.ToLower(reqType),
-		Details:   details,
+		Type:      resType,
+		Start:     start,
+		Value:     value,
+		Date:      date,
 		Status:    "pending",
+		Country:   country,
+		RIR:       rir,
+		Timestamp: timestamp,
 	}
-	data, _ := json.Marshal(request)
+
+	data, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request: %v", err)
+	}
+
 	return ctx.GetStub().PutState("REQ_"+reqID, data)
 }
 
+
 func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterface, reqID, decision, reviewedBy string) error {
+	// Validate decision
 	if decision != "approved" && decision != "rejected" {
-		return fmt.Errorf("invalid decision")
+		return fmt.Errorf("invalid decision: must be 'approved' or 'rejected'")
 	}
 
-	msp, _ := ctx.GetClientIdentity().GetMSPID()
+	msp, err := ctx.GetClientIdentity().GetMSPID()
+	if err != nil {
+		return fmt.Errorf("failed to get MSP ID: %v", err)
+	}
 	if msp != "Org1MSP" {
 		return fmt.Errorf("only AFRINIC (Org1) can review requests")
 	}
 
+	// Fetch request
 	reqBytes, err := ctx.GetStub().GetState("REQ_" + reqID)
 	if err != nil || reqBytes == nil {
-		return fmt.Errorf("request not found")
+		return fmt.Errorf("resource request %s not found", reqID)
 	}
 
 	var request ResourceRequest
-	_ = json.Unmarshal(reqBytes, &request)
+	if err := json.Unmarshal(reqBytes, &request); err != nil {
+		return fmt.Errorf("failed to unmarshal request: %v", err)
+	}
+
+	// Update status and reviewer
 	request.Status = decision
 	request.ReviewedBy = reviewedBy
-	data, _ := json.Marshal(request)
-	return ctx.GetStub().PutState("REQ_"+reqID, data)
+
+	updated, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("failed to marshal updated request: %v", err)
+	}
+
+	return ctx.GetStub().PutState("REQ_"+reqID, updated)
 }
 
-func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterface, allocationID, memberID, typ, value, timestamp string) error {
-	msp, _ := ctx.GetClientIdentity().GetMSPID()
+
+func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterface, allocationID, memberID, resType, value, timestamp string) error {
+	msp, err := ctx.GetClientIdentity().GetMSPID()
+	if err != nil {
+		return fmt.Errorf("failed to get MSP ID: %v", err)
+	}
 	if msp != "Org1MSP" {
-		return fmt.Errorf("only AFRINIC can assign resources")
+		return fmt.Errorf("only AFRINIC (Org1) can assign resources")
+	}
+
+	resType = strings.ToLower(resType)
+	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
+		return fmt.Errorf("invalid resource type")
 	}
 
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
-		Type:      typ,
+		Type:      resType,
 		Value:     value,
 		IssuedBy:  msp,
 		Timestamp: timestamp,
 	}
-	data, _ := json.Marshal(alloc)
+
+	data, err := json.Marshal(alloc)
+	if err != nil {
+		return fmt.Errorf("failed to marshal allocation: %v", err)
+	}
+
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, data)
 }
 
@@ -200,7 +249,6 @@ func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface
 		return fmt.Errorf("invalid role")
 	}
 
-	
 	comKey := "COM_" + comapanyID
 	compnayBytes, err := ctx.GetStub().GetState(comKey)
 	if err != nil || compnayBytes == nil {
@@ -215,8 +263,8 @@ func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface
 	user := User{
 		UserID:     userID,
 		ComapanyID: comapanyID,
-		Department:       dept,
-		Timestamp: timestamp,
+		Department: dept,
+		Timestamp:  timestamp,
 	}
 	data, _ := json.Marshal(user)
 	return ctx.GetStub().PutState("USER_"+userID, data)
@@ -230,7 +278,7 @@ func (s *SmartContract) LoginUser(ctx contractapi.TransactionContextInterface, u
 	var user User
 	_ = json.Unmarshal(userBytes, &user)
 
-	return fmt.Sprintf("LOGIN SUCCESS: %s (%s - %s)", user.UserID, user.Department, user.ComapanyID ), nil
+	return fmt.Sprintf("LOGIN SUCCESS: %s (%s - %s)", user.UserID, user.Department, user.ComapanyID), nil
 }
 
 func isPrefixInRange(parentPrefix, subPrefix string) bool {
@@ -244,7 +292,8 @@ func isPrefixInRange(parentPrefix, subPrefix string) bool {
 	}
 	return parentNet.Contains(subNet.IP)
 }
- // rono can assign prefixes to RIR organizations
+
+// rono can assign prefixes to RIR organizations
 func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, prefix, assignedTo, timestamp string) error {
 	mspID, err := getRIROrg(ctx)
 	if err != nil {
@@ -255,8 +304,8 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 	}
 
 	if assignedTo == "" {
-	return fmt.Errorf("assignedTo ID must not be empty")
-}
+		return fmt.Errorf("assignedTo ID must not be empty")
+	}
 
 	key := "PREFIX_" + prefix
 	if exists, _ := ctx.GetStub().GetState(key); exists != nil {
@@ -278,7 +327,8 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 
 	return ctx.GetStub().SetEvent("PrefixAssigned", data)
 }
-// RIR can assign prefixes to company 
+
+// RIR can assign prefixes to company
 func (s *SmartContract) SubAssignPrefix(ctx contractapi.TransactionContextInterface, parentPrefix, subPrefix, assignedTo, timestamp string) error {
 	mspID, _ := getRIROrg(ctx)
 
@@ -429,6 +479,28 @@ func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, 
 	return &company, nil
 
 }
+
+
+func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var allocations []*Allocation
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var alloc Allocation
+		if err := json.Unmarshal(result.Value, &alloc); err != nil {
+			continue
+		}
+		allocations = append(allocations, &alloc)
+	}
+	return allocations, nil
+}
+
 
 func main() {
 	config := serverConfig{
