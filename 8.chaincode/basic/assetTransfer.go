@@ -27,7 +27,6 @@ type Member struct {
 	Email    string `json:"email"`
 	Approved bool   `json:"approved"`
 }
-
 type ResourceRequest struct {
 	RequestID  string `json:"requestId"`
 	MemberID   string `json:"memberId"`
@@ -41,7 +40,6 @@ type ResourceRequest struct {
 	ReviewedBy string `json:"reviewedBy,omitempty"`
 	Timestamp  string `json:"timestamp"`
 }
-
 type Allocation struct {
 	ID        string `json:"id"`
 	MemberID  string `json:"memberId"`
