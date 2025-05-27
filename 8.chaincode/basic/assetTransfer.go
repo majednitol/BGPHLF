@@ -33,7 +33,7 @@ type ResourceRequest struct {
 	RequestID  string  `json:"requestId"`
 	MemberID   string  `json:"memberId"`
 	Type       string  `json:"type"`   // asn, ipv4, ipv6
-	Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
+	// Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
 	Value      int     `json:"value"`  // number of IPs or ASNs
 	Date       string  `json:"date"`   // e.g., 20250524
 	Status     string  `json:"status"` // allocated, reserved, etc.
@@ -47,8 +47,10 @@ type ResourceRequest struct {
 type Allocation struct {
 	ID        string  `json:"id"`
 	MemberID  string  `json:"memberId"`
-	Type      string  `json:"type"`
+	ResourceType   string `json:"resourceType "`   // asn or ip
+	ResourceID string `json:"resourceId"` // ASN number or IP prefix
 	Value     string  `json:"value"`
+	Expiry    string  `json:"expiry"`
 	IssuedBy  string  `json:"issuedBy"`
 	Timestamp string  `json:"timestamp"`
 }
@@ -212,7 +214,7 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 		RequestID: reqID,
 		MemberID:  memberID,
 		Type:      resType,
-		Start:     start,
+		// Start:     start,
 		Value:     value,
 		Date:      date,
 		Status:    "pending",
@@ -266,7 +268,10 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	return ctx.GetStub().PutState("REQ_"+reqID, updated)
 }
 
-func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterface, allocationID, memberID, resType, value, timestamp string) error {
+func (s *SmartContract) AssignResource(
+	ctx contractapi.TransactionContextInterface,
+	allocationID, memberID, resource, resourceID, expiry, timestamp string,
+) error {
 	msp, err := ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
 		return fmt.Errorf("failed to get MSP ID: %v", err)
@@ -275,28 +280,91 @@ func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf("only AFRINIC (Org1) can assign resources")
 	}
 
-	resType = strings.ToLower(resType)
-	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
-		return fmt.Errorf("invalid resource type")
+	resource = strings.ToLower(resource)
+	if resource != "asn" && resource != "ipv4" && resource != "ipv6" {
+		return fmt.Errorf("invalid resource type: %s", resource)
 	}
 
+	// If IP is being allocated, check ASN existence first
+	if resource == "ipv4" || resource == "ipv6" {
+		hasASN, err := s.memberHasASN(ctx, memberID)
+		if err != nil {
+			return err
+		}
+
+		// If no ASN found, assign one automatically
+		if !hasASN {
+			newASN, err := s.generateNextASN(ctx)
+			if err != nil {
+				return fmt.Errorf("failed to generate ASN: %v", err)
+			}
+			asnAlloc := Allocation{
+				ID:         "asn_" + memberID,
+				MemberID:   memberID,
+				ResourceType:   "asn",
+				ResourceID: fmt.Sprintf("%d", newASN),
+				Expiry:     "", // ASNs are typically permanent
+				IssuedBy:   msp,
+				Timestamp:  timestamp,
+			}
+			asnBytes, _ := json.Marshal(asnAlloc)
+			if err := ctx.GetStub().PutState("ALLOC_asn_"+memberID, asnBytes); err != nil {
+				return fmt.Errorf("failed to save ASN allocation: %v", err)
+			}
+		}
+	}
+
+	// Create final IP/ASN allocation
 	alloc := Allocation{
-		ID:        allocationID,
-		MemberID:  memberID,
-		Type:      resType,
-		Value:     value,
-		IssuedBy:  msp,
-		Timestamp: timestamp,
+		ID:         allocationID,
+		MemberID:   memberID,
+		ResourceType:   resource,
+		ResourceID: resourceID,
+		Expiry:     expiry,
+		IssuedBy:   msp,
+		Timestamp:  timestamp,
 	}
-
-	data, err := json.Marshal(alloc)
-	if err != nil {
-		return fmt.Errorf("failed to marshal allocation: %v", err)
-	}
-
-	return ctx.GetStub().PutState("ALLOC_"+allocationID, data)
+	allocBytes, _ := json.Marshal(alloc)
+	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 }
+func (s *SmartContract) memberHasASN(ctx contractapi.TransactionContextInterface, memberID string) (bool, error) {
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s","resource":"asn"}}`, memberID)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return false, err
+	}
+	defer iter.Close()
 
+	return iter.HasNext(), nil
+}
+func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
+	query := `{"selector":{"resource":"asn"}}`
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return 0, err
+	}
+	defer iter.Close()
+
+	maxASN := 64511 // Starting value for assignment
+
+	for iter.HasNext() {
+		result, err := iter.Next()
+		if err != nil {
+			continue
+		}
+		var alloc Allocation
+		if err := json.Unmarshal(result.Value, &alloc); err != nil {
+			continue
+		}
+		var asnVal int
+		if _, err := fmt.Sscanf(alloc.ResourceID, "%d", &asnVal); err == nil {
+			if asnVal > maxASN {
+				maxASN = asnVal
+			}
+		}
+	}
+	return maxASN + 1, nil
+}
 
 
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {
