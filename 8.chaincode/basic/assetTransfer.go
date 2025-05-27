@@ -21,32 +21,35 @@ type serverConfig struct {
 	Address string
 }
 type Member struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Country  string `json:"country"`
-	Email    string `json:"email"`
-	Approved bool   `json:"approved"`
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Country  string  `json:"country"`
+	Email    string  `json:"email"`
+	Approved bool    `json:"approved"`
+	Company  Company `json:"company"`
 }
 type ResourceRequest struct {
-	RequestID  string `json:"requestId"`
-	MemberID   string `json:"memberId"`
-	Type       string `json:"type"`    // asn, ipv4, ipv6
-	Start      string `json:"start"`   // e.g., 192.0.2.0 or ASN start
-	Value      int    `json:"value"`   // number of IPs or ASNs
-	Date       string `json:"date"`    // e.g., 20250524
-	Status     string `json:"status"`  // allocated, reserved, etc.
-	Country    string `json:"country"`
-	RIR        string `json:"rir"`
-	ReviewedBy string `json:"reviewedBy,omitempty"`
-	Timestamp  string `json:"timestamp"`
+	RequestID  string  `json:"requestId"`
+	MemberID   string  `json:"memberId"`
+	Type       string  `json:"type"`   // asn, ipv4, ipv6
+	Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
+	Value      int     `json:"value"`  // number of IPs or ASNs
+	Date       string  `json:"date"`   // e.g., 20250524
+	Status     string  `json:"status"` // allocated, reserved, etc.
+	Country    string  `json:"country"`
+	RIR        string  `json:"rir"`
+	ReviewedBy string  `json:"reviewedBy,omitempty"`
+	Timestamp  string  `json:"timestamp"`
+	Company    Company `json:"company"`
 }
 type Allocation struct {
-	ID        string `json:"id"`
-	MemberID  string `json:"memberId"`
-	Type      string `json:"type"`
-	Value     string `json:"value"`
-	IssuedBy  string `json:"issuedBy"`
-	Timestamp string `json:"timestamp"`
+	ID        string  `json:"id"`
+	MemberID  string  `json:"memberId"`
+	Type      string  `json:"type"`
+	Value     string  `json:"value"`
+	IssuedBy  string  `json:"issuedBy"`
+	Timestamp string  `json:"timestamp"`
+	Company   Company `json:"company"`
 }
 
 type SmartContract struct {
@@ -71,13 +74,21 @@ type PrefixAssignment struct {
 	AssignedBy string `json:"assignedBy"`
 	Timestamp  string `json:"timestamp"`
 }
-
+ 
 type Company struct {
-	ID       string `json:"id"`
-	RIR      string `json:"rir"`
-	RirMspID string `json:"rirMspId"`
-	Creator  string `json:"creator"`
-	Metadata string `json:"metadata"`
+	ID                    string `json:"id"`
+	LegalEntityName       string `json:"legal_entity_name"`
+	IndustryType          string `json:"industry_type"`
+	AddressLine1          string `json:"address_line1"`
+	City                  string `json:"city"`
+	State                 string `json:"state"`
+	StateProvinceDistrict string `json:"state_province_district"`
+	Postcode              string `json:"postcode"`
+	Economy               string `json:"economy"`
+	Phone                 string `json:"phone"`
+	OrganizationEmail     string `json:"organization_email"`
+	NetworkAbuseEmail     string `json:"network_abuse_email"`
+	IsMemberOfNIR         bool   `json:"is_member_of_nir"`
 }
 
 type User struct {
@@ -152,7 +163,6 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 	return ctx.GetStub().PutState("REQ_"+reqID, data)
 }
 
-
 func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterface, reqID, decision, reviewedBy string) error {
 	// Validate decision
 	if decision != "approved" && decision != "rejected" {
@@ -190,7 +200,6 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	return ctx.GetStub().PutState("REQ_"+reqID, updated)
 }
 
-
 func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterface, allocationID, memberID, resType, value, timestamp string) error {
 	msp, err := ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -222,24 +231,47 @@ func (s *SmartContract) AssignResource(ctx contractapi.TransactionContextInterfa
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, data)
 }
 
+func (s *SmartContract) RegisterCompany(
+	ctx contractapi.TransactionContextInterface,
+	companyID string,
+	legalEntityName string,
+	industryType string,
+	addressLine1 string,
+	city string,
+	state string,
+	postcode string,
+	economy string,
+	phone string,
+	orgEmail string,
+	abuseEmail string,
+	isMemberOfNIR string,
+) error {
 
-func (s *SmartContract) RegisterCompany(ctx contractapi.TransactionContextInterface, comapanyID, companyName, rir, metadata string) error {
-	mspid, _ := getRIROrg(ctx)
-	key := "COM_" + comapanyID
+	key := "ORG_" + companyID
 	exists, _ := ctx.GetStub().GetState(key)
 	if exists != nil {
-		return fmt.Errorf("Company %s already exists", comapanyID)
+		return fmt.Errorf("organization %s already exists", companyID)
 	}
 
-	company := Company{
-		ID:       comapanyID,
-		RIR:      rir,
-		RirMspID: mspid,
-		Creator:  companyName,
-		Metadata: metadata,
+	memberOfNIR := strings.ToLower(isMemberOfNIR) == "true"
+
+	org := Company{
+		ID:                companyID,
+		LegalEntityName:   legalEntityName,
+		IndustryType:      industryType,
+		AddressLine1:      addressLine1,
+		City:              city,
+		State:             state,
+		Postcode:          postcode,
+		Economy:           economy,
+		Phone:             phone,
+		OrganizationEmail: orgEmail,
+		NetworkAbuseEmail: abuseEmail,
+		IsMemberOfNIR:     memberOfNIR,
 	}
-	data, _ := json.Marshal(company)
-	return ctx.GetStub().PutState(key, data)
+
+	orgBytes, _ := json.Marshal(org)
+	return ctx.GetStub().PutState(key, orgBytes)
 }
 
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {
@@ -478,7 +510,6 @@ func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, 
 
 }
 
-
 func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
 	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
 	iter, err := ctx.GetStub().GetQueryResult(query)
@@ -498,7 +529,6 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 	}
 	return allocations, nil
 }
-
 
 func main() {
 	config := serverConfig{
