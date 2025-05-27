@@ -92,7 +92,7 @@ type Company struct {
 	NetworkAbuseEmail     string `json:"network_abuse_email"`
 	IsMemberOfNIR         bool   `json:"is_member_of_nir"`
 }
-
+ 
 type User struct {
 	UserID     string `json:"userid"`
 	ComapanyID string `json:"companyId"`
