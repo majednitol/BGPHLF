@@ -76,7 +76,7 @@ type PrefixAssignment struct {
 	AssignedBy string `json:"assignedBy"`
 	Timestamp  string `json:"timestamp"`
 }
- 
+
 type Company struct {
 	ID                    string `json:"id"`
 	LegalEntityName       string `json:"legal_entity_name"`
@@ -92,7 +92,7 @@ type Company struct {
 	NetworkAbuseEmail     string `json:"network_abuse_email"`
 	IsMemberOfNIR         bool   `json:"is_member_of_nir"`
 }
- 
+
 type User struct {
 	UserID     string `json:"userid"`
 	ComapanyID string `json:"companyId"`
@@ -313,18 +313,28 @@ func (s *SmartContract) LoginUser(ctx contractapi.TransactionContextInterface, u
 	return fmt.Sprintf("LOGIN SUCCESS: %s (%s - %s)", user.UserID, user.Department, user.ComapanyID), nil
 }
 
-func isPrefixInRange(parentPrefix, subPrefix string) bool {
-	_, parentNet, err := net.ParseCIDR(parentPrefix)
-	if err != nil {
+func isPrefixInRange(parent, sub string) bool {
+	_, pNet, pErr := net.ParseCIDR(parent)
+	_, sNet, sErr := net.ParseCIDR(sub)
+	if pErr != nil || sErr != nil {
 		return false
 	}
-	_, subNet, err := net.ParseCIDR(subPrefix)
-	if err != nil {
-		return false
-	}
-	return parentNet.Contains(subNet.IP)
-}
 
+	lastIP := func(ipNet *net.IPNet) net.IP {
+		ip := ipNet.IP
+		if ipv4 := ip.To4(); ipv4 != nil {
+			ip = ipv4
+		}
+		mask := ipNet.Mask
+		broadcast := make(net.IP, len(ip))
+		for i := 0; i < len(ip); i++ {
+			broadcast[i] = ip[i] | ^mask[i]
+		}
+		return broadcast
+	}
+
+	return pNet.Contains(sNet.IP) && pNet.Contains(lastIP(sNet))
+}
 // rono can assign prefixes to RIR organizations
 func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, prefix, assignedTo, timestamp string) error {
 	mspID, err := getRIROrg(ctx)
@@ -406,11 +416,7 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	return &assignment, nil
 }
 
-func (s *SmartContract) RegisterAS(ctx contractapi.TransactionContextInterface, asn, publicKey string) error {
-	as := AS{ASN: asn, PublicKey: publicKey}
-	asBytes, _ := json.Marshal(as)
-	return ctx.GetStub().PutState("AS_"+asn, asBytes)
-}
+
 
 func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, asn, prefix string, pathJSON string) error {
 	orgMSP, err := getRIROrg(ctx)
@@ -531,6 +537,28 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 	}
 	return allocations, nil
 }
+func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string) ([]*PrefixAssignment, error) {
+	var lineage []*PrefixAssignment
+
+	current := prefix
+	for {
+		bytes, err := ctx.GetStub().GetState("PREFIX_" + current)
+		if err != nil || bytes == nil {
+			break
+		}
+		var assign PrefixAssignment
+		if err := json.Unmarshal(bytes, &assign); err != nil {
+			break
+		}
+		lineage = append(lineage, &assign)
+		current = assign.AssignedTo
+		if strings.HasPrefix(current, "Org") || current == "RONO" {
+			break
+		}
+	}
+
+	return lineage, nil
+}
 
 func main() {
 	config := serverConfig{
@@ -554,4 +582,3 @@ func main() {
 		log.Panicf("error starting chaincode: %s", err)
 	}
 }
-
