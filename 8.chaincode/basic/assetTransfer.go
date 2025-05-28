@@ -507,11 +507,8 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	if err != nil {
 		return err
 	}
-
-	existingAS, err := ctx.GetStub().GetState("AS_" + asn)
-	if err != nil || existingAS == nil {
-		return fmt.Errorf("AS %s not registered", asn)
-	}
+//check asn exists 
+	
 
 	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
 	if err != nil || prefixMetaBytes == nil {
