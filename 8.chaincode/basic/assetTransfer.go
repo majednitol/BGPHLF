@@ -127,8 +127,11 @@ func (s *SmartContract) RegisterCompanyWithMember(
 ) error {
 	// Check if company already exists
 	companyKey := "COM_" + companyID
-	exists, _ := ctx.GetStub().GetState(companyKey)
-	if exists != nil {
+	companyBytes, err := ctx.GetStub().GetState(companyKey)
+	if err != nil {
+		return fmt.Errorf("failed to check existing company: %v", err)
+	}
+	if companyBytes != nil {
 		return fmt.Errorf("organization %s already exists", companyID)
 	}
 
@@ -137,7 +140,6 @@ func (s *SmartContract) RegisterCompanyWithMember(
 
 	// Create company struct
 	company := Company{
-
 		ID:                companyID,
 		LegalEntityName:   legalEntityName,
 		IndustryType:      industryType,
@@ -152,13 +154,17 @@ func (s *SmartContract) RegisterCompanyWithMember(
 		IsMemberOfNIR:     memberOfNIR,
 	}
 
-	// Store company
-	companyBytes, _ := json.Marshal(company)
-	if err := ctx.GetStub().PutState(companyKey, companyBytes); err != nil {
+	companyJSON, err := json.Marshal(company)
+	if err != nil {
+		return fmt.Errorf("failed to marshal company: %v", err)
+	}
+
+	// Store company first
+	if err := ctx.GetStub().PutState(companyKey, companyJSON); err != nil {
 		return fmt.Errorf("failed to store company: %v", err)
 	}
 
-	// Create member with the company embedded
+	// Create member with company embedded
 	member := Member{
 		ID:       memberID,
 		Name:     memberName,
@@ -168,14 +174,18 @@ func (s *SmartContract) RegisterCompanyWithMember(
 		Company:  company,
 	}
 
+	memberJSON, err := json.Marshal(member)
+	if err != nil {
+		return fmt.Errorf("failed to marshal member: %v", err)
+	}
+
 	memberKey := "MEMBER_" + memberID
-	memberBytes, _ := json.Marshal(member)
-	if err := ctx.GetStub().PutState(memberKey, memberBytes); err != nil {
+	if err := ctx.GetStub().PutState(memberKey, memberJSON); err != nil {
 		return fmt.Errorf("failed to store member: %v", err)
 	}
 
 	return nil
-}
+} // up
 
 func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterface, id string) error {
 	msp, _ := ctx.GetClientIdentity().GetMSPID()
