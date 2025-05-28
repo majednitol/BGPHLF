@@ -47,14 +47,14 @@ type ResourceRequest struct {
 type Allocation struct {
 	ID        string            `json:"id"`
 	MemberID  string            `json:"memberId"`
-	ASN       string               `json:"asn,omitempty"`
+	ASN       string            `json:"asn,omitempty"`
 	Prefix    *PrefixAssignment `json:"prefix,omitempty"`
 	Expiry    string            `json:"expiry"`
 	IssuedBy  string            `json:"issuedBy"`
 	Timestamp string            `json:"timestamp"`
 }
 type AS struct {
-	ASN        string    `json:"asn"`
+	ASN        string `json:"asn"`
 	Prefix     string `json:"prefix"`
 	AssignedTo string `json:"assignedTo"`
 	AssignedBy string `json:"assignedBy"`
@@ -214,7 +214,7 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType, start string, value int, date, country, rir, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir, timestamp string) error {
 	// Validate type
 	resType = strings.ToLower(resType)
 	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
@@ -367,9 +367,9 @@ func (s *SmartContract) AssignResource(
 	}
 	asBytes, _ := json.Marshal(as)
 	asnStr := strconv.Itoa(newASN)
-if err := ctx.GetStub().PutState("AS_"+asnStr, asBytes); err != nil {
-	return fmt.Errorf("failed to save ASN: %v", err)
-}
+	if err := ctx.GetStub().PutState("AS_"+asnStr, asBytes); err != nil {
+		return fmt.Errorf("failed to save ASN: %v", err)
+	}
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
@@ -524,15 +524,10 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 		return err
 	}
 	asKey := "AS_" + asn
-    asnBytes, err := ctx.GetStub().GetState(asKey)
-    if err != nil || asnBytes == nil {
-        return fmt.Errorf("ASN %s not found", asn)
-    }
-	var as AS
-_ = json.Unmarshal(asnBytes, &as)
-if as.Prefix != prefix {
-	return fmt.Errorf("ASN %s is not associated with prefix %s", asn, prefix)
-}
+	asnBytes, err := ctx.GetStub().GetState(asKey)
+	if err != nil || asnBytes == nil {
+		return fmt.Errorf("ASN %s not found", asn)
+	}
 
 	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
 	if err != nil || prefixMetaBytes == nil {
@@ -607,7 +602,6 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 
 	return fmt.Sprintf("VALID: AS path verified, announced by %s", onChainRoute.AssignedBy), nil
 }
-
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)

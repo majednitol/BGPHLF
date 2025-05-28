@@ -133,3 +133,21 @@ export async function RegisterAS(request) {
         throw error;
     }
 }
+TracePrefix
+export async function TracePrefix(request) {
+    try {
+        const { prefix, comapanyID } = request;
+        const contract = await smartContract(request, comapanyID);
+
+        const result = await contract.evaluateTransaction(
+            "TracePrefix",
+            prefix
+        );
+
+        console.log("Transaction Result:", result.toString());
+        return JSON.parse(result.toString());
+    } catch (error) {
+        console.error("Error in TracePrefix:", error);
+        throw error;
+    }
+}
