@@ -516,7 +516,7 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	}
 	var assignment PrefixAssignment
 	_ = json.Unmarshal(prefixMetaBytes, &assignment)
-	if assignment.AssignedTo != orgMSP {
+	if assignment.AssignedBy != orgMSP {
 		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, orgMSP)
 	}
 
