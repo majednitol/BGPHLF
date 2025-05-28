@@ -32,7 +32,7 @@ type Member struct {
 type ResourceRequest struct {
 	RequestID string `json:"requestId"`
 	MemberID  string `json:"memberId"`
-	Type      string `json:"type"` // asn, ipv4, ipv6
+	Type      string `json:"type"` // ipv4, ipv6
 	// Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
 	Value      int    `json:"value"`  // number of IPs or ASNs
 	Date       string `json:"date"`   // e.g., 20250524
@@ -44,23 +44,17 @@ type ResourceRequest struct {
 }
 
 type Allocation struct {
-	ID           string `json:"id"`
-	MemberID     string `json:"memberId"`
-	ResourceType string `json:"resourceType "` // asn or ip
-	ResourceID   string `json:"resourceId"`    // ASN number or IP prefix
-	Value        string `json:"value"`
-	Expiry       string `json:"expiry"`
-	IssuedBy     string `json:"issuedBy"`
-	Timestamp    string `json:"timestamp"`
+	ID        string            `json:"id"`
+	MemberID  string            `json:"memberId"`
+	ASN       int               `json:"asn,omitempty"`
+	Prefix    *PrefixAssignment `json:"prefix,omitempty"`
+	Expiry    string            `json:"expiry"`
+	IssuedBy  string            `json:"issuedBy"`
+	Timestamp string            `json:"timestamp"`
 }
 
 type SmartContract struct {
 	contractapi.Contract
-}
-
-type AS struct {
-	ASN       string `json:"asn"`
-	PublicKey string `json:"publicKey"`
 }
 
 type Route struct {
@@ -132,7 +126,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	memberEmail string,
 ) error {
 	// Check if company already exists
-	companyKey := "ORG_" + companyID
+	companyKey := "COM_" + companyID
 	exists, _ := ctx.GetStub().GetState(companyKey)
 	if exists != nil {
 		return fmt.Errorf("organization %s already exists", companyID)
@@ -266,76 +260,102 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 
 	return ctx.GetStub().PutState("REQ_"+reqID, updated)
 }
+func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextInterface, memberID string) (*Company, error) {
+	// Retrieve member by ID
+	memberKey := "MEMBER_" + memberID
+	memberBytes, err := ctx.GetStub().GetState(memberKey)
+	if err != nil || memberBytes == nil {
+		return nil, fmt.Errorf("member %s not found", memberID)
+	}
 
+	// Unmarshal member
+	var member Member
+	if err := json.Unmarshal(memberBytes, &member); err != nil {
+		return nil, fmt.Errorf("failed to parse member data: %v", err)
+	}
+
+	// Return embedded company
+	return &member.Company, nil
+}
 func (s *SmartContract) AssignResource(
 	ctx contractapi.TransactionContextInterface,
-	allocationID, memberID, resource, resourceID, expiry, timestamp string,
+	allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
 ) error {
+	// check "ALLOC_"+allocationID already exists
+	exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID)
+	if exists != nil {
+		return fmt.Errorf("allocation %s already exists", allocationID)
+	}
+
+	// check if member exists
+	memberKey := "MEMBER_" + memberID
+	memberBytes, err := ctx.GetStub().GetState(memberKey)
+	if err != nil || memberBytes == nil {
+		return fmt.Errorf("member %s not found", memberID)
+	}
 	msp, err := ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
 		return fmt.Errorf("failed to get MSP ID: %v", err)
 	}
 	if msp != "Org1MSP" {
-		return fmt.Errorf("only AFRINIC (Org1) can assign resources")
+		return fmt.Errorf("only AFRINIC (Org1MSP) can assign resources")
 	}
 
-	resource = strings.ToLower(resource)
-	if resource != "asn" && resource != "ipv4" && resource != "ipv6" {
-		return fmt.Errorf("invalid resource type: %s", resource)
+	// ======== Generate ASN Automatically ========
+	newASN, err := s.generateNextASN(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to generate ASN: %v", err)
 	}
 
-	// If IP is being allocated, check ASN existence first
-	if resource == "ipv4" || resource == "ipv6" {
-		hasASN, err := s.memberHasASN(ctx, memberID)
-		if err != nil {
-			return err
-		}
+	// ======== Validate Parent Prefix ========
+	parentKey := "PREFIX_" + parentPrefix
+	parentBytes, err := ctx.GetStub().GetState(parentKey)
+	if err != nil || parentBytes == nil {
+		return fmt.Errorf("parent prefix %s not found", parentPrefix)
+	}
+	var parentAssignment PrefixAssignment
+	_ = json.Unmarshal(parentBytes, &parentAssignment)
 
-		// If no ASN found, assign one automatically
-		if !hasASN {
-			newASN, err := s.generateNextASN(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to generate ASN: %v", err)
-			}
-			asnAlloc := Allocation{
-				ID:           "asn_" + memberID,
-				MemberID:     memberID,
-				ResourceType: "asn",
-				ResourceID:   fmt.Sprintf("%d", newASN),
-				Expiry:       "", // ASNs are typically permanent
-				IssuedBy:     msp,
-				Timestamp:    timestamp,
-			}
-			asnBytes, _ := json.Marshal(asnAlloc)
-			if err := ctx.GetStub().PutState("ALLOC_asn_"+memberID, asnBytes); err != nil {
-				return fmt.Errorf("failed to save ASN allocation: %v", err)
-			}
-		}
+	if parentAssignment.AssignedTo != msp {
+		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
 	}
 
-	// Create final IP/ASN allocation
+	// ======== Validate Sub Prefix ========
+	if !isPrefixInRange(parentPrefix, subPrefix) {
+		return fmt.Errorf("sub-prefix %s is not within parent prefix %s", subPrefix, parentPrefix)
+	}
+	subKey := "PREFIX_" + subPrefix
+	if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
+		return fmt.Errorf("prefix %s already assigned", subPrefix)
+	}
+
+	// ======== Create and Store Sub Prefix Assignment ========
+	prefixAssignment := PrefixAssignment{
+		Prefix:     subPrefix,
+		AssignedTo: memberID,
+		AssignedBy: msp,
+		Timestamp:  timestamp,
+	}
+	prefixBytes, _ := json.Marshal(prefixAssignment)
+	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
+		return fmt.Errorf("failed to save prefix assignment: %v", err)
+	}
+
+	// ======== Create Allocation Entry ========
 	alloc := Allocation{
-		ID:           allocationID,
-		MemberID:     memberID,
-		ResourceType: resource,
-		ResourceID:   resourceID,
-		Expiry:       expiry,
-		IssuedBy:     msp,
-		Timestamp:    timestamp,
+		ID:        allocationID,
+		MemberID:  memberID,
+		Prefix:    &prefixAssignment,
+		ASN:       newASN,
+		Expiry:    expiry,
+		IssuedBy:  msp,
+		Timestamp: timestamp,
 	}
+
 	allocBytes, _ := json.Marshal(alloc)
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 }
-func (s *SmartContract) memberHasASN(ctx contractapi.TransactionContextInterface, memberID string) (bool, error) {
-	query := fmt.Sprintf(`{"selector":{"memberId":"%s","resource":"asn"}}`, memberID)
-	iter, err := ctx.GetStub().GetQueryResult(query)
-	if err != nil {
-		return false, err
-	}
-	defer iter.Close()
 
-	return iter.HasNext(), nil
-}
 func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
 	query := `{"selector":{"resource":"asn"}}`
 	iter, err := ctx.GetStub().GetQueryResult(query)
@@ -356,7 +376,7 @@ func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterf
 			continue
 		}
 		var asnVal int
-		if _, err := fmt.Sscanf(alloc.ResourceID, "%d", &asnVal); err == nil {
+		if _, err := fmt.Sscanf(alloc.ID, "%d", &asnVal); err == nil {
 			if asnVal > maxASN {
 				maxASN = asnVal
 			}
@@ -373,7 +393,7 @@ func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface
 	comKey := "COM_" + comapanyID
 	compnayBytes, err := ctx.GetStub().GetState(comKey)
 	if err != nil || compnayBytes == nil {
-		return fmt.Errorf("company %s not found")
+		return fmt.Errorf("company %s not found", comapanyID)
 	}
 	userKey := "User_" + userID
 	exists, _ := ctx.GetStub().GetState(userKey)
@@ -460,41 +480,7 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 	return ctx.GetStub().SetEvent("PrefixAssigned", data)
 }
 
-// RIR can assign prefixes to company
-func (s *SmartContract) SubAssignPrefix(ctx contractapi.TransactionContextInterface, parentPrefix, subPrefix, assignedTo, timestamp string) error {
-	mspID, _ := getRIROrg(ctx)
 
-	parentKey := "PREFIX_" + parentPrefix
-	parentBytes, err := ctx.GetStub().GetState(parentKey)
-	if err != nil || parentBytes == nil {
-		return fmt.Errorf("parent prefix %s not found", parentPrefix)
-	}
-
-	var parentAssignment PrefixAssignment
-	_ = json.Unmarshal(parentBytes, &parentAssignment)
-
-	if parentAssignment.AssignedTo != mspID {
-		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
-	}
-
-	if !isPrefixInRange(parentPrefix, subPrefix) {
-		return fmt.Errorf("sub-prefix %s is not within parent prefix %s", subPrefix, parentPrefix)
-	}
-
-	subKey := "PREFIX_" + subPrefix
-	if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
-		return fmt.Errorf("prefix %s already assigned", subPrefix)
-	}
-
-	subAssignment := PrefixAssignment{
-		Prefix:     subPrefix,
-		AssignedTo: assignedTo,
-		AssignedBy: mspID,
-		Timestamp:  timestamp,
-	}
-	subBytes, _ := json.Marshal(subAssignment)
-	return ctx.GetStub().PutState(subKey, subBytes)
-}
 
 func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextInterface, prefix string) (*PrefixAssignment, error) {
 	bytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)

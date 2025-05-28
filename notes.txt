@@ -403,7 +403,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
   --peerAddresses peer0-org6:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["RequestResource","req001","brac001","ip","192.0.2.0/24"]}' \
+  -c '{"Args":["RegisterUser","user001","technical","brac-org","2025-05-28T11:00:00Z"]}' \
   --waitForEvent
 ```
 
