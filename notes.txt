@@ -264,7 +264,7 @@ Validate an AS path against the stored route:
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"Args":["ValidatePath","195.168.1.0/24","[\"64512\",\"64513\",\"64514\"]"]}'
+  -c '{"Args":["GetAllocationsByMember","com001"]}'
 
 
 ---
@@ -349,7 +349,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
   --peerAddresses peer0-org6:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["AssignResource","alloc001","brac001","192.0.2.0/24","192.0.2.0/25","2026-05-28","2025-05-28T10:00:00Z"]}' \
+  -c '{"Args":["GetAllocationsByMember","brac001"]}' \
   --waitForEvent
 ```
 

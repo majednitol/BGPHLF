@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -46,11 +47,18 @@ type ResourceRequest struct {
 type Allocation struct {
 	ID        string            `json:"id"`
 	MemberID  string            `json:"memberId"`
-	ASN       int               `json:"asn,omitempty"`
+	ASN       string               `json:"asn,omitempty"`
 	Prefix    *PrefixAssignment `json:"prefix,omitempty"`
 	Expiry    string            `json:"expiry"`
 	IssuedBy  string            `json:"issuedBy"`
 	Timestamp string            `json:"timestamp"`
+}
+type AS struct {
+	ASN        string    `json:"asn"`
+	Prefix     string `json:"prefix"`
+	AssignedTo string `json:"assignedTo"`
+	AssignedBy string `json:"assignedBy"`
+	Timestamp  string `json:"timestamp"`
 }
 
 type SmartContract struct {
@@ -350,13 +358,23 @@ func (s *SmartContract) AssignResource(
 	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 		return fmt.Errorf("failed to save prefix assignment: %v", err)
 	}
-
-	// ======== Create Allocation Entry ========
+	as := AS{
+		ASN:        strconv.Itoa(newASN),
+		Prefix:     subPrefix,
+		AssignedTo: memberID,
+		AssignedBy: msp,
+		Timestamp:  timestamp,
+	}
+	asBytes, _ := json.Marshal(as)
+	asnStr := strconv.Itoa(newASN)
+if err := ctx.GetStub().PutState("AS_"+asnStr, asBytes); err != nil {
+	return fmt.Errorf("failed to save ASN: %v", err)
+}
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
 		Prefix:    &prefixAssignment,
-		ASN:       newASN,
+		ASN:       strconv.Itoa(newASN),
 		Expiry:    expiry,
 		IssuedBy:  msp,
 		Timestamp: timestamp,
@@ -490,8 +508,6 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 	return ctx.GetStub().SetEvent("PrefixAssigned", data)
 }
 
-
-
 func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextInterface, prefix string) (*PrefixAssignment, error) {
 	bytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
 	if err != nil || bytes == nil {
@@ -507,8 +523,16 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	if err != nil {
 		return err
 	}
-//check asn exists 
-	
+	asKey := "AS_" + asn
+    asnBytes, err := ctx.GetStub().GetState(asKey)
+    if err != nil || asnBytes == nil {
+        return fmt.Errorf("ASN %s not found", asn)
+    }
+	var as AS
+_ = json.Unmarshal(asnBytes, &as)
+if as.Prefix != prefix {
+	return fmt.Errorf("ASN %s is not associated with prefix %s", asn, prefix)
+}
 
 	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
 	if err != nil || prefixMetaBytes == nil {
@@ -516,7 +540,7 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	}
 	var assignment PrefixAssignment
 	_ = json.Unmarshal(prefixMetaBytes, &assignment)
-	if assignment.AssignedBy  != orgMSP {
+	if assignment.AssignedBy != orgMSP {
 		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, orgMSP)
 	}
 
@@ -526,12 +550,12 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 		return fmt.Errorf("invalid path format")
 	}
 
-	// for _, pathASN := range path {
-	// 	asBytes, err := ctx.GetStub().GetState("AS_" + pathASN)
-	// 	if err != nil || asBytes == nil {
-	// 		return fmt.Errorf("ASN %s in path is not registered", pathASN)
-	// 	}
-	// }
+	for _, pathASN := range path {
+		asBytes, err := ctx.GetStub().GetState("AS_" + pathASN)
+		if err != nil || asBytes == nil {
+			return fmt.Errorf("ASN %s in path is not registered", pathASN)
+		}
+	}
 
 	route := Route{
 		Prefix:     prefix,
@@ -544,7 +568,7 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 }
 
 func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
-
+	// Retrieve the on-chain route for the given prefix
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve route for prefix %s: %v", prefix, err)
@@ -558,7 +582,7 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 		return "", fmt.Errorf("failed to unmarshal stored route data: %v", err)
 	}
 
-	//  Parse the input path
+	// Parse the input AS path JSON
 	var incomingPath []string
 	if err := json.Unmarshal([]byte(pathJSON), &incomingPath); err != nil {
 		return "", fmt.Errorf("invalid path JSON format: %v", err)
@@ -567,33 +591,23 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 		return "", fmt.Errorf("AS path cannot be empty")
 	}
 
+	// Validate each ASN in the path by checking if it exists on ledger
 	for _, asn := range incomingPath {
-		query := fmt.Sprintf(`{"selector":{"type":"asn","value":"%s"}}`, asn)
-		iter, err := ctx.GetStub().GetQueryResult(query)
-		if err != nil {
-			return "", fmt.Errorf("error querying ASN %s: %v", asn, err)
-		}
-		defer iter.Close()
-
-		found := false
-		for iter.HasNext() {
-			_, err := iter.Next()
-			if err == nil {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return "", fmt.Errorf("ASN %s in the path is not assigned", asn)
+		asnKey := "AS_" + asn
+		asBytes, err := ctx.GetStub().GetState(asnKey)
+		if err != nil || asBytes == nil {
+			return "", fmt.Errorf("ASN %s in the path is not registered", asn)
 		}
 	}
 
-	//  Compare with the announced path
+	// Compare the path with the announced route's path
 	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
 		return "INVALID: AS path mismatch with announced route", nil
 	}
+
 	return fmt.Sprintf("VALID: AS path verified, announced by %s", onChainRoute.AssignedBy), nil
 }
+
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
@@ -630,25 +644,25 @@ func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, 
 
 }
 
-func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
-	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
-	iter, err := ctx.GetStub().GetQueryResult(query)
-	if err != nil {
-		return nil, err
-	}
-	defer iter.Close()
+// func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
+// 	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
+// 	iter, err := ctx.GetStub().GetQueryResult(query)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer iter.Close()
 
-	var allocations []*Allocation
-	for iter.HasNext() {
-		result, _ := iter.Next()
-		var alloc Allocation
-		if err := json.Unmarshal(result.Value, &alloc); err != nil {
-			continue
-		}
-		allocations = append(allocations, &alloc)
-	}
-	return allocations, nil
-}
+//		var allocations []*Allocation
+//		for iter.HasNext() {
+//			result, _ := iter.Next()
+//			var alloc Allocation
+//			if err := json.Unmarshal(result.Value, &alloc); err != nil {
+//				continue
+//			}
+//			allocations = append(allocations, &alloc)
+//		}
+//		return allocations, nil
+//	}
 func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string) ([]*PrefixAssignment, error) {
 	var lineage []*PrefixAssignment
 
