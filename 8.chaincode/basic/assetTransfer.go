@@ -516,7 +516,7 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	}
 	var assignment PrefixAssignment
 	_ = json.Unmarshal(prefixMetaBytes, &assignment)
-	if assignment.AssignedBy != orgMSP {
+	if assignment.AssignedBy  != orgMSP {
 		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, orgMSP)
 	}
 
@@ -526,12 +526,12 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 		return fmt.Errorf("invalid path format")
 	}
 
-	for _, pathASN := range path {
-		asBytes, err := ctx.GetStub().GetState("AS_" + pathASN)
-		if err != nil || asBytes == nil {
-			return fmt.Errorf("ASN %s in path is not registered", pathASN)
-		}
-	}
+	// for _, pathASN := range path {
+	// 	asBytes, err := ctx.GetStub().GetState("AS_" + pathASN)
+	// 	if err != nil || asBytes == nil {
+	// 		return fmt.Errorf("ASN %s in path is not registered", pathASN)
+	// 	}
+	// }
 
 	route := Route{
 		Prefix:     prefix,
