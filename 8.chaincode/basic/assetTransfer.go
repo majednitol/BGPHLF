@@ -30,29 +30,28 @@ type Member struct {
 }
 
 type ResourceRequest struct {
-	RequestID  string  `json:"requestId"`
-	MemberID   string  `json:"memberId"`
-	Type       string  `json:"type"`   // asn, ipv4, ipv6
+	RequestID string `json:"requestId"`
+	MemberID  string `json:"memberId"`
+	Type      string `json:"type"` // asn, ipv4, ipv6
 	// Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
-	Value      int     `json:"value"`  // number of IPs or ASNs
-	Date       string  `json:"date"`   // e.g., 20250524
-	Status     string  `json:"status"` // allocated, reserved, etc.
-	Country    string  `json:"country"`
-	RIR        string  `json:"rir"`
-	ReviewedBy string  `json:"reviewedBy,omitempty"`
-	Timestamp  string  `json:"timestamp"`
-	
+	Value      int    `json:"value"`  // number of IPs or ASNs
+	Date       string `json:"date"`   // e.g., 20250524
+	Status     string `json:"status"` // allocated, reserved, etc.
+	Country    string `json:"country"`
+	RIR        string `json:"rir"`
+	ReviewedBy string `json:"reviewedBy,omitempty"`
+	Timestamp  string `json:"timestamp"`
 }
 
 type Allocation struct {
-	ID        string  `json:"id"`
-	MemberID  string  `json:"memberId"`
-	ResourceType   string `json:"resourceType "`   // asn or ip
-	ResourceID string `json:"resourceId"` // ASN number or IP prefix
-	Value     string  `json:"value"`
-	Expiry    string  `json:"expiry"`
-	IssuedBy  string  `json:"issuedBy"`
-	Timestamp string  `json:"timestamp"`
+	ID           string `json:"id"`
+	MemberID     string `json:"memberId"`
+	ResourceType string `json:"resourceType "` // asn or ip
+	ResourceID   string `json:"resourceId"`    // ASN number or IP prefix
+	Value        string `json:"value"`
+	Expiry       string `json:"expiry"`
+	IssuedBy     string `json:"issuedBy"`
+	Timestamp    string `json:"timestamp"`
 }
 
 type SmartContract struct {
@@ -299,13 +298,13 @@ func (s *SmartContract) AssignResource(
 				return fmt.Errorf("failed to generate ASN: %v", err)
 			}
 			asnAlloc := Allocation{
-				ID:         "asn_" + memberID,
-				MemberID:   memberID,
-				ResourceType:   "asn",
-				ResourceID: fmt.Sprintf("%d", newASN),
-				Expiry:     "", // ASNs are typically permanent
-				IssuedBy:   msp,
-				Timestamp:  timestamp,
+				ID:           "asn_" + memberID,
+				MemberID:     memberID,
+				ResourceType: "asn",
+				ResourceID:   fmt.Sprintf("%d", newASN),
+				Expiry:       "", // ASNs are typically permanent
+				IssuedBy:     msp,
+				Timestamp:    timestamp,
 			}
 			asnBytes, _ := json.Marshal(asnAlloc)
 			if err := ctx.GetStub().PutState("ALLOC_asn_"+memberID, asnBytes); err != nil {
@@ -316,13 +315,13 @@ func (s *SmartContract) AssignResource(
 
 	// Create final IP/ASN allocation
 	alloc := Allocation{
-		ID:         allocationID,
-		MemberID:   memberID,
-		ResourceType:   resource,
-		ResourceID: resourceID,
-		Expiry:     expiry,
-		IssuedBy:   msp,
-		Timestamp:  timestamp,
+		ID:           allocationID,
+		MemberID:     memberID,
+		ResourceType: resource,
+		ResourceID:   resourceID,
+		Expiry:       expiry,
+		IssuedBy:     msp,
+		Timestamp:    timestamp,
 	}
 	allocBytes, _ := json.Marshal(alloc)
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
@@ -365,7 +364,6 @@ func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterf
 	}
 	return maxASN + 1, nil
 }
-
 
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {
 	if dept != "technical" && dept != "financial" && dept != "member" {
@@ -426,6 +424,7 @@ func isPrefixInRange(parent, sub string) bool {
 
 	return pNet.Contains(sNet.IP) && pNet.Contains(lastIP(sNet))
 }
+
 // rono can assign prefixes to RIR organizations
 func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, prefix, assignedTo, timestamp string) error {
 	mspID, err := getRIROrg(ctx)
@@ -507,8 +506,6 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	return &assignment, nil
 }
 
-
-
 func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, asn, prefix string, pathJSON string) error {
 	orgMSP, err := getRIROrg(ctx)
 	if err != nil {
@@ -554,7 +551,7 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 }
 
 func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
-	
+
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve route for prefix %s: %v", prefix, err)
@@ -604,7 +601,6 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 	}
 	return fmt.Sprintf("VALID: AS path verified, announced by %s", onChainRoute.AssignedBy), nil
 }
-
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
