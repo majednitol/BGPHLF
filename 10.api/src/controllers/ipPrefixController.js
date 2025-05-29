@@ -1,5 +1,5 @@
 
-import { AnnounceRoute, AssignPrefix, GetPrefixAssignment, RegisterAS, RevokeRoute, SubAssignPrefix, ValidatePath } from "../services/ipPrefix.service.js";
+import { AnnounceRoute, AssignPrefix, GetPrefixAssignment, RevokeRoute, SubAssignPrefix, TracePrefix, ValidatePath } from "../services/ipPrefix.service.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function validatePath(req, res) {
@@ -130,23 +130,42 @@ export async function getPrefixAssignment(req, res) {
     }
 }
 
-export async function registerAS(req, res) {
+// export async function registerAS(req, res) {
+//     try {
+//         const payload = {
+//             "org": req.body.org,
+//             "channelName": channelName,
+//             "chaincodeName": chaincodeName,
+//             "comapanyID": req.body.comapanyID || req.comapanyID,
+//             "asn": req.body.asn,
+//             "publicKey": req.body.publicKey
+//         };
+
+//         console.log("RegisterAS Payload", payload);
+
+//         const result = await RegisterAS(payload);
+//         res.send({ success: true, result });
+//     } catch (error) {
+//         console.error("RegisterAS Error", error);
+//         res.status(500).send({ success: false, error: error.message });
+//     }
+// }
+
+export async function tracePrefix(req, res) {
     try {
-        const payload = {
-            "org": req.body.org,
+        let payload = {
+            "org": req.query.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.body.comapanyID || req.comapanyID,
-            "asn": req.body.asn,
-            "publicKey": req.body.publicKey
-        };
-
-        console.log("RegisterAS Payload", payload);
-
-        const result = await RegisterAS(payload);
-        res.send({ success: true, result });
+            "comapanyID": req.query.comapanyID ? req.query.comapanyID : req.comapanyID,
+            "prefix": req.query.prefix ? req.query.prefix : req.prefix
+        }
+        console.log("payload", payload)
+        let result = await TracePrefix(payload);
+        console.log("result app", result)
+        res.json(result)
     } catch (error) {
-        console.error("RegisterAS Error", error);
-        res.status(500).send({ success: false, error: error.message });
+        console.log(error)
+        res.send(error)
     }
 }

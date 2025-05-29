@@ -1,4 +1,4 @@
-import { ApproveMember, AssignResource, GetCompany, GetCompanyByMemberID, RegisterCompany, RegisterCompanyWithMember, RequestResource, ReviewRequest } from "../services/companyService.js";
+import { ApproveMember, AssignResource, GetCompany, GetCompanyByMemberID, RegisterCompanyWithMember, RequestResource, ReviewRequest } from "../services/companyService.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function registerCompanyWithMember(req, res) {

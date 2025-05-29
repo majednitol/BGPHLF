@@ -16,7 +16,7 @@ const companyRouter = express.Router();
 // Company registration and retrieval
 companyRouter.post("/register-company-by-member", registerCompanyWithMember);
 companyRouter.get("/get-company", getCompany);
-
+ 
 // Member actions
 companyRouter.post("/approve-member", approveMember);
 

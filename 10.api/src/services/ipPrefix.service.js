@@ -115,25 +115,25 @@ export async function RevokeRoute(request) {
 }
 
 
-export async function RegisterAS(request) {
-    try {
-        const { asn, publicKey, comapanyID } = request;
-        const contract = await smartContract(request, comapanyID);
+// export async function RegisterAS(request) {
+//     try {
+//         const { asn, publicKey, comapanyID } = request;
+//         const contract = await smartContract(request, comapanyID);
 
-        const result = await contract.submitTransaction(
-            "RegisterAS",
-            asn,
-            publicKey
-        );
+//         const result = await contract.submitTransaction(
+//             "RegisterAS",
+//             asn,
+//             publicKey
+//         );
 
-        console.log("Transaction Result:", result.toString());
-        return result.toString();
-    } catch (error) {
-        console.error("Error in RegisterAS:", error);
-        throw error;
-    }
-}
-TracePrefix
+//         console.log("Transaction Result:", result.toString());
+//         return result.toString();
+//     } catch (error) {
+//         console.error("Error in RegisterAS:", error);
+//         throw error;
+//     }
+// }
+
 export async function TracePrefix(request) {
     try {
         const { prefix, comapanyID } = request;
