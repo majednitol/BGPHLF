@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
-  },
+  }, 
   "dependencies": {
     "@reduxjs/toolkit": "2.8.2",
     "axios": "^1.9.0",
