@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios instance
 const apiClient = axios.create({
-  baseURL: 'https://your-api-url.com', // Change this
+  baseURL: 'http://www.patient-bio.majedurnitol.site', // Change this
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

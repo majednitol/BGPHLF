@@ -1,52 +1,60 @@
 import apiClient from './apiClient';
 
-// Replace this with a better token mechanism (cookies, session) in production
 const getAccessToken = () => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('accessToken');
 };
 
-const getAuthHeaders = () => {
+const getAuthHeaders = (tokenRequired = true) => {
+  if (!tokenRequired) return {};
   const token = getAccessToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 const apiRepository = {
-  async get(endpoint, params = {}, requireToken = true) {
+  async get(endpoint, params = {}, tokenRequired = true) {
     return apiClient.get(endpoint, {
       params,
-      headers: requireToken ? getAuthHeaders() : {},
+      headers: {
+        ...getAuthHeaders(tokenRequired),
+      },
     });
   },
 
-  async post(endpoint, data = {}, requireToken = true) {
+  async post(endpoint, data = {}, tokenRequired = true) {
     return apiClient.post(endpoint, data, {
-      headers: requireToken ? getAuthHeaders() : {},
+      headers: {
+        ...getAuthHeaders(tokenRequired),
+      },
     });
   },
 
-  async put(endpoint, data = {}, requireToken = true) {
+  async put(endpoint, data = {}, tokenRequired = true) {
     return apiClient.put(endpoint, data, {
-      headers: requireToken ? getAuthHeaders() : {},
+      headers: {
+        ...getAuthHeaders(tokenRequired),
+      },
     });
   },
 
-  async delete(endpoint, params = {}, requireToken = true) {
+  async delete(endpoint, params = {}, tokenRequired = true) {
     return apiClient.delete(endpoint, {
       params,
-      headers: requireToken ? getAuthHeaders() : {},
+      headers: {
+        ...getAuthHeaders(tokenRequired),
+      },
     });
   },
 
-  async customRequest({ method, endpoint, data = {}, headers = {}, requireToken = true }) {
+  async customRequest({ method = 'get', endpoint, data = {}, headers = {}, tokenRequired = true }) {
+    const isWriteMethod = ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase());
     return apiClient({
       method,
       url: endpoint,
-      data: ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase()) ? data : undefined,
-      params: ['GET', 'DELETE'].includes(method.toUpperCase()) ? data : undefined,
+      ...(isWriteMethod ? { data } : { params: data }),
       headers: {
         ...headers,
-        ...(requireToken ? getAuthHeaders() : {}),
+        ...getAuthHeaders(tokenRequired),
       },
     });
   },
