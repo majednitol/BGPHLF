@@ -1,4 +1,4 @@
-import apiRepository from '@/app/lib/apiRepository';
+import apiRepository from '../../lib/apiRepository';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // ✅ Register Company With Member

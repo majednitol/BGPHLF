@@ -1,10 +1,17 @@
 import React from 'react'
-import Demo from './src/demo'
+import EnrollUserPage from './dashboard/user/EnrollUser'
+import GetUserPage from './dashboard/user/GetUserPage'
+import CreateUserPage from './dashboard/user/CreateUserPage'
+import LoginUserPage from './dashboard/user/LoginUserPage'
+
 
 const page = () => {
   return (
     <div>
-     <Demo />
+      <EnrollUserPage/>
+      {/* <GetUserPage /> */}
+      {/* <CreateUserPage /> */}
+      {/* <LoginUserPage/> */}
     </div>
   )
 }
