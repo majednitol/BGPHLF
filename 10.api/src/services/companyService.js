@@ -3,7 +3,6 @@ import { smartContract } from "./smartContract.js";
 
 export async function RegisterCompanyWithMember(request) {
   try {
-
     const comapanyID = request.comapanyID
     const legalEntityName = request.legalEntityName
     const industryType = request.industryType
@@ -19,6 +18,7 @@ export async function RegisterCompanyWithMember(request) {
     const memberID = request.memberID
     const memberName = request.memberName
     const memberEmail = request.memberEmail
+    const memberCountry = request.memberCountry
     const contract = await smartContract(request, comapanyID)
     let result = await contract.submitTransaction(
       "RegisterCompanyWithMember",
@@ -39,11 +39,11 @@ export async function RegisterCompanyWithMember(request) {
       memberCountry,
       memberEmail,
     );
-    console.log("Transaction Result:", result);
+    console.log("Transaction Result:", result.toString());
 
     return result;
   } catch (error) {
-    console.error("Error in createAsset:", error);
+    console.error("Error in createAsset:", error.meaasge);
     throw error;
   }
 }

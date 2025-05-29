@@ -1,4 +1,4 @@
-import { GetCompany, RegisterCompany } from "../services/companyService.js";
+import { ApproveMember, AssignResource, GetCompany, GetCompanyByMemberID, RegisterCompany, RegisterCompanyWithMember, RequestResource, ReviewRequest } from "../services/companyService.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function registerCompanyWithMember(req, res) {
@@ -29,7 +29,7 @@ export async function registerCompanyWithMember(req, res) {
 
         }
         console.log("payload", payload)
-        let result = await RegisterCompany(payload);
+        let result = await RegisterCompanyWithMember(payload);
         console.log(result)
         res.send(result)
     } catch (error) {
@@ -56,3 +56,107 @@ export async function getCompany(req, res) {
     }
 }
 
+export async function approveMember(req, res) {
+  try {
+    const payload = {
+      "org": req.body.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "memberID": req.body.memberID,
+    };
+
+    console.log("Payload:", payload);
+    const result = await ApproveMember(payload);
+    res.send(result);
+  } catch (error) {
+    console.error("Error in approveMember:", error);
+    res.status(500).send(error.toString());
+  }
+}
+export async function assignResource(req, res) {
+  try {
+    const payload = {
+      "org": req.body.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "memberID": req.body.memberID,
+      "allocationID": req.body.allocationID,
+      "parentPrefix": req.body.parentPrefix,
+      "subPrefix": req.body.subPrefix,
+      "expiry": req.body.expiry,
+      "timestamp": req.body.timestamp,
+    };
+
+    console.log("Payload:", payload);
+    const result = await AssignResource(payload);
+    res.send(result);
+  } catch (error) {
+    console.error("Error in assignResource:", error);
+    res.status(500).send(error.toString());
+  }
+}
+
+export async function requestResource(req, res) {
+  try {
+    const payload = {
+      "org": req.body.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "reqID": req.body.reqID,
+      "memberID": req.body.memberID,
+      "resType": req.body.resType,
+      "value": req.body.value,
+      "date": req.body.date,
+      "country": req.body.country,
+      "rir": req.body.rir,
+      "timestamp": req.body.timestamp,
+    };
+
+    console.log("Payload:", payload);
+    const result = await RequestResource(payload);
+    res.send(result);
+  } catch (error) {
+    console.error("Error in requestResource:", error);
+    res.status(500).send(error.toString());
+  }
+}
+
+
+export async function reviewRequest(req, res) {
+  try {
+    const payload = {
+      "org": req.body.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "reqID": req.body.reqID,
+      "memberID": req.body.memberID,
+      "decision": req.body.decision,
+      "reviewedBy": req.body.reviewedBy,
+    };
+
+    console.log("Payload:", payload);
+    const result = await ReviewRequest(payload);
+    res.send(result);
+  } catch (error) {
+    console.error("Error in reviewRequest:", error);
+    res.status(500).send(error.toString());
+  }
+}
+
+export async function getCompanyByMemberID(req, res) {
+  try {
+    const payload = {
+      "org": req.query.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "memberID": req.query.memberID || req.body.memberID,
+    };
+
+    console.log("Payload:", payload);
+    const result = await GetCompanyByMemberID(payload);
+    res.json(result);
+  } catch (error) {
+    console.error("Error in getCompanyByMemberID:", error);
+    res.status(500).send(error.toString());
+  }
+}
