@@ -10,7 +10,7 @@ spec:
   type: ClusterIP
   ports:
     - name: grpc
-      port: 7051
+      port: 12051
       protocol: TCP
     - name: event
       port: 7061

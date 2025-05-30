@@ -2,8 +2,10 @@ import { smartContract } from "./smartContract.js";
 
 export async function GetPrefixAssignment(request) {
     try {
+
+        const userID = request.comapanyID
         const prefix = request.prefix
-        const contract = await smartContract(request, pathologistId)
+        const contract = await smartContract(request, userID)
         let result = await contract.evaluateTransaction("GetPrefixAssignment", prefix);
         console.log("result", result)
         return JSON.parse(result);
@@ -13,9 +15,10 @@ export async function GetPrefixAssignment(request) {
 }
 export async function ValidatePath(request) {
     try {
+        const userID = request.comapanyID
         const prefix = request.prefix
         const pathJSON = request.pathJSON
-        const contract = await smartContract(request, pathologistId)
+        const contract = await smartContract(request, userID)
         let result = await contract.evaluateTransaction("ValidatePath", prefix, pathJSON);
         console.log("result", result)
         return JSON.parse(result);

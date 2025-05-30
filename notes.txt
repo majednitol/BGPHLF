@@ -132,7 +132,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
   --peerAddresses peer0-org5:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"RegisterUser","Args":["user1", "technical", "BRAC", "2025-05-23T10:00:00Z"]}' \
+  -c '{"function":"RegisterUser","Args":["222", "technical", "BRAC", "2025-05-23T10:00:00Z"]}' \
   --waitForEvent
   3️⃣ Login User
 
@@ -166,7 +166,7 @@ peer chaincode invoke \
   peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"function":"GetCompany","Args":["BRAC"]}'
+  -c '{"function":"GetCompany","Args":["com001"]}'
 
 
 ### 1. **AssignPrefix**

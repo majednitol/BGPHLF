@@ -4,22 +4,30 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ✅ Validate Path
 export const validatePath = createAsyncThunk(
   'ipPrefix/validatePath',
-  async (payload, thunkAPI) => {
+  async ({ comapanyID, prefix, pathJSON }, thunkAPI) => {
     try {
-      const response = await apiRepository.post('/validate-path', payload, true);
+      const data = { comapanyID, prefix, pathJSON }
+      const response = await apiRepository.post('/validate-path', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
     }
   }
-);    
+);
 
 // ✅ Assign Prefix
 export const assignPrefix = createAsyncThunk(
   'ipPrefix/assignPrefix',
-  async (payload, thunkAPI) => {
+  async ({ comapanyID, prefix,
+    assignedTo,
+    timestamp }, thunkAPI) => {
     try {
-      const response = await apiRepository.post('/assign-prefix', payload, true);
+      const data = {
+        comapanyID, prefix,
+        assignedTo,
+        timestamp
+      }
+      const response = await apiRepository.post('/assign-prefix', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -43,9 +51,16 @@ export const subAssignPrefix = createAsyncThunk(
 // ✅ Announce Route
 export const announceRoute = createAsyncThunk(
   'ipPrefix/announceRoute',
-  async (payload, thunkAPI) => {
+  async ({ comapanyID, asn,
+    prefix,
+    pathJSON }, thunkAPI) => {
     try {
-      const response = await apiRepository.post('/announce-route', payload, true);
+      const data = {
+        comapanyID, asn,
+        prefix,
+        pathJSON
+      }
+      const response = await apiRepository.post('/announce-route', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -56,9 +71,12 @@ export const announceRoute = createAsyncThunk(
 // ✅ Revoke Route
 export const revokeRoute = createAsyncThunk(
   'ipPrefix/revokeRoute',
-  async (payload, thunkAPI) => {
+  async ({ comapanyID, asn,
+    prefix }, thunkAPI) => {
     try {
-      const response = await apiRepository.post('/revoke-route', payload, true);
+      const data = {comapanyID, asn,
+    prefix}
+      const response = await apiRepository.post('/revoke-route', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -69,8 +87,9 @@ export const revokeRoute = createAsyncThunk(
 // ✅ Get Prefix Assignment
 export const getPrefixAssignment = createAsyncThunk(
   'ipPrefix/getPrefixAssignment',
-  async (params, thunkAPI) => {
+  async ({comapanyID,prefix}, thunkAPI) => {
     try {
+      const params ={comapanyID,prefix}
       const response = await apiRepository.get('/get-prefix-assignment', params, true);
       return response.data;
     } catch (error) {
@@ -82,8 +101,9 @@ export const getPrefixAssignment = createAsyncThunk(
 // ✅ Trace Prefix
 export const tracePrefix = createAsyncThunk(
   'ipPrefix/tracePrefix',
-  async (params, thunkAPI) => {
+  async ({comapanyID,prefix}, thunkAPI) => {
     try {
+      const params = {comapanyID,prefix}
       const response = await apiRepository.get('/trace-prefix', params, true);
       return response.data;
     } catch (error) {
