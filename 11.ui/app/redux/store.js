@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import ipPrefixReducer from './features/ipPrefix/ipPrefixSlice';
-import userReducer from './features/user/userSlice';
-import companyReducer from './features/company/companySlice';
+import ipPrefixReducer from '../features/ipPrefix/ipPrefixSlice';
+import userReducer from '../features/user/userSlice';
+import companyReducer from '../features/company/companySlice';
 
 const store = configureStore({
   reducer: {
@@ -10,5 +10,5 @@ const store = configureStore({
     company: companyReducer,
   },
 });
-
+ 
 export default store;

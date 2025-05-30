@@ -1,4 +1,5 @@
-import apiRepository from '@/app/lib/apiRepository';
+
+import apiRepository from '../../lib/apiRepository';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // ✅ Get User
@@ -56,14 +57,6 @@ const initialState = {
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {
-    logout: (state) => {
-      state.userData = null;
-      state.isLoggedIn = false;
-      state.success = null;
-      state.error = null;
-    },
-  },
   extraReducers: (builder) => {
     builder
       // Get User
@@ -129,5 +122,4 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout } = userSlice.actions;
 export default userSlice.reducer;

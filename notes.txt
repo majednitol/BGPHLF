@@ -311,7 +311,7 @@ go to nfs_clientshare
 ./scripts/ccp.sh 
 
 
-
+kubectl port-forward services/api 4000
 
 
 
