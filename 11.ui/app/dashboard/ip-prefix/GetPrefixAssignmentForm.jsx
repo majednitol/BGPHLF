@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { getPrefixAssignment } from '../features/ipPrefix/ipPrefixSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { getPrefixAssignment } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
 
 const GetPrefixAssignment = () => {

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { revokeRoute } from '../features/ipPrefix/ipPrefixSlice';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { revokeRoute } from '../../features/ipPrefix/ipPrefixSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import toast from 'react-hot-toast';
 
 const RevokeRouteForm = () => {
