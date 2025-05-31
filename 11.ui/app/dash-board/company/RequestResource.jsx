@@ -6,7 +6,7 @@ import { requestResource } from '../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const RequestResourceForm = () => {
+const RequestResource = () => {
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     reqID: '',
@@ -106,4 +106,4 @@ const RequestResourceForm = () => {
   );
 };
 
-export default RequestResourceForm;
+export default RequestResource;

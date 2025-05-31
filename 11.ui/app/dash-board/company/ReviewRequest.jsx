@@ -6,7 +6,7 @@ import { reviewRequest } from '../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const ReviewRequestForm = () => {
+const ReviewRequest = () => {
   const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState({
@@ -90,4 +90,4 @@ const ReviewRequestForm = () => {
   );
 };
 
-export default ReviewRequestForm;
+export default ReviewRequest;

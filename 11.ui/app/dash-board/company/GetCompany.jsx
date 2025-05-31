@@ -7,7 +7,7 @@ import { getCompany } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const GetCompanyForm = () => {
+const GetCompany = () => {
   const dispatch = useAppDispatch();
   const [comapanyID, setCompanyID] = useState('');
 const [org, setOrg] = useState('Org1');
@@ -92,4 +92,4 @@ const styles = {container: {
   },
 };
 
-export default GetCompanyForm;
+export default GetCompany;

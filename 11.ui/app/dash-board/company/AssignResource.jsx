@@ -6,7 +6,7 @@ import { assignResource } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const AssignResourceForm = () => {
+const AssignResource = () => {
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     allocationID: '',
@@ -109,4 +109,4 @@ const styles = {
     transition: '0.3s',
   },
 };
-export default AssignResourceForm;
+export default AssignResource;

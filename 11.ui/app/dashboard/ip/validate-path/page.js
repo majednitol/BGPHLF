@@ -1,7 +1,7 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import ValidatePath from '../../../dash-board/ip-prefix/ValidatePathForm'
+import ValidatePath from '../../../dash-board/ip-prefix/ValidatePath'
 
 
 const ValidatePathPage = () => {

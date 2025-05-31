@@ -6,7 +6,7 @@ import { approveMember } from '../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const ApproveMemberForm = () => {
+const ApproveMember = () => {
   const dispatch = useAppDispatch();
   const [memberID, setMemberID] = useState('');
 const [org, setOrg] = useState('Org1');
@@ -42,4 +42,4 @@ const [org, setOrg] = useState('Org1');
   );
 };
 
-export default ApproveMemberForm;
+export default ApproveMember;

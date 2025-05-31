@@ -6,7 +6,7 @@ import { getCompanyByMemberID } from '../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
-const GetCompanyByMemberIDForm = () => {
+const GetCompanyByMemberID = () => {
   const dispatch = useAppDispatch();
   const { companyData, loading, error } = useAppSelector(state => state.company);
 
@@ -61,4 +61,4 @@ const [org, setOrg] = useState('Org1');
   );
 };
 
-export default GetCompanyByMemberIDForm;
+export default GetCompanyByMember;
