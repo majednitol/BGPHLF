@@ -1,3 +1,83 @@
+'use client';
+
+import { useContext } from 'react';
+import Link from 'next/link';
+import styles from './dashboard.module.css';
+import { HealthContext } from '@/context/Health';
+
+const navItems = {
+  1: [
+    { href: '/dashboard/doctor-personal-data', label: 'Doctor personal info' },
+    { href: '/dashboard/patient-list', label: "Doctor's patient list" },
+    { href: '/dashboard/doctor-file-upload', label: 'File Upload' },
+    { href: '/dashboard/display-doctor-file', label: 'Patient shared File' },
+    { href: '/dashboard/shared-data-doctor', label: 'Pathologist Shared Data' },
+  ],
+  2: [
+    { href: '/dashboard/pathologist/PathologistPersonalData', label: 'Pathologist Data' },
+    { href: '/dashboard/pathologist/PatientPrescriptionSentByDoctor', label: 'Patient Prescription' },
+    { href: '/dashboard/pathologist/TestReportToDoctor', label: 'Test Report' },
+  ],
+  3: [
+    { href: '/dashboard/medical-research-lab/MediResearchLabPersonalData', label: 'Personal Data' },
+    { href: '/dashboard/medical-research-lab/ResearchLabReport', label: 'Add Research Lab Report' },
+    { href: '/dashboard/medical-research-lab/PrescriptionOrLabReport', label: 'View Prescription Or Lab Report' },
+    { href: '/dashboard/medical-research-lab/MedicalResearchLabSharedData', label: 'Lab Shared Data' },
+  ],
+  4: [
+    { href: '/dashboard/pharmacy-company/PharmacyCompanyPersonalData', label: 'Personal Data' },
+    { href: '/dashboard/pharmacy-company/AddingTopMedichine', label: 'Adding Top Medicine' },
+    { href: '/dashboard/pharmacy-company/ViewTopMedicine', label: 'View Top Medicine' },
+    { href: '/dashboard/pharmacy-company/PatientToPharmacyCompanySharedData', label: 'Patient Data' },
+  ],
+  5: [
+    { href: '/dashboard/patient-personal-details', label: 'Patient Details' },
+    { href: '/dashboard/patient-file-upload', label: 'File Upload' },
+    { href: '/dashboard/Patient/AddPersonalHealthData', label: 'Add Health Data' },
+    { href: '/dashboard/Patient/ViewPatientHealthData', label: 'View Health Data' },
+    { href: '/dashboard/Patient/PatientPersonalDoctorList', label: 'Patient Personal Doctor' },
+  ],
+};
+
+function DashboardLayout({ children }) {
+  const { ConnectedAccountUser } = useContext(HealthContext);
+
+  return (
+    <div className="dashboard">
+      <aside id="mySidenav" className={styles.mySidenav}>
+        <nav className={styles.dashboardNav}>
+          <div className={styles.sidebarMenu}>
+            <ul className={styles.sidebarMenu__list}>
+              <li className={styles.sidebarMenu__list__item}>
+                <Link href="/dashboard" className={styles.sidebarMenu__list__item__link}>
+                  <p>Dashboard</p>
+                </Link>
+
+                {navItems[ConnectedAccountUser]?.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={styles.sidebarMenu__list__item__link}
+                  >
+                    <p>{label}</p>
+                  </Link>
+                ))}
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <main className={styles.content} id="dashboard-container__main">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+export default DashboardLayout;
+
+
 // import { useContext } from "react";
 // import styles from "./dashboard.module.css";
 // import { HealthContext } from "@/context/Health";
