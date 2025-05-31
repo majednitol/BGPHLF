@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ✅ Register Company With Member
 export const registerCompanyWithMember = createAsyncThunk(
   'company/registerCompanyWithMember',
-  async ({ comapanyID,
+  async ({org, comapanyID,
     legalEntityName,
     industryType,
     addressLine1,
@@ -21,7 +21,7 @@ export const registerCompanyWithMember = createAsyncThunk(
     memberCountry,
     memberEmail }, thunkAPI) => {
     try {
-      const data = {
+      const data = {org,
         comapanyID,
         legalEntityName,
         industryType,
@@ -39,7 +39,7 @@ export const registerCompanyWithMember = createAsyncThunk(
         memberCountry,
         memberEmail
       }
-      const response = await apiRepository.post('/register-company-by-member', data, true);
+      const response = await apiRepository.post('company/register-company-by-member', data, false);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -50,10 +50,10 @@ export const registerCompanyWithMember = createAsyncThunk(
 // ✅ Get Company
 export const getCompany = createAsyncThunk(
   'company/getCompany',
-  async ({ comapanyID }, thunkAPI) => {
+  async ({ comapanyID,org }, thunkAPI) => {
     try {
-      const params = { comapanyID }
-      const response = await apiRepository.get('/get-company', params, true);
+      const params = { org,comapanyID }
+      const response = await apiRepository.get('/company/get-company', params, false);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -64,10 +64,10 @@ export const getCompany = createAsyncThunk(
 // ✅ Approve Member
 export const approveMember = createAsyncThunk(
   'company/approveMember',
-  async ({ memberID }, thunkAPI) => {
+  async ({org, memberID }, thunkAPI) => {
     try {
-      const data = { memberID }
-      const response = await apiRepository.post('/approve-member', data, true);
+      const data = { org, memberID }
+      const response = await apiRepository.post('company/approve-member', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -78,10 +78,10 @@ export const approveMember = createAsyncThunk(
 // ✅ Assign Resource
 export const assignResource = createAsyncThunk(
   'company/assignResource',
-  async ({allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp}, thunkAPI) => {
+  async ({org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
     try {
-      const data = {allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp}
-      const response = await apiRepository.post('/assign-resource', data, true);
+      const data = { org,allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }
+      const response = await apiRepository.post('company/assign-resource', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -92,16 +92,18 @@ export const assignResource = createAsyncThunk(
 // ✅ Request Resource
 export const requestResource = createAsyncThunk(
   'company/requestResource',
-  async ({reqID,
-      memberID,
-      resType,
-      value, date, country, rir, timestamp}, thunkAPI) => {
+  async ({org, reqID,
+    memberID,
+    resType,
+    value, date, country, rir, timestamp }, thunkAPI) => {
     try {
-      const data = {reqID,
-      memberID,
-      resType,
-      value, date, country, rir, timestamp}
-      const response = await apiRepository.post('/request-resource', data, true);
+      const data = {org,
+        reqID,
+        memberID,
+        resType,
+        value, date, country, rir, timestamp
+      }
+      const response = await apiRepository.post('company/request-resource', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -112,16 +114,18 @@ export const requestResource = createAsyncThunk(
 // ✅ Review Request
 export const reviewRequest = createAsyncThunk(
   'company/reviewRequest',
-  async ({ reqID,
-      memberID,
-      decision,
-      reviewedBy}, thunkAPI) => {
+  async ({org, reqID,
+    memberID,
+    decision,
+    reviewedBy }, thunkAPI) => {
     try {
-      const data = { reqID,
-      memberID,
-      decision,
-      reviewedBy}
-      const response = await apiRepository.post('/review-request', data, true);
+      const data = {org,
+        reqID,
+        memberID,
+        decision,
+        reviewedBy
+      }
+      const response = await apiRepository.post('company/review-request', data, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -132,10 +136,10 @@ export const reviewRequest = createAsyncThunk(
 // ✅ Get Company By Member ID
 export const getCompanyByMemberID = createAsyncThunk(
   'company/getCompanyByMemberID',
-  async ({memberID}, thunkAPI) => {
+  async ({org, memberID }, thunkAPI) => {
     try {
-      const params = {memberID}
-      const response = await apiRepository.get('/get-company-by-member-id', params, true);
+      const params = {org, memberID }
+      const response = await apiRepository.get('company/get-company-by-member-id', params, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -153,14 +157,6 @@ const initialState = {
 const companySlice = createSlice({
   name: 'company',
   initialState,
-  reducers: {
-    resetState: (state) => {
-      state.companyData = null;
-      state.loading = false;
-      state.error = null;
-      state.success = null;
-    },
-  },
   extraReducers: (builder) => {
     builder
       // Register Company With Member
@@ -268,5 +264,4 @@ const companySlice = createSlice({
   },
 });
 
-export const { resetState } = companySlice.actions;
 export default companySlice.reducer;
