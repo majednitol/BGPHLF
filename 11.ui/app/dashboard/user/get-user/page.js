@@ -1,9 +1,18 @@
+"use client"
 import React from 'react'
 
-function page() {
+import IsAuth from '../../../ProtectedRoute/IsAuth';
+import DashboardLayout from '../../../DashboardLayout/DashboardLayout';
+import GetUserPage from '../../../dash-board/user/GetUserPage';
+
+function GetUser() {
   return (
-    <div>page</div>
+     <>
+          <DashboardLayout>
+              <GetUserPage/>
+      </DashboardLayout>
+    </>
   )
 }
 
-export default page
+export default IsAuth(GetUser);

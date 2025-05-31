@@ -1,0 +1,17 @@
+"use client"
+import React from 'react'
+import IsAuth from '../../../ProtectedRoute/IsAuth'
+import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
+import CreateUserPage from '../../../dash-board/user/CreateUserPage'
+
+const CreateUser = () => {
+  return (
+     <>
+          <DashboardLayout>
+              <CreateUserPage/>
+      </DashboardLayout>
+    </>
+  )
+}
+
+export default IsAuth(CreateUser) // Protected route for CreateUserPage
