@@ -53,17 +53,17 @@ spec:
             - name: CORE_PEER_ID
               value: peer0-org2
             - name: CORE_PEER_ADDRESS
-              value: peer0-org2:7051
+              value: peer0-org2:9051
             - name: CORE_PEER_LISTENADDRESS
-              value: 0.0.0.0:7051
+              value: 0.0.0.0:9051
             - name: CORE_PEER_EVENTS_ADDRESS
               value: 0.0.0.0:7061
             - name: CORE_PEER_GOSSIP_BOOTSTRAP
-              value: peer0-org2:7051
+              value: peer0-org2:9051
             - name: CORE_PEER_GOSSIP_ENDPOINT
-              value: peer0-org2:7051
+              value: peer0-org2:9051
             - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
-              value: peer0-org2:7051
+              value: peer0-org2:9051
             - name: CORE_PEER_GOSSIP_ORGLEADER
               value: "false"
             - name: CORE_PEER_GOSSIP_USELEADERELECTION
@@ -95,7 +95,7 @@ spec:
             - name: CORE_METRICS_PROVIDER
               value: prometheus
           ports:    
-            - containerPort: 7051
+            - containerPort: 9051
             - containerPort: 7052
             - containerPort: 7053
             - containerPort: 9443

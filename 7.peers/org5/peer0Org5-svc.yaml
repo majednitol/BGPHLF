@@ -11,7 +11,7 @@ spec:
   ports:
     - name: grpc
       port: 13051
-      targetPort: 7051   
+      targetPort: 13051   
       protocol: TCP
     - name: event
       port: 7061         

@@ -34,7 +34,7 @@ spec:
                         value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
                       - name: CORE_PEER_ADDRESS
-                        value: peer0-org2:7051
+                        value: peer0-org2:9051
                       - name: CORE_PEER_ID
                         value: cli.peer0.org2.example.com
                       - name: CORE_PEER_LOCALMSPID
