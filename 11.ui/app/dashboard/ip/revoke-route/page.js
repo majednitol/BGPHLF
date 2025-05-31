@@ -1,7 +1,9 @@
+'use client';
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import RevokeRoute from '../../ip-prefix/RevokeRouteForm';
+import RevokeRoute from '../../../dashboard(main)/ip-prefix/RevokeRoute';
+
 
 const RevokeRoutePage = () => {
   return (

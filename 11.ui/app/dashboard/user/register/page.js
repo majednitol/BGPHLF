@@ -2,7 +2,7 @@
 import React from 'react'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
-import EnrollUserPage from '../../../dash-board/user/EnrollUser'
+import EnrollUserPage from '../../../dashboard(main)/user/EnrollUser'
 
 const Register = () => {
     return (

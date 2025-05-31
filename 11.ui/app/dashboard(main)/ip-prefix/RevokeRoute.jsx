@@ -5,7 +5,7 @@ import { revokeRoute } from '../../features/ipPrefix/ipPrefixSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import toast from 'react-hot-toast';
 
-const RevokeRouteForm = () => {
+const RevokeRoute = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.ipPrefix);
 
@@ -124,4 +124,4 @@ const styles = {
   },
 };
 
-export default RevokeRouteForm;
+export default RevokeRoute;

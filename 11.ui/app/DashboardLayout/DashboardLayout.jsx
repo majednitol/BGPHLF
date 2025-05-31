@@ -3,9 +3,6 @@
 import { useContext } from 'react';
 import Link from 'next/link';
 import styles from './dashboard.module.css';
-// import { HealthContext } from '@/context/Health';
-
-// Utility function to generate label from href
 function generateLabel(href) {
   const parts = href.split('/');
   const lastPart = parts[parts.length - 1];
@@ -37,7 +34,7 @@ const navItems = {
     '/dashboard/user/login-user'
   ]
 };
-const ConnectedAccountUser = 'user'; // TODO: Replace with actual user type
+const ConnectedAccountUser = 'ip'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
 //   const { ConnectedAccountUser } = useContext(HealthContext);
 

@@ -1,7 +1,9 @@
+'use client';
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import GetPrefixAssignment from '../../ip-prefix/GetPrefixAssignmentForm';
+import GetPrefixAssignment from '../../../dashboard(main)/ip-prefix/GetPrefixAssignment';
+
 
 const GetPrefixAssignmentPage = () => {
   return (

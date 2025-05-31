@@ -1,7 +1,9 @@
+'use client';
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import TracePrefix from '../../ip-prefix/TracePrefixForm';
+import TracePrefix from '../../../dashboard(main)/ip-prefix/TracePrefix';
+
 
 const TracePrefixPage = () => {
   return (

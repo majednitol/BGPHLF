@@ -2,7 +2,7 @@
 import React from 'react'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
-import LoginUserPage from '../../../dash-board/user/LoginUserPage'
+import LoginUserPage from '../../../dashboard(main)/user/LoginUserPage'
 
 
 const LoginUser = () => {

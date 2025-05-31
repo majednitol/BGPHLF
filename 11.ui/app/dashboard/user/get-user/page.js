@@ -3,16 +3,16 @@ import React from 'react'
 
 import IsAuth from '../../../ProtectedRoute/IsAuth';
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout';
-import GetUserPage from '../../../dash-board/user/GetUserPage';
+import GetUserPage from '../../../dashboard(main)/user/GetUserPage';
 
 function GetUser() {
-  return (
-     <>
-          <DashboardLayout>
-              <GetUserPage/>
-      </DashboardLayout>
-    </>
-  )
+    return (
+        <>
+            <DashboardLayout>
+                <GetUserPage />
+            </DashboardLayout>
+        </>
+    )
 }
 
 export default IsAuth(GetUser);
