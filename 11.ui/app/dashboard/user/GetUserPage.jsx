@@ -32,7 +32,7 @@ export default function GetUserPage() {
         onChange={(e) => setUserId(e.target.value)}
       />
       <select style={styles.select} value={org} onChange={(e) => setOrg(e.target.value)}>
-        {['Org1', 'Org2', 'Org3', 'Org4', 'Org5', 'Org6'].map((o) => (
+        {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
           <option key={o} value={o}>{o}</option>
         ))}
       </select>

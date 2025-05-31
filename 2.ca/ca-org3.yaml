@@ -28,11 +28,11 @@ spec:
             ]
           resources:
             requests:
-              memory: "300Mi"
-              cpu: "300m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
-              memory: "500Mi"
-              cpu: "350m"
+              memory: "1Gi"
+              cpu: "1"
           env:
            - name: FABRIC_CA_SERVER_CA_NAME
              value: ca-org3

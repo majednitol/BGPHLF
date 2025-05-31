@@ -8,10 +8,10 @@ import LoginUserPage from './dashboard/user/LoginUserPage'
 const page = () => {
   return (
     <div>
-      <EnrollUserPage/>
-      {/* <GetUserPage /> */}
+      {/* <EnrollUserPage/> */}
+       <GetUserPage />
       {/* <CreateUserPage /> */}
-      {/* <LoginUserPage/> */}
+      {/* <LoginUserPage/>  */}
     </div>
   )
 }
