@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { getUser } from '../../../app/features/user/userSlice';
+import { getUser } from '../../features/user/userSlice';
 import toast from 'react-hot-toast';
 
 export default function GetUserPage() {

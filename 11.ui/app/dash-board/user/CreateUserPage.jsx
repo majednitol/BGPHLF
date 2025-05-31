@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import toast from 'react-hot-toast';
-import { createUser } from '../../../app/features/user/userSlice';
+import { createUser } from '../../features/user/userSlice';
 
 export default function CreateUserPage() {
   const dispatch = useAppDispatch();

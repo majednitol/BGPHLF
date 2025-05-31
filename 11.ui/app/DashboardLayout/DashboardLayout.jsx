@@ -3,44 +3,43 @@
 import { useContext } from 'react';
 import Link from 'next/link';
 import styles from './dashboard.module.css';
-import { HealthContext } from '@/context/Health';
+// import { HealthContext } from '@/context/Health';
+
+// Utility function to generate label from href
+function generateLabel(href) {
+  const parts = href.split('/');
+  const lastPart = parts[parts.length - 1];
+  return lastPart.replace(/-/g, ' ').toLowerCase();
+}
 
 const navItems = {
-  1: [
-    { href: '/dashboard/doctor-personal-data', label: 'Doctor personal info' },
-    { href: '/dashboard/patient-list', label: "Doctor's patient list" },
-    { href: '/dashboard/doctor-file-upload', label: 'File Upload' },
-    { href: '/dashboard/display-doctor-file', label: 'Patient shared File' },
-    { href: '/dashboard/shared-data-doctor', label: 'Pathologist Shared Data' },
+  ip: [
+    '/dashboard/ip/validate-path',
+    '/dashboard/ip/assign-prefix',
+    '/dashboard/ip/announce-route',
+    '/dashboard/ip/revoke-route',
+    '/dashboard/ip/get-prefix-assignment',
+    '/dashboard/ip/trace-prefix'
   ],
-  2: [
-    { href: '/dashboard/pathologist/PathologistPersonalData', label: 'Pathologist Data' },
-    { href: '/dashboard/pathologist/PatientPrescriptionSentByDoctor', label: 'Patient Prescription' },
-    { href: '/dashboard/pathologist/TestReportToDoctor', label: 'Test Report' },
+  company: [
+    '/dashboard/company/register-company-by-member',
+    '/dashboard/company/get-company',
+    '/dashboard/company/approve-member',
+    '/dashboard/company/assign-resource',
+    '/dashboard/company/request-resource',
+    '/dashboard/company/review-request',
+    '/dashboard/company/get-company-by-member-id'
   ],
-  3: [
-    { href: '/dashboard/medical-research-lab/MediResearchLabPersonalData', label: 'Personal Data' },
-    { href: '/dashboard/medical-research-lab/ResearchLabReport', label: 'Add Research Lab Report' },
-    { href: '/dashboard/medical-research-lab/PrescriptionOrLabReport', label: 'View Prescription Or Lab Report' },
-    { href: '/dashboard/medical-research-lab/MedicalResearchLabSharedData', label: 'Lab Shared Data' },
-  ],
-  4: [
-    { href: '/dashboard/pharmacy-company/PharmacyCompanyPersonalData', label: 'Personal Data' },
-    { href: '/dashboard/pharmacy-company/AddingTopMedichine', label: 'Adding Top Medicine' },
-    { href: '/dashboard/pharmacy-company/ViewTopMedicine', label: 'View Top Medicine' },
-    { href: '/dashboard/pharmacy-company/PatientToPharmacyCompanySharedData', label: 'Patient Data' },
-  ],
-  5: [
-    { href: '/dashboard/patient-personal-details', label: 'Patient Details' },
-    { href: '/dashboard/patient-file-upload', label: 'File Upload' },
-    { href: '/dashboard/Patient/AddPersonalHealthData', label: 'Add Health Data' },
-    { href: '/dashboard/Patient/ViewPatientHealthData', label: 'View Health Data' },
-    { href: '/dashboard/Patient/PatientPersonalDoctorList', label: 'Patient Personal Doctor' },
-  ],
+  user: [
+    '/dashboard/user/get-user',
+    '/dashboard/user/register',
+    '/dashboard/user/create-user',
+    '/dashboard/user/login-user'
+  ]
 };
-
+const ConnectedAccountUser = 'user'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
-  const { ConnectedAccountUser } = useContext(HealthContext);
+//   const { ConnectedAccountUser } = useContext(HealthContext);
 
   return (
     <div className="dashboard">
@@ -53,13 +52,13 @@ function DashboardLayout({ children }) {
                   <p>Dashboard</p>
                 </Link>
 
-                {navItems[ConnectedAccountUser]?.map(({ href, label }) => (
+                {(navItems[ConnectedAccountUser] || []).map((href) => (
                   <Link
                     key={href}
                     href={href}
                     className={styles.sidebarMenu__list__item__link}
                   >
-                    <p>{label}</p>
+                    <p>{generateLabel(href)}</p>
                   </Link>
                 ))}
               </li>
@@ -76,198 +75,3 @@ function DashboardLayout({ children }) {
 }
 
 export default DashboardLayout;
-
-
-// import { useContext } from "react";
-// import styles from "./dashboard.module.css";
-// import { HealthContext } from "@/context/Health";
-// import Link from "next/link";
-
-// function DashboardLayout({ children }) {
-//   const { account, ConnectedAccountUser } = useContext(HealthContext);
-//   return (
-//     <>
-//       <div className="dashboard">
-//         <div id="mySidenav" className={styles.mySidenav}>
-//           <nav className={styles.dashboardNav}>
-//             <div className={styles.sidebarMenu}>
-//               <ul className={styles.sidebarMenu__list}>
-//                 <li className={styles.sidebarMenu__list__item}>
-//                   <Link
-//                     href="/dashboard"
-//                     className={styles.sidebarMenu__list__item__link}
-//                   >
-//                     <p>Dashboard</p>
-//                   </Link>
-
-//                   {/* doctor routes */}
-//                   {ConnectedAccountUser == 1 && (
-//                     <>
-//                       <Link
-//                         href="/dashboard/doctor-personal-data"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Doctor personal info</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/patient-list"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Doctor's patient list</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/doctor-file-upload"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>File Upload</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/display-doctor-file"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>patient shared File</p>
-//                       </Link>
-
-//                       <Link
-//                         href="/dashboard/shared-data-doctor"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Pathologist Shared Data</p>
-//                       </Link>
-//                     </>
-//                   )}
-
-//                   {/* Pathologist routes */}
-//                   {ConnectedAccountUser == 2 && (
-//                     <>
-//                       <Link
-//                         href="/dashboard/pathologist/PathologistPersonalData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Pathologist Data</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/pathologist/PatientPrescriptionSentByDoctor"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Patient Prescription</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/pathologist/TestReportToDoctor"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Test Report</p>
-//                       </Link>
-//                     </>
-//                   )}
-
-//                   {/* Medical Research Lab */}
-//                   {ConnectedAccountUser == 3 && (
-//                     <>
-//                       <Link
-//                         href="/dashboard/medical-research-lab/MediResearchLabPersonalData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Personal Data</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/medical-research-lab/ResearchLabReport"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Add Research Lab Report</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/medical-research-lab/PrescriptionOrLabReport"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>View Prescription Or Lab Report</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/medical-research-lab/MedicalResearchLabSharedData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Lab Shared Data</p>
-//                       </Link>
-//                     </>
-//                   )}
-
-//                   {/* Parmacy Company */}
-//                   {ConnectedAccountUser == 4 && (
-//                     <>
-//                       <Link
-//                         href="/dashboard/pharmacy-company/PharmacyCompanyPersonalData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Personal Data</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/pharmacy-company/AddingTopMedichine"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Adding Top Medichine</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/pharmacy-company/ViewTopMedicine"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>View Top Medicine</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/pharmacy-company/PatientToPharmacyCompanySharedData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Patient Data</p>
-//                       </Link>
-//                     </>
-//                   )}
-
-//                   {/* Patient */}
-//                   {ConnectedAccountUser == 5 && (
-//                     <>
-//                       <Link
-//                         href="/dashboard/patient-personal-details"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Patient Details</p>
-//                       </Link>
-
-//                       <Link
-//                         href="/dashboard/patient-file-upload"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>File Upload</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/Patient/AddPersonalHealthData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Add Health Data</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/Patient/ViewPatientHealthData"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>View Health Data</p>
-//                       </Link>
-//                       <Link
-//                         href="/dashboard/Patient/PatientPersonalDoctorList"
-//                         className={styles.sidebarMenu__list__item__link}
-//                       >
-//                         <p>Patient Personal Doctor</p>
-//                       </Link>
-//                     </>
-//                   )}
-//                 </li>
-//               </ul>
-//             </div>
-//           </nav>
-//         </div>
-//         <div className={styles.content} id="dashboard-container__main">
-//           {children}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
-// export default DashboardLayout;
