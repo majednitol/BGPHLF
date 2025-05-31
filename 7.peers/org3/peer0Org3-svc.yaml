@@ -10,13 +10,16 @@ spec:
   type: ClusterIP
   ports:
     - name: grpc
-      port: 7051
+      port: 11051	
+      targetPort: 7051   
       protocol: TCP
     - name: event
-      port: 7061
+      port: 7061         
+      targetPort: 7061   
       protocol: TCP
     - name: couchdb
-      port: 5984
+      port: 5984         
+      targetPort: 5984  
       protocol: TCP
 
 ---

@@ -78,7 +78,6 @@ export async function ApproveMember(request) {
   }
 }
 
-RequestResource
 
 export async function RequestResource(request) {
   try {
@@ -154,7 +153,6 @@ export async function GetCompanyByMemberID(request) {
     throw error;
   }
 }
-AssignResource
 
 export async function AssignResource(request) {
   try {
