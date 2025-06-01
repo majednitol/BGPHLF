@@ -13,6 +13,16 @@ export const getUser = createAsyncThunk('user/getUser', async ({ userId, org }, 
   }
 });
 
+export const getAllPrefixesAssignedByRONO = createAsyncThunk('user/getAllPrefixesAssignedByRONO', async ({ userId, org }, thunkAPI) => {
+  try {
+    const params = { userId, org };
+    const response = await apiRepository.get('/user/get-all-prefixes-assigned-by-rono', params, true);
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
+
 export const getOrgUser = createAsyncThunk('user/getOrgUser', async ({ userId, org }, thunkAPI) => {
   try {
     const params = { userId, org };
@@ -100,7 +110,20 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-.addCase(getOrgUser.pending, (state) => {
+      // Get All Prefixes Assigned By RONO
+      .addCase(getAllPrefixesAssignedByRONO.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllPrefixesAssignedByRONO.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userData = action.payload;
+      })
+      .addCase(getAllPrefixesAssignedByRONO.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getOrgUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -186,7 +209,7 @@ const userSlice = createSlice({
         state.isLoggedIn = false;
         state.error = action.payload;
       });
-      
+
   },
 });
 

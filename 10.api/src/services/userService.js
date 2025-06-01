@@ -154,3 +154,18 @@ export async function GetLoggedInUser(request) {
         throw error;
     }
 }
+
+export async function GetAllPrefixesAssignedByRONO(request) {
+    try {
+        const userId = request.userId;
+        console.log("userId", userId);
+
+        const contract = await smartContract(request, userId);
+        let result = await contract.evaluateTransaction("GetAllPrefixesAssignedByRONO");
+        console.log("result", result);
+        return JSON.parse(result);
+    } catch (error) {
+        console.error("Error in GetAllPrefixesAssignedByRONO:", error);
+        throw error;
+    }
+}
