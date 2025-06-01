@@ -789,6 +789,32 @@ func (s *SmartContract) GetUser(ctx contractapi.TransactionContextInterface, use
 	_ = json.Unmarshal(bytes, &user)
 	return &user, nil
 }
+func (s *SmartContract) GetAllPrefixesAssignedByRONO(ctx contractapi.TransactionContextInterface) ([]*PrefixAssignment, error) {
+	query := `{
+		"selector": {
+			"assignedBy": "Org6MSP"
+		}
+	}`
+
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query assigned prefixes: %v", err)
+	}
+	defer iter.Close()
+
+	var assignments []*PrefixAssignment
+	for iter.HasNext() {
+		result, err := iter.Next()
+		if err != nil {
+			continue
+		}
+		var assign PrefixAssignment
+		if err := json.Unmarshal(result.Value, &assign); err == nil {
+			assignments = append(assignments, &assign)
+		}
+	}
+	return assignments, nil
+}
 
 func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, comapanyID string) (*Company, error) {
 	bytes, err := ctx.GetStub().GetState("COM_" + comapanyID)
