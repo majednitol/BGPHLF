@@ -296,7 +296,7 @@ Query prefix assignment info:
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"Args":["getRIROrg"]}'
+  -c '{"Args":["GetAllPrefixesAssignedByRONO"]}'
 
 
 

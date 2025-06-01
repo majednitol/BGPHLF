@@ -529,24 +529,31 @@ func (s *SmartContract) SetLoggedInUser(ctx contractapi.TransactionContextInterf
 	return nil
 }
 
-func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterface, id string) (string, string, error) {
+func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterface, id string) (string, error) {
 	key := "LOGGEDIN_USER_" + id
 
 	data, err := ctx.GetStub().GetState(key)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to get logged-in user data: %v", err)
+		return "", fmt.Errorf("failed to get logged-in user data: %v", err)
 	}
 	if data == nil {
-		return "", "", fmt.Errorf("no user found with ID %s", id)
+		return "", fmt.Errorf("no user found with ID %s", id)
 	}
 
 	var user LoggedInUser
 	if err := json.Unmarshal(data, &user); err != nil {
-		return "", "", fmt.Errorf("failed to parse logged-in user data: %v", err)
+		return "", fmt.Errorf("failed to parse logged-in user data: %v", err)
 	}
 
-	return user.OrgMSPOrCompany, user.Role, nil
+	// Return as JSON string
+	output := map[string]string{
+		"org":  user.OrgMSPOrCompany,
+		"role": user.Role,
+	}
+	resultBytes, _ := json.Marshal(output)
+	return string(resultBytes), nil
 }
+
 
 func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
 	query := `{"selector":{"resource":"asn"}}`
