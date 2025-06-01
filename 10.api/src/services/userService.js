@@ -22,6 +22,21 @@ export async function GetUser(request) {
         throw error;
     }
 }
+
+export async function GetSystemManager(request) {
+    try {
+        const userId = request.userId;
+        console.log("userId", userId);
+
+        const contract = await smartContract(request, userId);
+        let result = await contract.evaluateTransaction("GetSystemManager", userId);
+        console.log("result", result);
+        return JSON.parse(result);
+    } catch (error) {
+        console.error("Error in GetSystemManager:", error);
+        throw error;
+    }
+}
 export async function registerAndEnrollUserOrCompany(request) {
     try {
         const userId = request.userId;
@@ -99,6 +114,43 @@ export async function CreateUser(request) {
         return result;
     } catch (error) {
         console.error("Error in createAsset:", error);
+        throw error;
+    }
+}
+
+export async function CreateSystemManager(request) {
+    try {
+        const userID = request.userID
+        const name = request.name;
+        const email = request.email;
+        const orgMSP = request.org;
+        const role = request.role;
+        const createdAt = request.createdAt;
+        const contract = await smartContract(request, userID)
+        let result = await contract.submitTransaction(
+            "CreateSystemManager",
+           userID, name, email, orgMSP, role, createdAt
+        );
+        console.log("Transaction Result:", result);
+
+        return result;
+    } catch (error) {
+        console.error("Error in createAsset:", error);
+        throw error;
+    }
+}
+
+export async function GetLoggedInUser(request) {
+    try {
+        const userId = request.userId;
+        console.log("userId", userId);
+
+        const contract = await smartContract(request, userId);
+        let result = await contract.evaluateTransaction("GetLoggedInUser", userId);
+        console.log("result", result);
+        return JSON.parse(result);
+    } catch (error) {
+        console.error("Error in getUser:", error);
         throw error;
     }
 }

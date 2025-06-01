@@ -219,7 +219,7 @@ func (s *SmartContract) CreateSystemManager(ctx contractapi.TransactionContextIn
 	if existing != nil {
 		return fmt.Errorf("system manager with id '%s' already exists", id)
 	}
-s.SetLoggedInUser(ctx, id, orgMSP, role)
+	s.SetLoggedInUser(ctx, id, orgMSP, role)
 	manager := SystemManager{
 		ID:        id,
 		Name:      name,
@@ -290,7 +290,7 @@ func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInter
 	return &manager, nil
 }
 func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInterface) ([]*SystemManager, error) {
-	// Range query from SYS_MGR_ to SYS_MGR_z to cover all keys starting with prefix
+
 	iter, err := ctx.GetStub().GetStateByRange("SYS_MGR_", "SYS_MGR_z")
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve system managers: %v", err)
