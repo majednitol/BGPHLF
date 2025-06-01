@@ -1,17 +1,15 @@
-"use client"
+'use client';
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import AssignIPPage from '../../../dashboard(main)/rono/AssignIPPrefixPage'
+import AssignPrefixPage from '../../../dashboard(main)/rono/AssignPrefixPage';
 
-const AssignIP = () => {
-    return (
-        <>
-            <DashboardLayout>
-   <AssignIPPage />
-            </DashboardLayout>
-        </>
-    )
+const AssignPrefix = () => {
+  return (
+    <DashboardLayout>
+      <AssignPrefixPage/>
+    </DashboardLayout>
+  )
 }
 
-export default IsAuth(AssignIP)
+export default IsAuth(AssignPrefix)

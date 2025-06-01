@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { assignPrefix, resetState } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
 
-const AssignPrefix = () => {
+const AssignPrefixPage = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.ipPrefix);
 
@@ -138,4 +138,4 @@ const styles = {
   },
 };
 
-export default AssignPrefix;
+export default AssignPrefixPage;
