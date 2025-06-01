@@ -28,7 +28,7 @@ export async function ValidatePath(request) {
 }
 export async function AssignPrefix(request) {
     try {
-        const userID = request.comapanyID
+        const userID = request.userID
         const prefix = request.prefix
         const assignedTo = request.assignedTo
         const timestamp = request.timestamp

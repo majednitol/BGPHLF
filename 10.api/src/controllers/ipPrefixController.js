@@ -30,7 +30,7 @@ export async function assignPrefix(req, res) {
             "org": req.body.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.body.comapanyID ? req.body.comapanyID : req.comapanyID,
+            "userID": req.body.userID ? req.body.userID : req.userID,
             "prefix": req.body.prefix,
             "assignedTo": req.body.assignedTo,
             "timestamp": req.body.timestamp

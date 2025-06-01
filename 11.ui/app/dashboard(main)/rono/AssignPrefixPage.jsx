@@ -9,12 +9,13 @@ const AssignPrefixPage = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.ipPrefix);
 
+  // These values would typically come from decoded token/session
+  const org = 'Org1MSP';
+  const userID = '222';
+
   const [form, setForm] = useState({
-    org: 'Org1MSP',
-    companyID: '',
     prefix: '',
     assignedTo: '',
-    timestamp: '',
   });
 
   const handleChange = (e) => {
@@ -24,16 +25,18 @@ const AssignPrefixPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      ...form,
+      org,
+      userID,
+      timestamp: new Date().toISOString(),
+    };
+
     try {
-      await dispatch(assignPrefix(form)).unwrap();
+      await dispatch(assignPrefix(payload)).unwrap();
       toast.success('Prefix assigned successfully');
-      setForm({
-        org: 'Org1MSP',
-        companyID: '',
-        prefix: '',
-        assignedTo: '',
-        timestamp: '',
-      });
+      setForm({ prefix: '', assignedTo: '' });
     } catch (err) {
       toast.error(`Error: ${err}`);
     } finally {
@@ -44,30 +47,6 @@ const AssignPrefixPage = () => {
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
       <h2>Assign IP Prefix</h2>
-
-      <label style={styles.label}>Organization</label>
-      <select
-        name="org"
-        value={form.org}
-        onChange={handleChange}
-        style={styles.input}
-      >
-        {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((org) => (
-          <option key={org} value={org}>
-            {org}
-          </option>
-        ))}
-      </select>
-
-      <label style={styles.label}>Company ID</label>
-      <input
-        name="companyID"
-        value={form.companyID}
-        onChange={handleChange}
-        placeholder="Company ID"
-        required
-        style={styles.input}
-      />
 
       <label style={styles.label}>Prefix</label>
       <input
@@ -85,16 +64,6 @@ const AssignPrefixPage = () => {
         value={form.assignedTo}
         onChange={handleChange}
         placeholder="Assigned To"
-        required
-        style={styles.input}
-      />
-
-      <label style={styles.label}>Timestamp</label>
-      <input
-        name="timestamp"
-        value={form.timestamp}
-        onChange={handleChange}
-        placeholder="e.g., 2025-05-31T10:30:00Z"
         required
         style={styles.input}
       />

@@ -18,15 +18,16 @@ export const validatePath = createAsyncThunk(
 // ✅ Assign Prefix
 export const assignPrefix = createAsyncThunk(
   'ipPrefix/assignPrefix',
-  async ({ org,comapanyID, prefix,
+  async ({ org,userID, prefix,
     assignedTo,
     timestamp }, thunkAPI) => {
     try {
       const data = {
-       org, comapanyID, prefix,
+       org, userID, prefix,
         assignedTo,
         timestamp
       }
+      console.log(data)
       const response = await apiRepository.post('ip/assign-prefix', data, true);
       return response.data;
     } catch (error) {
