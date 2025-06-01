@@ -29,7 +29,14 @@ type Member struct {
 	Approved bool    `json:"approved"`
 	Company  Company `json:"company"`
 }
-
+type SystemManager struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	OrgMSP    string `json:"orgMSP"` // e.g., RONO or RIR org
+	Role      string `json:"role"`   // e.g., RONO Manager, RIR Admin
+	CreatedAt string `json:"createdAt"`
+}
 type ResourceRequest struct {
 	RequestID string `json:"requestId"`
 	MemberID  string `json:"memberId"`
@@ -100,6 +107,11 @@ type User struct {
 	ComapanyID string `json:"companyId"`
 	Department string `json:"department"` // technical, financial, member
 	Timestamp  string `json:"timestamp"`
+}
+type LoggedInUser struct {
+	ID              string `json:"id"`
+	OrgMSPOrCompany string `json:"orgMSPOrCompany"`
+	Role            string `json:"role"`
 }
 
 func getRIROrg(ctx contractapi.TransactionContextInterface) (string, error) {
@@ -194,6 +206,112 @@ func (s *SmartContract) RegisterCompanyWithMember(
 
 	return nil
 } // up
+func (s *SmartContract) CreateSystemManager(ctx contractapi.TransactionContextInterface, id, name, email, orgMSP, role, createdAt string) error {
+	if id == "" || name == "" || email == "" || orgMSP == "" || role == "" {
+		return fmt.Errorf("all fields except CreatedAt are required")
+	}
+
+	key := "SYS_MGR_" + id
+	existing, err := ctx.GetStub().GetState(key)
+	if err != nil {
+		return fmt.Errorf("failed to read ledger: %v", err)
+	}
+	if existing != nil {
+		return fmt.Errorf("system manager with id '%s' already exists", id)
+	}
+s.SetLoggedInUser(ctx, id, orgMSP, role)
+	manager := SystemManager{
+		ID:        id,
+		Name:      name,
+		Email:     email,
+		OrgMSP:    orgMSP,
+		Role:      role,
+		CreatedAt: createdAt,
+	}
+
+	data, err := json.Marshal(manager)
+	if err != nil {
+		return fmt.Errorf("failed to marshal system manager data: %v", err)
+	}
+
+	return ctx.GetStub().PutState(key, data)
+}
+
+type SystemManagerLoginResponse struct {
+	Name   string `json:"name"`
+	OrgMSP string `json:"orgMSP"`
+	Role   string `json:"role"`
+}
+
+func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManagerLoginResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("system manager id cannot be empty")
+	}
+
+	key := "SYS_MGR_" + id
+	data, err := ctx.GetStub().GetState(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read from ledger: %v", err)
+	}
+	if data == nil {
+		return nil, fmt.Errorf("system manager with id '%s' not found", id)
+	}
+
+	var manager SystemManager
+	if err := json.Unmarshal(data, &manager); err != nil {
+		return nil, fmt.Errorf("failed to parse system manager data: %v", err)
+	}
+
+	return &SystemManagerLoginResponse{
+		Name:   manager.Name,
+		OrgMSP: manager.OrgMSP,
+		Role:   manager.Role,
+	}, nil
+}
+func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManager, error) {
+	if id == "" {
+		return nil, fmt.Errorf("system manager id cannot be empty")
+	}
+
+	key := "SYS_MGR_" + id
+	data, err := ctx.GetStub().GetState(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read from ledger: %v", err)
+	}
+	if data == nil {
+		return nil, fmt.Errorf("system manager with id '%s' not found", id)
+	}
+
+	var manager SystemManager
+	if err := json.Unmarshal(data, &manager); err != nil {
+		return nil, fmt.Errorf("failed to parse system manager data: %v", err)
+	}
+
+	return &manager, nil
+}
+func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInterface) ([]*SystemManager, error) {
+	// Range query from SYS_MGR_ to SYS_MGR_z to cover all keys starting with prefix
+	iter, err := ctx.GetStub().GetStateByRange("SYS_MGR_", "SYS_MGR_z")
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve system managers: %v", err)
+	}
+	defer iter.Close()
+
+	var managers []*SystemManager
+	for iter.HasNext() {
+		kv, err := iter.Next()
+		if err != nil {
+			continue // skip problematic entries
+		}
+		var manager SystemManager
+		if err := json.Unmarshal(kv.Value, &manager); err != nil {
+			continue
+		}
+		managers = append(managers, &manager)
+	}
+
+	return managers, nil
+}
 
 func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterface, id string) error {
 	msp, _ := ctx.GetClientIdentity().GetMSPID()
@@ -383,6 +501,52 @@ func (s *SmartContract) AssignResource(
 	allocBytes, _ := json.Marshal(alloc)
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 }
+func (s *SmartContract) SetLoggedInUser(ctx contractapi.TransactionContextInterface, id, orgMSP, role string) error {
+	if id == "" {
+		return fmt.Errorf("user ID cannot be empty")
+	}
+	if orgMSP == "" || role == "" {
+		return fmt.Errorf("orgMSP and role must not be empty")
+	}
+
+	user := LoggedInUser{
+		ID:              id,
+		OrgMSPOrCompany: orgMSP,
+		Role:            role,
+	}
+
+	userJSON, err := json.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("failed to marshal logged-in user data: %v", err)
+	}
+
+	key := "LOGGEDIN_USER_" + id
+	err = ctx.GetStub().PutState(key, userJSON)
+	if err != nil {
+		return fmt.Errorf("failed to save logged-in user data: %v", err)
+	}
+
+	return nil
+}
+
+func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterface, id string) (string, string, error) {
+	key := "LOGGEDIN_USER_" + id
+
+	data, err := ctx.GetStub().GetState(key)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to get logged-in user data: %v", err)
+	}
+	if data == nil {
+		return "", "", fmt.Errorf("no user found with ID %s", id)
+	}
+
+	var user LoggedInUser
+	if err := json.Unmarshal(data, &user); err != nil {
+		return "", "", fmt.Errorf("failed to parse logged-in user data: %v", err)
+	}
+
+	return user.OrgMSPOrCompany, user.Role, nil
+}
 
 func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
 	query := `{"selector":{"resource":"asn"}}`
@@ -428,12 +592,11 @@ func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface
 	if exists != nil {
 		return fmt.Errorf("User %s already exists", userID)
 	}
-
+	s.SetLoggedInUser(ctx, userID, "company", dept)
 	user := User{
 		UserID:     userID,
 		ComapanyID: comapanyID,
 		Department: dept,
-		Timestamp:  timestamp,
 	}
 	data, _ := json.Marshal(user)
 	return ctx.GetStub().PutState("USER_"+userID, data)
@@ -636,6 +799,133 @@ func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, 
 	_ = json.Unmarshal(bytes, &company)
 	return &company, nil
 
+}
+
+// List all prefixes assigned from RONO to RIRs
+func (s *SmartContract) GetAllAssignedPrefixes(ctx contractapi.TransactionContextInterface) ([]*PrefixAssignment, error) {
+	query := `{"selector":{"assignedBy":"Org6MSP"}}`
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var assignments []*PrefixAssignment
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var pa PrefixAssignment
+		if err := json.Unmarshal(result.Value, &pa); err == nil {
+			assignments = append(assignments, &pa)
+		}
+	}
+	return assignments, nil
+}
+
+// View assigned prefixes to this RIR
+func (s *SmartContract) GetAssignedPrefixesToRIR(ctx contractapi.TransactionContextInterface) ([]*PrefixAssignment, error) {
+	msp, err := getRIROrg(ctx)
+	if err != nil {
+		return nil, err
+	}
+	query := fmt.Sprintf(`{"selector":{"assignedTo":"%s"}}`, msp)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var results []*PrefixAssignment
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var pa PrefixAssignment
+		if err := json.Unmarshal(result.Value, &pa); err == nil {
+			results = append(results, &pa)
+		}
+	}
+	return results, nil
+}
+
+// List all pending requests submitted to this RIR
+func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface) ([]*ResourceRequest, error) {
+	msp, err := getRIROrg(ctx)
+	if err != nil {
+		return nil, err
+	}
+	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, msp)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var requests []*ResourceRequest
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var req ResourceRequest
+		if err := json.Unmarshal(result.Value, &req); err == nil {
+			requests = append(requests, &req)
+		}
+	}
+	return requests, nil
+}
+
+// List all registered members (companies)
+func (s *SmartContract) ListAllMembers(ctx contractapi.TransactionContextInterface) ([]*Member, error) {
+	iter, err := ctx.GetStub().GetStateByRange("MEMBER_", "MEMBER_z")
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var members []*Member
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var mem Member
+		if err := json.Unmarshal(result.Value, &mem); err == nil {
+			members = append(members, &mem)
+		}
+	}
+	return members, nil
+}
+
+// View all allocations of current member
+func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var allocations []*Allocation
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var alloc Allocation
+		if err := json.Unmarshal(result.Value, &alloc); err == nil {
+			allocations = append(allocations, &alloc)
+		}
+	}
+	return allocations, nil
+}
+
+// View all submitted resource requests by member
+func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*ResourceRequest, error) {
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var requests []*ResourceRequest
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var req ResourceRequest
+		if err := json.Unmarshal(result.Value, &req); err == nil {
+			requests = append(requests, &req)
+		}
+	}
+	return requests, nil
 }
 
 // func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*Allocation, error) {
