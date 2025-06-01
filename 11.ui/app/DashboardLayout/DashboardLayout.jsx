@@ -10,6 +10,12 @@ function generateLabel(href) {
 }
 
 const navItems = {
+  rono: [
+    '/dashboard/rono/user-info',
+     '/dashboard/rono/assign-ip-prefix',
+    '/dashboard/rono/view-assigned-ip-prefix',
+  
+  ],
   ip: [
     '/dashboard/ip/validate-path',
     '/dashboard/ip/assign-prefix',
@@ -34,7 +40,7 @@ const navItems = {
     '/dashboard/user/login-user'
   ]
 };
-const ConnectedAccountUser = 'ip'; // TODO: Replace with actual user type
+const ConnectedAccountUser = 'rono'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
 //   const { ConnectedAccountUser } = useContext(HealthContext);
 
