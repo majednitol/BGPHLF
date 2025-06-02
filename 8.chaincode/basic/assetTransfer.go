@@ -796,12 +796,12 @@ func (s *SmartContract) GetUser(ctx contractapi.TransactionContextInterface, use
 	_ = json.Unmarshal(bytes, &user)
 	return &user, nil
 }
-func (s *SmartContract) GetAllPrefixesAssignedByRONO(ctx contractapi.TransactionContextInterface) ([]*PrefixAssignment, error) {
-	query := `{
+func (s *SmartContract) GetAllPrefixesAssignedByOrg(ctx contractapi.TransactionContextInterface, org string) ([]*PrefixAssignment, error) {
+	query := fmt.Sprintf(`{
 		"selector": {
-			"assignedBy": "Org6MSP"
+			"assignedBy": "%s"
 		}
-	}`
+	}`, org)
 
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
@@ -822,6 +822,7 @@ func (s *SmartContract) GetAllPrefixesAssignedByRONO(ctx contractapi.Transaction
 	}
 	return assignments, nil
 }
+
 
 func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, comapanyID string) (*Company, error) {
 	bytes, err := ctx.GetStub().GetState("COM_" + comapanyID)

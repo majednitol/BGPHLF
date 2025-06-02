@@ -13,10 +13,10 @@ export const getUser = createAsyncThunk('user/getUser', async ({ userId, org }, 
   }
 });
 
-export const getAllPrefixesAssignedByRONO = createAsyncThunk('user/getAllPrefixesAssignedByRONO', async ({ userId, org }, thunkAPI) => {
+export const getAllPrefixesAssignedByOrg = createAsyncThunk('user/getAllPrefixesAssignedByOrg', async ({ userId, org }, thunkAPI) => {
   try {
     const params = { userId, org };
-    const response = await apiRepository.get('/user/get-all-prefixes-assigned-by-rono', params, true);
+    const response = await apiRepository.get('/user/get-all-prefixes-assigned-by-org', params, true);
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -111,15 +111,15 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
       // Get All Prefixes Assigned By RONO
-      .addCase(getAllPrefixesAssignedByRONO.pending, (state) => {
+      .addCase(getAllPrefixesAssignedByOrg.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getAllPrefixesAssignedByRONO.fulfilled, (state, action) => {
+      .addCase(getAllPrefixesAssignedByOrg.fulfilled, (state, action) => {
         state.loading = false;
         state.userData = action.payload;
       })
-      .addCase(getAllPrefixesAssignedByRONO.rejected, (state, action) => {
+      .addCase(getAllPrefixesAssignedByOrg.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

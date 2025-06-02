@@ -31,7 +31,7 @@ export const assignPrefix = createAsyncThunk(
       const response = await apiRepository.post('ip/assign-prefix', data, true);
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(error?.responses[0]?.response?.message || error.message);
     }
   }
 );

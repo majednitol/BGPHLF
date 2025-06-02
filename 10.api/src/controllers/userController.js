@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { CreateSystemManager, CreateUser, GetAllPrefixesAssignedByRONO, GetLoggedInUser, GetSystemManager, GetUser, LoginUser, registerAndEnrollUserOrCompany } from "../services/userService.js";
+import { CreateSystemManager, CreateUser, GetAllPrefixesAssignedByOrg, GetLoggedInUser, GetSystemManager, GetUser, LoginUser, registerAndEnrollUserOrCompany } from "../services/userService.js";
 
 const chaincodeName = "basic";
 const channelName = "mychannel"
@@ -143,7 +143,7 @@ export async function getLoggedInUser(req, res, next) {
     }
 }
 
-export async function getAllPrefixesAssignedByRONO(req, res, next) {
+export async function getAllPrefixesAssignedByOrg(req, res, next) {
     try {
         let payload = {
                 "org": req.query.org ? req.query.org : req.org,
@@ -153,7 +153,7 @@ export async function getAllPrefixesAssignedByRONO(req, res, next) {
 
         }
         console.log("payload", payload)
-        let result = await GetAllPrefixesAssignedByRONO(payload, next);
+        let result = await GetAllPrefixesAssignedByOrg(payload, next);
         console.log("result ", result)
         res.json(result)
     } catch (error) {

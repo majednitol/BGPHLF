@@ -38,7 +38,9 @@ const AssignPrefixPage = () => {
       toast.success('Prefix assigned successfully');
       setForm({ prefix: '', assignedTo: '' });
     } catch (err) {
-      toast.error(`Error: ${err}`);
+      console.log("msg",err)
+      toast.error(`Error: ${err
+}`);
     } finally {
       dispatch(resetState());
     }

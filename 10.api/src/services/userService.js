@@ -155,17 +155,18 @@ export async function GetLoggedInUser(request) {
     }
 }
 
-export async function GetAllPrefixesAssignedByRONO(request) {
+export async function GetAllPrefixesAssignedByOrg(request) {
     try {
         const userId = request.userId;
+        const orgMSP = request.org;
         console.log("userId", userId);
 
         const contract = await smartContract(request, userId);
-        let result = await contract.evaluateTransaction("GetAllPrefixesAssignedByRONO");
+        let result = await contract.evaluateTransaction("GetAllPrefixesAssignedByOrg",orgMSP);
         console.log("result", result);
         return JSON.parse(result);
     } catch (error) {
-        console.error("Error in GetAllPrefixesAssignedByRONO:", error);
+        console.error("Error in GetAllPrefixesAssignedByOrg:", error);
         throw error;
     }
 }
