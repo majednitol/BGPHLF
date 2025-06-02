@@ -179,7 +179,7 @@ export async function ListAllMembers(request) {
         const contract = await smartContract(request, userID);
 
         const result = await contract.evaluateTransaction(
-            "ListAllMembers"
+            "ListPendingRequests"
         );
 
         console.log("Transaction Result:", result.toString());

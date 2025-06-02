@@ -885,12 +885,12 @@ func (s *SmartContract) GetAssignedPrefixesToRIR(ctx contractapi.TransactionCont
 }
 
 // List all pending requests submitted to this RIR
-func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface) ([]*ResourceRequest, error) {
-	msp, err := getRIROrg(ctx)
-	if err != nil {
-		return nil, err
-	}
-	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, msp)
+func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface,org string) ([]*ResourceRequest, error) {
+	// msp, err := getRIROrg(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, org)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
 		return nil, err
