@@ -2,7 +2,8 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import GetAllPrefixesAssignedPage from '../../../dashboard(main)/rono/ViewAssignedIpPrefixPage'
+import GetAllPrefixesAssignedPage from '../../../dashboard(main)/RIR/ViewAssignedPrefixPage'
+
 
 
 const ViewAssignedIP = () => {

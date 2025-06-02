@@ -125,6 +125,19 @@ export const listPendingRequests = createAsyncThunk(
     }
   }
 );
+
+export const listApprovedRequests = createAsyncThunk(
+  'ipPrefix/listApprovedRequests',
+  async ({org,userID}, thunkAPI) => {
+    try {
+      const params = {org,userID}
+      const response = await apiRepository.get('ip/list-approved-requests', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 export const listAllMembers = createAsyncThunk(
   'ipPrefix/listAllMembers',
   async ({org,userID}, thunkAPI) => {
@@ -269,6 +282,19 @@ const ipPrefixSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(listPendingRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // List Approved Requests
+      .addCase(listApprovedRequests.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listApprovedRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(listApprovedRequests.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

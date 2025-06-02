@@ -173,7 +173,23 @@ export async function ListPendingRequests(request) {
     }
 }
 
+export async function ListApprovedRequests(request) {
+    try {
+        const userID = request.userID;
+        const org = request.org;
+        const contract = await smartContract(request, userID);
 
+        const result = await contract.evaluateTransaction(
+            "ListApprovedRequests", org
+        );
+
+        console.log("Transaction Result:", result.toString());
+        return JSON.parse(result.toString());
+    } catch (error) {
+        console.error("Error in ListApprovedRequests:", error);
+        throw error;
+    }
+}
 export async function ListAllMembers(request) {
     try {
         const userID = request.userID;

@@ -65,7 +65,7 @@ const styles = {
     maxWidth: 800,
     margin: 'auto',
     padding: 20,
-    backgroundColor: '#0077cc',
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
     boxShadow: '0 0 10px rgba(0,0,0,0.1)',
   },

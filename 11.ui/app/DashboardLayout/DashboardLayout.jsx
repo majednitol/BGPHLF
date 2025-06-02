@@ -19,7 +19,6 @@ const navItems = {
     rir: [
     '/dashboard/rir/user-info',
     '/dashboard/rir/view-assigned-ip-prefix',
-    '/dashboard/rir/approve-member',
     '/dashboard/rir/assign-resource',
     '/dashboard/rir/list-pending-requests',
     '/dashboard/rir/list-all-members',

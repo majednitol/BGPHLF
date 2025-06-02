@@ -894,10 +894,6 @@ func (s *SmartContract) GetAssignedPrefixesToRIR(ctx contractapi.TransactionCont
 
 // List all pending requests submitted to this RIR
 func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface,org string) ([]*ResourceRequest, error) {
-	// msp, err := getRIROrg(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, org)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
@@ -905,6 +901,23 @@ func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextIn
 	}
 	defer iter.Close()
 
+	var requests []*ResourceRequest
+	for iter.HasNext() {
+		result, _ := iter.Next()
+		var req ResourceRequest
+		if err := json.Unmarshal(result.Value, &req); err == nil {
+			requests = append(requests, &req)
+		}
+	}
+	return requests, nil
+}
+func (s *SmartContract) ListApprovedRequests(ctx contractapi.TransactionContextInterface, org string) ([]*ResourceRequest, error) {
+	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"approved"}}`, org)
+	iter, err := ctx.GetStub().GetQueryResult(query)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
 	var requests []*ResourceRequest
 	for iter.HasNext() {
 		result, _ := iter.Next()
