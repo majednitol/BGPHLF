@@ -129,7 +129,8 @@ export const getAllOwnedPrefixes = createAsyncThunk(
   'ipPrefix/getAllOwnedPrefixes',
   async ({org,userID}, thunkAPI) => {
     try {
-      const params = {org,userID}
+      const params = { org, userID }
+      console.log("params",params)
       const response = await apiRepository.get('ip/list-all-owned-prefixes', params, true);
       return response.data;
     } catch (error) {

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { listApprovedRequests, resetState } from '../../features/ipPrefix/ipPrefixSlice';
 import { assignResource } from '../../features/company/companySlice';
+import { getAllOwnedPrefixes } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
 
 const decodedUser = {
@@ -13,8 +14,8 @@ const decodedUser = {
 
 const ListApprovedRequests = () => {
   const dispatch = useAppDispatch();
-    const { data, loading, error,prefix } = useAppSelector((state) => state.ipPrefix);
-  
+  const { data, loading, error, prefix } = useAppSelector((state) => state.ipPrefix);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedMemberID, setSelectedMemberID] = useState('');
   const [formData, setFormData] = useState({
@@ -25,9 +26,9 @@ const ListApprovedRequests = () => {
     expiry: '',
     org: decodedUser.org,
   });
-console.log("prefix",prefix)
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchApprovedRequests = async () => {
       try {
         await dispatch(listApprovedRequests(decodedUser)).unwrap();
       } catch {
@@ -35,30 +36,29 @@ console.log("prefix",prefix)
       }
     };
 
-    fetchData();
+    fetchApprovedRequests();
     return () => dispatch(resetState());
   }, [dispatch]);
 
+  const fetchOwnedPrefixes = async () => {
+    try {
+      await dispatch(getAllOwnedPrefixes(decodedUser)).unwrap();
+    } catch (err) {
+      toast.error('Failed to fetch owned prefixes');
+    }
+  };
 
-  
-    const fetchData = async () => {
-      try {
-        await dispatch(getAllOwnedPrefixes(decodedUser)).unwrap();
-      } catch (err) {
-        toast.error('Failed to fetch owned prefixes');
-      }
-    };
-
-   
-
-    const handleAssignClick = (memberID) => {
-         fetchData();
-      console.log("memberID",memberID)
+  const handleAssignClick = (memberID) => {
+    fetchOwnedPrefixes();
     setSelectedMemberID(memberID);
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      allocationID: '',
       memberID,
-    }));
+      parentPrefix: '',
+      subPrefix: '',
+      expiry: '',
+      org: decodedUser.org,
+    });
     setShowModal(true);
   };
 
@@ -107,8 +107,13 @@ console.log("prefix",prefix)
             {data.map((item, idx) => (
               <tr key={idx}>
                 {Object.values(item).map((val, i) => (
-                  <td key={i} style={styles.td}>{String(val)}</td>
-                ))}
+  <td key={i} style={styles.td}>
+    {typeof val === 'object' && val !== null
+      ? JSON.stringify(val)
+      : String(val)}
+  </td>
+))}
+
                 <td style={styles.td}>
                   <button style={styles.assignBtn} onClick={() => handleAssignClick(item.memberId)}>
                     Assign Resource
@@ -125,12 +130,57 @@ console.log("prefix",prefix)
           <div style={styles.modal}>
             <h3 style={styles.modalTitle}>Assign Resource to Member</h3>
             <form onSubmit={handleSubmit} style={styles.form}>
-              <input name="allocationID" placeholder="Allocation ID" style={styles.input} onChange={handleChange} required />
-              <input value={selectedMemberID} readOnly style={styles.input} />
-              <input name="parentPrefix" placeholder="Parent Prefix" style={styles.input} onChange={handleChange} required />
-              <input name="subPrefix" placeholder="Sub Prefix" style={styles.input} onChange={handleChange} required />
-              <input name="expiry" type="date" style={styles.input} onChange={handleChange} required />
-              <select name="org" value={formData.org} onChange={handleChange} style={styles.input}>
+              <input
+                name="allocationID"
+                placeholder="Allocation ID"
+                style={styles.input}
+                onChange={handleChange}
+                required
+              />
+              <input
+                value={selectedMemberID}
+                readOnly
+                style={styles.input}
+              />
+
+              {/* UPDATED PARENT PREFIX FIELD AS SELECT */}
+              <select
+                name="parentPrefix"
+                value={formData.parentPrefix}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              >
+                <option value="">Select Parent Prefix</option>
+                              {
+                                  prefix.map((item, idx) => (
+                                      <option key={idx} value={item.prefix}>
+                                        {item.prefix}
+                                      </option>
+                                  ))
+               }
+              </select>
+
+              <input
+                name="subPrefix"
+                placeholder="Sub Prefix"
+                style={styles.input}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="expiry"
+                type="date"
+                style={styles.input}
+                onChange={handleChange}
+                required
+              />
+              <select
+                name="org"
+                value={formData.org}
+                onChange={handleChange}
+                style={styles.input}
+              >
                 {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP'].map((org) => (
                   <option key={org} value={org}>{org}</option>
                 ))}

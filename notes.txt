@@ -465,3 +465,7 @@ peer chaincode invoke \
 
 peer chaincode invoke -n basic -C mychannel -c '{"Args":["RequestResource","req123","brac001","ipv4","192.0.2.0",1,"20250524","BD","afrinic","2025-05-27T12:00:00Z"]}'
 
+peer chaincode query \
+  -C mychannel \
+  -n basic \
+  -c '{"function":"GetAllOwnedPrefixes","Args":["Org1MSP"]}'
