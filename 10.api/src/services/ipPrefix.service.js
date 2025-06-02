@@ -168,7 +168,7 @@ export async function ListPendingRequests(request) {
         return JSON.parse(result.toString());
     } catch (error) {
         console.error("Error in ListPendingRequests:", error);
-        throw error;
+        // throw error;
     }
 }
 
