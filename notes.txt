@@ -264,7 +264,7 @@ Validate an AS path against the stored route:
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"Args":["GetAllocationsByMember","com001"]}'
+  -c '{"Args":["ListPendingRequests"]}'
 
 
 ---
