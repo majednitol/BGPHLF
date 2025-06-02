@@ -165,7 +165,7 @@ export async function ListPendingRequests(request) {
         );
 
         console.log("Transaction Result:", result.toString());
-        return JSON.parse(result.toString());
+        // return JSON.parse(result);
     } catch (error) {
         console.error("Error in ListPendingRequests:", error);
         throw error;
