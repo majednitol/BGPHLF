@@ -98,7 +98,7 @@ export async function AnnounceRoute(request) {
 
 export async function RevokeRoute(request) {
     try {
-        
+
         const comapanyID = request.comapanyID
         const asn = request.asn
         const prefix = request.prefix
@@ -157,29 +157,30 @@ export async function TracePrefix(request) {
 
 export async function ListPendingRequests(request) {
     try {
-        const  userID = request.userID;
+        const userID = request.userID;
+        const org = request.org;
         const contract = await smartContract(request, userID);
 
         const result = await contract.evaluateTransaction(
-            "ListPendingRequests"
+            "ListPendingRequests", org
         );
 
         console.log("Transaction Result:", result.toString());
         return JSON.parse(result.toString());
     } catch (error) {
         console.error("Error in ListPendingRequests:", error);
-        // throw error;
+        throw error;
     }
 }
 
 
 export async function ListAllMembers(request) {
     try {
-        const  userID = request.userID;
+        const userID = request.userID;
         const contract = await smartContract(request, userID);
 
         const result = await contract.evaluateTransaction(
-            "ListPendingRequests"
+            "ListAllMembers"
         );
 
         console.log("Transaction Result:", result.toString());
