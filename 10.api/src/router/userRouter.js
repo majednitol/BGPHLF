@@ -1,5 +1,5 @@
 import express from 'express' 
-import {  createSystemManager, createUser, getAllPrefixesAssignedByOrg, getAllPrefixesAssignedByRONO, getLoggedInUser, getSystemManager, getUser, loginUser, registerNewUser } from '../controllers/userController.js';
+import {  createSystemManager, createUser, getAllPrefixesAssignedByOrg, getLoggedInUser, getSystemManager, getUser, loginUser, registerNewUser } from '../controllers/userController.js';
 const userRouter = express.Router()
 userRouter.get('/get-user', getUser);
 userRouter.get('/get-user', getUser);

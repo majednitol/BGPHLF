@@ -2,14 +2,14 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import AssignResourceForm from '../../../dashboard(main)/company/AssignResource'
+import ApproveMember from '../../../dashboard(main)/RIR/ApproveMember'
 
-const AssignResourcePage = () => {
+const ApproveMemberPage = () => {
     return (
         <DashboardLayout>
-            <AssignResourceForm />
+            <ApproveMember />
         </DashboardLayout>
     )
 }
 
-export default IsAuth(AssignResourcePage)
+export default IsAuth(ApproveMemberPage)

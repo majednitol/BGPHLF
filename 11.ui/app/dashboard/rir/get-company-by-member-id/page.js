@@ -2,14 +2,14 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import ApproveMember from '../../../dashboard(main)/company/ApproveMember'
+import GetCompanyByMemberID from '../../../dashboard(main)/RIR/GetCompanyByMemberID';
 
-const ApproveMemberPage = () => {
+const GetCompanyByMemberIDPage = () => {
     return (
         <DashboardLayout>
-            <ApproveMember />
+            <GetCompanyByMemberID />
         </DashboardLayout>
     )
 }
 
-export default IsAuth(ApproveMemberPage)
+export default IsAuth(GetCompanyByMemberIDPage)

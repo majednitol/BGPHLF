@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAppDispatch } from '../redux/hooks';
-import { approveMember } from '../features/company/companySlice';
+import { useAppDispatch } from '../../redux/hooks';
+
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
+import { approveMember } from '../../features/company/companySlice';
 
 const ApproveMember = () => {
   const dispatch = useAppDispatch();

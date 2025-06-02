@@ -16,6 +16,15 @@ const navItems = {
     '/dashboard/rono/view-assigned-ip-prefix',
   
   ],
+    rir: [
+    '/dashboard/rir/user-info',
+    '/dashboard/rir/view-assigned-ip-prefix',
+    '/dashboard/rir/approve-member',
+    '/dashboard/rir/assign-resource',
+    '/dashboard/rir/review-request',
+    '/dashboard/rir/get-company-by-member-id'
+  
+  ],
   ip: [
     '/dashboard/ip/validate-path',
     '/dashboard/ip/assign-prefix',
@@ -40,7 +49,7 @@ const navItems = {
     '/dashboard/user/login-user'
   ]
 };
-const ConnectedAccountUser = 'rono'; // TODO: Replace with actual user type
+const ConnectedAccountUser = 'rir'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
 //   const { ConnectedAccountUser } = useContext(HealthContext);
 

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAppDispatch } from '../redux/hooks';
-import { reviewRequest } from '../features/company/companySlice';
+import { useAppDispatch } from '../../redux/hooks';
+import { reviewRequest } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 import './styles/formStyles.css';
 
