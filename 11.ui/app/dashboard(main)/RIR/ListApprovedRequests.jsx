@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { listApprovedRequests, resetState } from '../../features/ipPrefix/ipPrefixSlice';
+import { assignResource } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 
-// ✅ Replace this with actual decoded user logic
 const decodedUser = {
   org: 'Org1MSP',
   userID: '222',
@@ -14,22 +14,63 @@ const decodedUser = {
 const ListApprovedRequests = () => {
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector((state) => state.ipPrefix);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMemberID, setSelectedMemberID] = useState('');
+  const [formData, setFormData] = useState({
+    allocationID: '',
+    memberID: '',
+    parentPrefix: '',
+    subPrefix: '',
+    expiry: '',
+    org: decodedUser.org,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         await dispatch(listApprovedRequests(decodedUser)).unwrap();
-      } catch (err) {
+      } catch {
         toast.error('Failed to fetch approved requests');
       }
     };
 
     fetchData();
-
-    return () => {
-      dispatch(resetState());
-    };
+    return () => dispatch(resetState());
   }, [dispatch]);
+
+    const handleAssignClick = (memberID) => {
+      console.log("memberID",memberID)
+    setSelectedMemberID(memberID);
+    setFormData((prev) => ({
+      ...prev,
+      memberID,
+    }));
+    setShowModal(true);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+      ...formData,
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      await dispatch(assignResource(payload)).unwrap();
+      toast.success('Resource assigned successfully!');
+      setShowModal(false);
+    } catch (err) {
+      toast.error(`Error: ${err}`);
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -42,29 +83,51 @@ const ListApprovedRequests = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Request ID</th>
-              <th style={styles.th}>Company ID</th>
-              <th style={styles.th}>Prefix</th>
-              <th style={styles.th}>ASN</th>
-              <th style={styles.th}>Requester</th>
-              <th style={styles.th}>Status</th>
+              {Object.keys(data[0]).map((key) => (
+                <th key={key} style={styles.th}>{key}</th>
+              ))}
+              <th style={styles.th}>Action</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, idx) => (
               <tr key={idx}>
-                <td style={styles.td}>{item.id || 'N/A'}</td>
-                <td style={styles.td}>{item.companyID || 'N/A'}</td>
-                <td style={styles.td}>{item.prefix || 'N/A'}</td>
-                <td style={styles.td}>{item.asn || 'N/A'}</td>
-                <td style={styles.td}>{item.requester || 'N/A'}</td>
-                <td style={styles.td}>{item.status || 'approved'}</td>
+                {Object.values(item).map((val, i) => (
+                  <td key={i} style={styles.td}>{String(val)}</td>
+                ))}
+                <td style={styles.td}>
+                  <button style={styles.assignBtn} onClick={() => handleAssignClick(item.memberId)}>
+                    Assign Resource
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-      ) : (
-        !loading && <p style={styles.noDataText}>No approved requests found.</p>
+      ) : !loading && <p style={styles.noDataText}>No approved requests found.</p>}
+
+      {showModal && (
+        <div style={styles.modalBackdrop}>
+          <div style={styles.modal}>
+            <h3 style={styles.modalTitle}>Assign Resource to Member</h3>
+            <form onSubmit={handleSubmit} style={styles.form}>
+              <input name="allocationID" placeholder="Allocation ID" style={styles.input} onChange={handleChange} required />
+              <input value={selectedMemberID} readOnly style={styles.input} />
+              <input name="parentPrefix" placeholder="Parent Prefix" style={styles.input} onChange={handleChange} required />
+              <input name="subPrefix" placeholder="Sub Prefix" style={styles.input} onChange={handleChange} required />
+              <input name="expiry" type="date" style={styles.input} onChange={handleChange} required />
+              <select name="org" value={formData.org} onChange={handleChange} style={styles.input}>
+                {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP'].map((org) => (
+                  <option key={org} value={org}>{org}</option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                <button type="submit" style={styles.button}>Assign</button>
+                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelButton}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -87,12 +150,10 @@ const styles = {
   loadingText: {
     textAlign: 'center',
     color: '#444',
-    marginBottom: '10px',
   },
   errorText: {
     textAlign: 'center',
     color: 'red',
-    marginBottom: '10px',
   },
   noDataText: {
     textAlign: 'center',
@@ -113,6 +174,69 @@ const styles = {
     padding: '10px',
     border: '1px solid #ccc',
     textAlign: 'center',
+  },
+  assignBtn: {
+    padding: '6px 12px',
+    backgroundColor: '#00cc66',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+  },
+  modalBackdrop: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    background: 'white',
+    padding: '30px',
+    borderRadius: '10px',
+    width: '90%',
+    maxWidth: '500px',
+    boxShadow: '0 0 15px rgba(0,0,0,0.2)',
+  },
+  modalTitle: {
+    marginBottom: '15px',
+    textAlign: 'center',
+    color: '#0077cc',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  input: {
+    padding: '10px',
+    border: '2px solid #0077cc',
+    borderRadius: '6px',
+    fontSize: '16px',
+  },
+  button: {
+    padding: '12px',
+    backgroundColor: '#0077cc',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    flex: 1,
+  },
+  cancelButton: {
+    padding: '12px',
+    backgroundColor: '#ccc',
+    color: '#333',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    flex: 1,
   },
 };
 
