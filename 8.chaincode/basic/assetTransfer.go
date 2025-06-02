@@ -353,7 +353,7 @@ msp, err := ctx.GetClientIdentity().GetMSPID()
 		Status:    "pending",
 		Country:   country,
 		RIR:       msp,
-		ReviewedBy: "",
+		ReviewedBy: "not yet reviewed",
 		Timestamp: timestamp,
 	}
 
