@@ -125,7 +125,18 @@ export const listPendingRequests = createAsyncThunk(
     }
   }
 );
-
+export const getAllOwnedPrefixes = createAsyncThunk(
+  'ipPrefix/getAllOwnedPrefixes',
+  async ({org,userID}, thunkAPI) => {
+    try {
+      const params = {org,userID}
+      const response = await apiRepository.get('ip/list-all-owned-prefixes', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 export const listApprovedRequests = createAsyncThunk(
   'ipPrefix/listApprovedRequests',
   async ({org,userID}, thunkAPI) => {
@@ -152,6 +163,7 @@ export const listAllMembers = createAsyncThunk(
 );
 const initialState = {
   data: null,
+  prefix: null,
   loading: false,
   error: null,
   success: null,
@@ -295,6 +307,19 @@ const ipPrefixSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(listApprovedRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // List All Owned Prefixes
+       .addCase(getAllOwnedPrefixes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllOwnedPrefixes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.prefix = action.payload;
+      })
+      .addCase(getAllOwnedPrefixes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

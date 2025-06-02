@@ -13,7 +13,8 @@ const decodedUser = {
 
 const ListApprovedRequests = () => {
   const dispatch = useAppDispatch();
-  const { data, loading, error } = useAppSelector((state) => state.ipPrefix);
+    const { data, loading, error,prefix } = useAppSelector((state) => state.ipPrefix);
+  
   const [showModal, setShowModal] = useState(false);
   const [selectedMemberID, setSelectedMemberID] = useState('');
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const ListApprovedRequests = () => {
     expiry: '',
     org: decodedUser.org,
   });
-
+console.log("prefix",prefix)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,7 +39,20 @@ const ListApprovedRequests = () => {
     return () => dispatch(resetState());
   }, [dispatch]);
 
+
+  
+    const fetchData = async () => {
+      try {
+        await dispatch(getAllOwnedPrefixes(decodedUser)).unwrap();
+      } catch (err) {
+        toast.error('Failed to fetch owned prefixes');
+      }
+    };
+
+   
+
     const handleAssignClick = (memberID) => {
+         fetchData();
       console.log("memberID",memberID)
     setSelectedMemberID(memberID);
     setFormData((prev) => ({

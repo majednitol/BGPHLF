@@ -1,5 +1,5 @@
 
-import { AnnounceRoute, AssignPrefix, GetPrefixAssignment, ListAllMembers, ListApprovedRequests, ListPendingRequests, RevokeRoute, SubAssignPrefix, TracePrefix, ValidatePath } from "../services/ipPrefix.service.js";
+import { AnnounceRoute, AssignPrefix, GetAllAssignedPrefixes, GetAllOwnedPrefixes, GetPrefixAssignment, ListAllMembers, ListApprovedRequests, ListPendingRequests, RevokeRoute, SubAssignPrefix, TracePrefix, ValidatePath } from "../services/ipPrefix.service.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function validatePath(req, res) {
@@ -181,6 +181,25 @@ export async function listPendingRequests(req, res) {
         }
         console.log("payload", payload)
         let result = await ListPendingRequests(payload);
+        console.log("result app", result)
+        res.json(result)
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
+}
+
+export async function getAllOwnedPrefixes(req, res) {
+    try {
+        let payload = {
+            "org": req.query.org,
+            "channelName": channelName,
+            "chaincodeName": chaincodeName,
+            "userID": req.query.userID ? req.query.userID : req.userID,
+        
+        }
+        console.log("payload", payload)
+        let result = await GetAllOwnedPrefixes(payload);
         console.log("result app", result)
         res.json(result)
     } catch (error) {

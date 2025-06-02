@@ -869,12 +869,12 @@ func (s *SmartContract) GetAllAssignedPrefixes(ctx contractapi.TransactionContex
 }
 
 // View assigned prefixes to this RIR
-func (s *SmartContract) GetAssignedPrefixesToRIR(ctx contractapi.TransactionContextInterface) ([]*PrefixAssignment, error) {
-	msp, err := getRIROrg(ctx)
-	if err != nil {
-		return nil, err
-	}
-	query := fmt.Sprintf(`{"selector":{"assignedTo":"%s"}}`, msp)
+func (s *SmartContract) GetAllOwnedPrefixes(ctx contractapi.TransactionContextInterface, org string) ([]*PrefixAssignment, error) {
+	// msp, err := getRIROrg(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	query := fmt.Sprintf(`{"selector":{"assignedTo":"%s"}}`, org)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
 		return nil, err
