@@ -334,7 +334,15 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 // ========== Resource Request & Approval ==========
 
 func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, timestamp string) error {
-	// Validate type
+	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + memberID)
+	if err != nil || memberBytes == nil {
+		return fmt.Errorf("member not found")
+	}
+	var member Member
+	_ = json.Unmarshal(memberBytes, &member)
+if !member.Approved  {
+		return fmt.Errorf("member not approved")
+	}
 	resType = strings.ToLower(resType)
 	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
 		return fmt.Errorf("invalid resource type: %s", resType)
@@ -375,8 +383,8 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	if err != nil {
 		return fmt.Errorf("failed to get MSP ID: %v", err)
 	}
-	if msp != "Org1MSP" {
-		return fmt.Errorf("only AFRINIC (Org1) can review requests")
+	if msp == "Org1MSP" || msp == "Org2MSP" || msp == "Org3MSP" || msp == "Org4MSP" || msp == "Org5MSP"{
+		return fmt.Errorf("only RIR can review requests")
 	}
 
 	// Fetch request
