@@ -289,7 +289,7 @@ func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInter
 
 	return &manager, nil
 }
-// TODO
+
 func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInterface) ([]*SystemManager, error) {
 
 	iter, err := ctx.GetStub().GetStateByRange("SYS_MGR_", "SYS_MGR_z")
@@ -333,13 +333,16 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, timestamp string) error {
 	// Validate type
 	resType = strings.ToLower(resType)
 	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
 		return fmt.Errorf("invalid resource type: %s", resType)
 	}
-
+msp, err := ctx.GetClientIdentity().GetMSPID()
+	if err != nil {
+		return fmt.Errorf("failed to get MSP ID: %v", err)
+	}
 	request := ResourceRequest{
 		RequestID: reqID,
 		MemberID:  memberID,
@@ -349,7 +352,8 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 		Date:      date,
 		Status:    "pending",
 		Country:   country,
-		RIR:       rir,
+		RIR:       msp,
+		ReviewedBy: "",
 		Timestamp: timestamp,
 	}
 
@@ -881,12 +885,11 @@ func (s *SmartContract) GetAssignedPrefixesToRIR(ctx contractapi.TransactionCont
 }
 
 // List all pending requests submitted to this RIR
-func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface) ([]byte, error) {
+func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface) ([]*ResourceRequest, error) {
 	msp, err := getRIROrg(ctx)
 	if err != nil {
 		return nil, err
 	}
-
 	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, msp)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
@@ -902,19 +905,8 @@ func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextIn
 			requests = append(requests, &req)
 		}
 	}
-
-	if len(requests) == 0 {
-		// Return a plain string indicating no data
-		return []byte(`"No pending requests found"`), nil
-	}
-
-	response, err := json.Marshal(requests)
-	if err != nil {
-		return nil, err
-	}
-	return response, nil
+	return requests, nil
 }
-
 
 // List all registered members (companies)
 func (s *SmartContract) ListAllMembers(ctx contractapi.TransactionContextInterface) ([]*Member, error) {

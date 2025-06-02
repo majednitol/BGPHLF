@@ -394,17 +394,18 @@ peer chaincode invoke \
   -n basic \
   --peerAddresses peer0-org1:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:7051 \
+  --peerAddresses peer0-org2:9051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:7051 \
+  --peerAddresses peer0-org3:11051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:7051 \
+  --peerAddresses peer0-org4:12051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:7051 \
+  --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:7051 \
+  --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["RegisterUser","user001","technical","brac-org","2025-05-28T11:00:00Z"]}' \
+  -c -c '{"Args":["RequestResource","req123","222","ipv4","1","20250524","BD","afrinic","2025-05-27T12:00:00Z"]}'
+ \
   --waitForEvent
 ```
 
@@ -421,17 +422,17 @@ peer chaincode invoke \
   -n basic \
   --peerAddresses peer0-org1:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:7051 \
+  --peerAddresses peer0-org2:9051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:7051 \
+  --peerAddresses peer0-org3:11051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:7051 \
+  --peerAddresses peer0-org4:12051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:7051 \
+  --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:7051 \
+  --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["ReviewRequest","req001","approved","admin@afrinic"]}' \
+  -c '{"Args":["ReviewRequest","req123","pending","admin@afrinic"]}' \
   --waitForEvent
 ```
 
