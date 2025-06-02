@@ -1,5 +1,5 @@
 
-import { AnnounceRoute, AssignPrefix, GetAllAssignedPrefixes, GetAllOwnedPrefixes, GetPrefixAssignment, ListAllMembers, ListApprovedRequests, ListPendingRequests, RevokeRoute, SubAssignPrefix, TracePrefix, ValidatePath } from "../services/ipPrefix.service.js";
+import { AnnounceRoute, AssignPrefix, GetAllOwnedPrefixes, GetPrefixAssignment, ListAllMembers, ListApprovedRequests, ListPendingRequests, RevokeRoute, SubAssignPrefix, TracePrefix, ValidatePath } from "../services/ipPrefix.service.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function validatePath(req, res) {
