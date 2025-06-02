@@ -91,7 +91,7 @@ const styles = {
   th: {
     textAlign: 'left',
     padding: 12,
-    backgroundColor: '#007bff',
+    backgroundColor: '#0077cc',
     color: '#fff',
     border: '1px solid #ddd',
   },

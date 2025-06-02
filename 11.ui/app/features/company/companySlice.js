@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ✅ Register Company With Member
 export const registerCompanyWithMember = createAsyncThunk(
   'company/registerCompanyWithMember',
-  async ({org, comapanyID,
+  async ({ org, comapanyID,
     legalEntityName,
     industryType,
     addressLine1,
@@ -21,7 +21,8 @@ export const registerCompanyWithMember = createAsyncThunk(
     memberCountry,
     memberEmail }, thunkAPI) => {
     try {
-      const data = {org,
+      const data = {
+        org,
         comapanyID,
         legalEntityName,
         industryType,
@@ -50,9 +51,9 @@ export const registerCompanyWithMember = createAsyncThunk(
 // ✅ Get Company
 export const getCompany = createAsyncThunk(
   'company/getCompany',
-  async ({ comapanyID,org }, thunkAPI) => {
+  async ({ comapanyID, org }, thunkAPI) => {
     try {
-      const params = { org,comapanyID }
+      const params = { org, comapanyID }
       const response = await apiRepository.get('/company/get-company', params, false);
       return response.data;
     } catch (error) {
@@ -64,7 +65,7 @@ export const getCompany = createAsyncThunk(
 // ✅ Approve Member
 export const approveMember = createAsyncThunk(
   'company/approveMember',
-  async ({org, memberID }, thunkAPI) => {
+  async ({ org, memberID }, thunkAPI) => {
     try {
       const data = { org, memberID }
       const response = await apiRepository.post('company/approve-member', data, true);
@@ -78,9 +79,9 @@ export const approveMember = createAsyncThunk(
 // ✅ Assign Resource
 export const assignResource = createAsyncThunk(
   'company/assignResource',
-  async ({org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
+  async ({ org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
     try {
-      const data = { org,allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }
+      const data = { org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }
       const response = await apiRepository.post('company/assign-resource', data, true);
       return response.data;
     } catch (error) {
@@ -92,12 +93,13 @@ export const assignResource = createAsyncThunk(
 // ✅ Request Resource
 export const requestResource = createAsyncThunk(
   'company/requestResource',
-  async ({org, reqID,
+  async ({ org, reqID,
     memberID,
     resType,
     value, date, country, rir, timestamp }, thunkAPI) => {
     try {
-      const data = {org,
+      const data = {
+        org,
         reqID,
         memberID,
         resType,
@@ -114,18 +116,18 @@ export const requestResource = createAsyncThunk(
 // ✅ Review Request
 export const reviewRequest = createAsyncThunk(
   'company/reviewRequest',
-  async ({org, reqID,
-    memberID,
+  async ({ org, reqID,
     decision,
     reviewedBy }, thunkAPI) => {
     try {
-      const data = {org,
+      const data = {
+        org,
         reqID,
-        memberID,
         decision,
         reviewedBy
       }
-      const response = await apiRepository.post('company/review-request', data, true);
+      console.log("payload",data)
+      const response = await apiRepository.post('company/review-request', data, false);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -136,9 +138,9 @@ export const reviewRequest = createAsyncThunk(
 // ✅ Get Company By Member ID
 export const getCompanyByMemberID = createAsyncThunk(
   'company/getCompanyByMemberID',
-  async ({org, memberID }, thunkAPI) => {
+  async ({ org, memberID }, thunkAPI) => {
     try {
-      const params = {org, memberID }
+      const params = { org, memberID }
       const response = await apiRepository.get('company/get-company-by-member-id', params, true);
       return response.data;
     } catch (error) {

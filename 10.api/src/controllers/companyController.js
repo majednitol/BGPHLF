@@ -129,7 +129,6 @@ export async function reviewRequest(req, res) {
       "channelName": "mychannel",
       "chaincodeName": "basic",
       "reqID": req.body.reqID,
-      "memberID": req.body.memberID,
       "decision": req.body.decision,
       "reviewedBy": req.body.reviewedBy,
     };

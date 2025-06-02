@@ -65,7 +65,7 @@ const styles = {
     maxWidth: 800,
     margin: 'auto',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0077cc',
     borderRadius: 8,
     boxShadow: '0 0 10px rgba(0,0,0,0.1)',
   },
@@ -82,7 +82,7 @@ const styles = {
     border: '1px solid #ddd',
     padding: 12,
     textAlign: 'left',
-    backgroundColor: '#007bff',
+    backgroundColor: '#0077cc',
     color: '#fff',
   },
   td: {

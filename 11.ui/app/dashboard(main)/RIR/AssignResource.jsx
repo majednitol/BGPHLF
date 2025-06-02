@@ -4,17 +4,16 @@ import React, { useState } from 'react';
 import { useAppDispatch } from '../../redux/hooks';
 import { assignResource } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
-import './styles/formStyles.css';
 
 const AssignResource = () => {
   const dispatch = useAppDispatch();
+
   const [formData, setFormData] = useState({
     allocationID: '',
     memberID: '',
     parentPrefix: '',
     subPrefix: '',
     expiry: '',
-    timestamp: '',
     org: 'Org1MSP',
   });
 
@@ -28,8 +27,14 @@ const AssignResource = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      ...formData,
+      timestamp: new Date().toISOString(), // auto-generate timestamp
+    };
+
     try {
-      await dispatch(assignResource(formData)).unwrap();
+      await dispatch(assignResource(payload)).unwrap();
       toast.success('Resource assigned successfully!');
     } catch (err) {
       toast.error(`Error: ${err}`);
@@ -37,27 +42,63 @@ const AssignResource = () => {
   };
 
   return (
-    <div className="form-container">
-      <h2>Assign Resource</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="allocationID" placeholder="Allocation ID" onChange={handleChange} required />
-        <input name="memberID" placeholder="Member ID" onChange={handleChange} required />
-        <input name="parentPrefix" placeholder="Parent Prefix" onChange={handleChange} required />
-        <input name="subPrefix" placeholder="Sub Prefix" onChange={handleChange} required />
-        <input name="expiry" placeholder="Expiry Date" type="date" onChange={handleChange} required />
-        <input name="timestamp" placeholder="Timestamp" type="datetime-local" onChange={handleChange} required />
-        <select name="org" value={formData.org} onChange={handleChange} style={styles.select}>
-          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-            <option key={o} value={o}>
-              {o}
+    <div style={styles.formContainer}>
+      <h2 style={styles.heading}>Assign Resource</h2>
+      <form style={styles.form} onSubmit={handleSubmit}>
+        <input
+          style={styles.input}
+          name="allocationID"
+          placeholder="Allocation ID"
+          onChange={handleChange}
+          required
+        />
+        <input
+          style={styles.input}
+          name="memberID"
+          placeholder="Member ID"
+          onChange={handleChange}
+          required
+        />
+        <input
+          style={styles.input}
+          name="parentPrefix"
+          placeholder="Parent Prefix"
+          onChange={handleChange}
+          required
+        />
+        <input
+          style={styles.input}
+          name="subPrefix"
+          placeholder="Sub Prefix"
+          onChange={handleChange}
+          required
+        />
+        <input
+          style={styles.input}
+          name="expiry"
+          type="date"
+          placeholder="Expiry Date"
+          onChange={handleChange}
+          required
+        />
+        <select
+          name="org"
+          value={formData.org}
+          onChange={handleChange}
+          style={styles.select}
+        >
+          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((org) => (
+            <option key={org} value={org}>
+              {org}
             </option>
           ))}
         </select>
-        <button type="submit">Assign</button>
+        <button type="submit" style={styles.button}>Assign</button>
       </form>
     </div>
   );
 };
+
 const styles = {
   formContainer: {
     maxWidth: '600px',
@@ -82,7 +123,6 @@ const styles = {
     border: '2px solid #0077cc',
     borderRadius: '8px',
     fontSize: '16px',
-    transition: '0.3s',
   },
   select: {
     padding: '10px',
@@ -90,12 +130,6 @@ const styles = {
     borderRadius: '8px',
     fontSize: '16px',
     backgroundColor: '#fff',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    color: '#444',
   },
   button: {
     padding: '12px',
@@ -106,7 +140,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '16px',
     cursor: 'pointer',
-    transition: '0.3s',
   },
 };
+
 export default AssignResource;

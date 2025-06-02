@@ -432,7 +432,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
   --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["ReviewRequest","req123","pending","admin@afrinic"]}' \
+  -c '{"Args":["ReviewRequest","req123","approved","admin@afrinic"]}' \
   --waitForEvent
 ```
 

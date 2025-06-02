@@ -21,10 +21,9 @@ const navItems = {
     '/dashboard/rir/view-assigned-ip-prefix',
     '/dashboard/rir/approve-member',
     '/dashboard/rir/assign-resource',
-    '/dashboard/rir/review-request',
     '/dashboard/rir/list-pending-requests',
     '/dashboard/rir/list-all-members',
-    '/dashboard/rir/get-company-by-member-id'
+  
   
   ],
   ip: [

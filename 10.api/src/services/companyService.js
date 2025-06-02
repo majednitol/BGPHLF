@@ -113,15 +113,13 @@ export async function ReviewRequest(request) {
   try {
 
     const reqID = request.reqID;
-    const memberID = request.memberID;
     const decision = request.decision;
     const reviewedBy = request.reviewedBy;
 
-    const contract = await smartContract(request, memberID);
+    const contract = await smartContract(request, reviewedBy);
     let result = await contract.submitTransaction(
       "ReviewRequest",
       reqID,
-      memberID,
       decision,
       reviewedBy,
     );
