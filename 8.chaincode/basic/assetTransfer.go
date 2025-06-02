@@ -289,6 +289,7 @@ func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInter
 
 	return &manager, nil
 }
+// TODO
 func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInterface) ([]*SystemManager, error) {
 
 	iter, err := ctx.GetStub().GetStateByRange("SYS_MGR_", "SYS_MGR_z")

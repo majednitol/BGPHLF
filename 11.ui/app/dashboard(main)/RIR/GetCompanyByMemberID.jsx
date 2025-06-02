@@ -39,11 +39,11 @@ const [org, setOrg] = useState('Org1');
           onChange={(e) => setMemberID(e.target.value)}
           required
               />
-              <select style={styles.select} value={org} onChange={(e) => setOrg(e.target.value)}>
-        {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-          <option key={o} value={o}>{o}</option>
-        ))}
-      </select>
+               <select value={org} onChange={(e) => setOrg(e.target.value)}>
+          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
         <button type="submit" disabled={loading}>
           {loading ? 'Loading...' : 'Fetch Company'}
         </button>

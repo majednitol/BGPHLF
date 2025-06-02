@@ -77,13 +77,18 @@ const ReviewRequest = () => {
           value={formData.reviewedBy}
           onChange={handleChange}
           required
-        /><select name="org" value={formData.org} onChange={handleChange} style={styles.select}>
-          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
+        /><select
+  name="org"
+  value={formData.org}
+  onChange={handleChange}
+>
+  {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
+    <option key={o} value={o}>
+      {o}
+    </option>
+  ))}
+</select>
+
         <button type="submit">Submit Review</button>
       </form>
     </div>

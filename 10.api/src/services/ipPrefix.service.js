@@ -154,3 +154,38 @@ export async function TracePrefix(request) {
         throw error;
     }
 }
+
+export async function ListPendingRequests(request) {
+    try {
+        const  userID = request.userID;
+        const contract = await smartContract(request, userID);
+
+        const result = await contract.evaluateTransaction(
+            "ListPendingRequests"
+        );
+
+        console.log("Transaction Result:", result.toString());
+        return JSON.parse(result.toString());
+    } catch (error) {
+        console.error("Error in ListPendingRequests:", error);
+        throw error;
+    }
+}
+
+
+export async function ListAllMembers(request) {
+    try {
+        const  userID = request.userID;
+        const contract = await smartContract(request, userID);
+
+        const result = await contract.evaluateTransaction(
+            "ListAllMembers"
+        );
+
+        console.log("Transaction Result:", result.toString());
+        return JSON.parse(result.toString());
+    } catch (error) {
+        console.error("Error in ListAllMembers:", error);
+        throw error;
+    }
+}

@@ -113,6 +113,30 @@ export const tracePrefix = createAsyncThunk(
   }
 );
 
+export const listPendingRequests = createAsyncThunk(
+  'ipPrefix/listPendingRequests',
+  async ({org,userID}, thunkAPI) => {
+    try {
+      const params = {org,userID}
+      const response = await apiRepository.get('ip/list-pending-requests', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+export const listAllMembers = createAsyncThunk(
+  'ipPrefix/listAllMembers',
+  async ({org,userID}, thunkAPI) => {
+    try {
+      const params = {org,userID}
+      const response = await apiRepository.get('ip/list-all-members', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 const initialState = {
   data: null,
   loading: false,
@@ -234,7 +258,33 @@ const ipPrefixSlice = createSlice({
       .addCase(tracePrefix.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+    // List Pending Requests
+      .addCase(listPendingRequests.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listPendingRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(listPendingRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+    // List All Members
+      .addCase(listAllMembers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listAllMembers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(listAllMembers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 
