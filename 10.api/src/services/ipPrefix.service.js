@@ -172,7 +172,22 @@ export async function ListPendingRequests(request) {
         throw error;
     }
 }
+export async function ListAllASNValues(request) {
+    try {
+        const memberID = request.memberID;
+        const contract = await smartContract(request, memberID);
 
+        const result = await contract.evaluateTransaction(
+            "ListAllASNValues"
+        );
+
+        console.log("Transaction Result:", result.toString());
+        return JSON.parse(result.toString());
+    } catch (error) {
+        console.error("Error in ListAllASNValues:", error);
+        throw error;
+    }
+}
 export async function GetAllOwnedPrefixes(request) {
     try {
         const userID = request.userID;

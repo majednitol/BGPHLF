@@ -34,12 +34,15 @@ const navItems = {
     '/dashboard/ip/trace-prefix'
   ],
   company: [
-    // '/dashboard/company/register-company-by-member',
-    // '/dashboard/company/get-company',
+    
     '/dashboard/company/my-allocation',
     '/dashboard/company/request-resource',
     '/dashboard/company/my-resource-request',
-    '/dashboard/company/get-company-by-member-id'
+    '/dashboard/company/get-company-by-member-id',
+    '/dashboard/company/announce-route',
+    '/dashboard/company/validate-path',
+    "/dashboard/company/revoke-route"
+
   ],
   user: [
     '/dashboard/user/get-user',

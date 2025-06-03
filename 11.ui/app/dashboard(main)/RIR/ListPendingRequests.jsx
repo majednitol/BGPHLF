@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import ReviewRequest from './ReviewRequest';
 
 const decodedUser = {
-  org: 'Org1MSP',
+  org: 'Org6MSP',
   userID: '222',
 };
 

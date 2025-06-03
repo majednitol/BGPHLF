@@ -138,6 +138,19 @@ export const getAllOwnedPrefixes = createAsyncThunk(
     }
   }
 );
+export const listAllASNValues = createAsyncThunk(
+  'ipPrefix/listAllASNValues',
+  async ({org,memberID}, thunkAPI) => {
+    try {
+      const params = { org, memberID }
+      console.log("params",params)
+      const response = await apiRepository.get('ip/list-all-asn-values', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 export const listApprovedRequests = createAsyncThunk(
   'ipPrefix/listApprovedRequests',
   async ({org,userID}, thunkAPI) => {
@@ -334,6 +347,19 @@ const ipPrefixSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(listAllMembers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // List All ASN Values
+      .addCase(listAllASNValues.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listAllASNValues.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(listAllASNValues.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

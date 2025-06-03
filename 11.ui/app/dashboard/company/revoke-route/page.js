@@ -2,15 +2,14 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import ValidatePath from '../../../dashboard(main)/company/ValidatePath'
+import RevokeRoute from '../../../dashboard(main)/company/RevokeRoute';
 
-
-const ValidatePathPage = () => {
+const RevokeRoutePage = () => {
     return (
         <DashboardLayout>
-            <ValidatePath />
+            < RevokeRoute />
         </DashboardLayout>
     )
 }
 
-export default IsAuth(ValidatePathPage)
+export default IsAuth(RevokeRoutePage)

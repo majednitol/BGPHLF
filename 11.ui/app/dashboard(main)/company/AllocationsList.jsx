@@ -18,7 +18,7 @@ const AllocationsList = () => {
     dispatch(getAllocationsByMember({ org: decodedUser.org, memberID: decodedUser.memberID }));
     return () => dispatch(resetState());
   }, [dispatch]);
-
+console.log("companyData",companyData)
   useEffect(() => {
     if (error) toast.error(error);
   }, [error]);
@@ -47,20 +47,20 @@ const AllocationsList = () => {
             </tr>
           </thead>
           <tbody>
-            {companyData.map((item, idx) => (
-              <tr key={idx}>
-                <td style={styles.td}>{item.id || '-'}</td>
-                <td style={styles.td}>{item.asn || '-'}</td>
-                <td style={styles.td}>{item.prefix || '-'}</td>
-                <td style={styles.td}>{item.expiry || '-'}</td>
-                <td style={styles.td}>{item.issuedBy || '-'}</td>
-                <td style={styles.td}>
-                  {item.timestamp && !isNaN(Date.parse(item.timestamp))
-                    ? new Date(item.timestamp).toLocaleString()
-                    : item.timestamp || '-'}
-                </td>
-              </tr>
-            ))}
+            {companyData?.map((item, idx) => (
+  <tr key={idx}>
+    <td style={styles.td}>{item.id || '-'}</td>
+    <td style={styles.td}>{item.asn || '-'}</td>
+    <td style={styles.td}>{item.prefix?.prefix || '-'}</td>
+    <td style={styles.td}>{item.expiry || '-'}</td>
+    <td style={styles.td}>{item.issuedBy || '-'}</td>
+    <td style={styles.td}>
+      {item.timestamp && !isNaN(Date.parse(item.timestamp))
+        ? new Date(item.timestamp).toLocaleString()
+        : item.timestamp || '-'}
+    </td>
+  </tr>
+))}
           </tbody>
         </table>
       )}

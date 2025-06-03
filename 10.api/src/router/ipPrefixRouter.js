@@ -1,6 +1,6 @@
 import express from 'express'
 import authenticate from '../middleware/authenticate.js';
-import { announceRoute, assignPrefix, getAllOwnedPrefixes, getPrefixAssignment, listAllMembers, listApprovedRequests, listPendingRequests, revokeRoute, subAssignPrefix, tracePrefix, validatePath } from '../controllers/ipPrefixController.js';
+import { announceRoute, assignPrefix, getAllOwnedPrefixes, getPrefixAssignment, listAllASNValues, listAllMembers, listApprovedRequests, listPendingRequests, revokeRoute, subAssignPrefix, tracePrefix, validatePath } from '../controllers/ipPrefixController.js';
 
 
 const ipPrefixRouter = express.Router()
@@ -20,5 +20,5 @@ ipPrefixRouter.get("/list-pending-requests", listPendingRequests)
 ipPrefixRouter.get("/list-approved-requests", listApprovedRequests)
 ipPrefixRouter.get("/list-all-owned-prefixes", getAllOwnedPrefixes)
 ipPrefixRouter.get("/list-all-members",listAllMembers)
- 
+   .get("/list-all-asn-values", listAllASNValues)
 export default ipPrefixRouter

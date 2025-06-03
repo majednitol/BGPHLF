@@ -2,15 +2,14 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import ValidatePath from '../../../dashboard(main)/company/ValidatePath'
+import TracePrefix from '../../../dashboard(main)/RIR/styles/TracePrefix';
 
-
-const ValidatePathPage = () => {
+const TracePrefixPage = () => {
     return (
         <DashboardLayout>
-            <ValidatePath />
+            <TracePrefix />
         </DashboardLayout>
     )
 }
 
-export default IsAuth(ValidatePathPage)
+export default IsAuth(TracePrefixPage)

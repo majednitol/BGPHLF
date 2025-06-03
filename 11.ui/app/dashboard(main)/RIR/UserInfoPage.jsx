@@ -11,8 +11,8 @@ const GetRIRUser = () => {
 
   // Simulated token-based values (replace with actual token logic)
   const payload = {
-    userId: '222',
-    org: 'Org6MSP',
+    userId: 'sys002',
+    org: 'Org1MSP',
   };
 
   useEffect(() => {

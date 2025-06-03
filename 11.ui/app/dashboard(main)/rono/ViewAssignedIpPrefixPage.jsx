@@ -11,7 +11,7 @@ const GetAllPrefixesAssignedPage = () => {
 
   const data = {
     userId: '222',
-    org: 'Org1MSP',
+    org: 'Org6MSP',
   };
 
   useEffect(() => {

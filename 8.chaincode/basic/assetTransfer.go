@@ -76,7 +76,7 @@ type Route struct {
 	Prefix     string   `json:"prefix"`
 	Origin     string   `json:"origin"`
 	Path       []string `json:"path"`
-	AssignedBy string   `json:"assignedBy"`
+	AnnouncedBy string   `json:"announcedBy"`
 }
 
 type PrefixAssignment struct {
@@ -145,7 +145,6 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	memberCountry string,
 	memberEmail string,
 ) error {
-	// Check if company already exists
 	companyKey := "COM_" + companyID
 	companyBytes, err := ctx.GetStub().GetState(companyKey)
 	if err != nil {
@@ -205,7 +204,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	}
 
 	return nil
-} // up
+} 
 func (s *SmartContract) CreateSystemManager(ctx contractapi.TransactionContextInterface, id, name, email, orgMSP, role, createdAt string) error {
 	if id == "" || name == "" || email == "" || orgMSP == "" || role == "" {
 		return fmt.Errorf("all fields except CreatedAt are required")
@@ -691,12 +690,12 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	_ = json.Unmarshal(bytes, &assignment)
 	return &assignment, nil
 }
-
-func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, asn, prefix string, pathJSON string) error {
-	orgMSP, err := getRIROrg(ctx)
-	if err != nil {
-		return err
-	}
+// AS1-
+func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface,owner, asn, prefix string, pathJSON string) error {
+	// orgMSP, err := getRIROrg(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 	asKey := "AS_" + asn
 	asnBytes, err := ctx.GetStub().GetState(asKey)
 	if err != nil || asnBytes == nil {
@@ -709,8 +708,8 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	}
 	var assignment PrefixAssignment
 	_ = json.Unmarshal(prefixMetaBytes, &assignment)
-	if assignment.AssignedBy != orgMSP {
-		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, orgMSP)
+	if assignment.AssignedTo != owner {
+		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, owner)
 	}
 
 	var path []string
@@ -730,13 +729,13 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 		Prefix:     prefix,
 		Origin:     asn,
 		Path:       path,
-		AssignedBy: orgMSP,
+		AnnouncedBy: owner,
 	}
 	routeBytes, _ := json.Marshal(route)
 	return ctx.GetStub().PutState("ROUTE_"+prefix, routeBytes)
 }
 
-func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
+func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {	
 	// Retrieve the on-chain route for the given prefix
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil {
@@ -774,7 +773,7 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 		return "INVALID: AS path mismatch with announced route", nil
 	}
 
-	return fmt.Sprintf("VALID: AS path verified, announced by %s", onChainRoute.AssignedBy), nil
+	return "VALID: AS path verified", nil
 }
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
@@ -936,6 +935,27 @@ func (s *SmartContract) ListAllMembers(ctx contractapi.TransactionContextInterfa
 		}
 	}
 	return members, nil
+}
+func (s *SmartContract) ListAllASNValues(ctx contractapi.TransactionContextInterface) ([]string, error) {
+	iter, err := ctx.GetStub().GetStateByRange("AS_", "AS_z")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ASN range: %v", err)
+	}
+	defer iter.Close()
+
+	var asnList []string
+	for iter.HasNext() {
+		result, err := iter.Next()
+		if err != nil {
+			return nil, fmt.Errorf("iterator error: %v", err)
+		}
+
+		var asn AS
+		if err := json.Unmarshal(result.Value, &asn); err == nil && asn.ASN != "" {
+			asnList = append(asnList, asn.ASN)
+		}
+	}
+	return asnList, nil
 }
 
 // View all allocations of current member

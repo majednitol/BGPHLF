@@ -6,6 +6,7 @@ import { listApprovedRequests, resetState } from '../../features/ipPrefix/ipPref
 import { assignResource } from '../../features/company/companySlice';
 import { getAllOwnedPrefixes } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
+import { calculateSubnets } from '../../utils/ipUtils';
 
 const decodedUser = {
   org: 'Org1MSP',
@@ -62,13 +63,32 @@ const ListApprovedRequests = () => {
     setShowModal(true);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  if (name === 'parentPrefix') {
+    try {
+      const selectedRequest = data.find((req) => req.memberId === selectedMemberID);
+      const requiredIPs = Number(selectedRequest?.value || 0);
+
+      const subnets = calculateSubnets(value, requiredIPs);
+      const firstSubnet = subnets[0] || '';
+console.log("firstSubnet",firstSubnet)
+      setFormData((prev) => ({
+        ...prev,
+        parentPrefix: value,
+        subPrefix: firstSubnet,
+      }));
+    } catch (err) {
+      toast.error(`Subnet calc failed: ${err.message}`);
+    }
+  } else {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -162,12 +182,14 @@ const ListApprovedRequests = () => {
               </select>
 
               <input
-                name="subPrefix"
-                placeholder="Sub Prefix"
-                style={styles.input}
-                onChange={handleChange}
-                required
-              />
+  name="subPrefix"
+  value={formData.subPrefix} 
+  placeholder="Sub Prefix"
+  style={styles.input}
+  onChange={handleChange}
+  required
+/>
+              
               <input
                 name="expiry"
                 type="date"

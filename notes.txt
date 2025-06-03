@@ -211,7 +211,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
   --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"CreateSystemManager","Args":["sys001", "Alice Admin", "alice@example.com", "Org6MSP", "SYSTEM_MANAGER", "2025-06-01T12:00:00Z"]}' \
+  -c '{"function":"CreateSystemManager","Args":["sys001", "Alice Admin", "alice@example.com", "Org1MSP", "SYSTEM_MANAGER", "2025-06-01T12:00:00Z"]}' \
   --waitForEvent
 ### 2. **RegisterAS**
 
@@ -227,7 +227,27 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
   --peerAddresses peer0-org2:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  -c '{"Args":["RegisterAS","64514444","publicKeyExampleHere"]}' \
+  -c '{
+    "function": "RegisterCompanyWithMember",
+    "Args": [
+      "com_gp_bd",
+      "Grameenphone Ltd",
+      "Telecommunications",
+      "GP House, Bashundhara",
+      "Dhaka",
+      "Dhaka",
+      "1229",
+      "BD",
+      "+8801700000000",
+      "info@grameenphone.com",
+      "abuse@grameenphone.com",
+      "false",
+      "mem_gp001",
+      "GP Network Admin",
+      "BD",
+      "admin@grameenphone.com"
+    ]
+  }' \
   --waitForEvent
 
 
@@ -340,17 +360,37 @@ peer chaincode invoke \
   -n basic \
   --peerAddresses peer0-org1:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:7051 \
+  --peerAddresses peer0-org2:9051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:7051 \
+  --peerAddresses peer0-org3:11051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:7051 \
+  --peerAddresses peer0-org4:12051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:7051 \
+  --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:7051 \
+  --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c '{"Args":["GetAllocationsByMember","brac001"]}' \
+  -c ''{
+    "function": "RegisterCompanyWithMember",
+    "Args": [
+      "com_gp_bd",
+      "Grameenphone Ltd",
+      "Telecommunications",
+      "GP House, Bashundhara",
+      "Dhaka",
+      "Dhaka",
+      "1229",
+      "BD",
+      "+8801700000000",
+      "info@grameenphone.com",
+      "abuse@grameenphone.com",
+      "false",
+      "mem_gp001",
+      "GP Network Admin",
+      "BD",
+      "admin@grameenphone.com"
+    ]
+  }' \
   --waitForEvent
 ```
 
@@ -404,7 +444,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
   --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c -c '{"Args":["RequestResource","brac001","222","ipv4","1","20250524","BD","afrinic","2025-05-27T12:00:00Z"]}' \
+  -c -c '{"Args":["RequestResource","brac001","222","ipv4","1","20250524","BD","afrinic","2025-05-27T12:00:00Z"]}' 
   --waitForEvent
 ```
 
@@ -467,4 +507,4 @@ peer chaincode invoke -n basic -C mychannel -c '{"Args":["RequestResource","req1
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"function":"ListPendingRequests","Args":["brac001"]}'
+  -c '{"function":"ListPendingRequests","Args":["Org6MSP"]}'

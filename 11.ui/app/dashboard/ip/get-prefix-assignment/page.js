@@ -2,7 +2,7 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import GetPrefixAssignment from '../../../dashboard(main)/ip-prefix/GetPrefixAssignment';
+import GetPrefixAssignment from '../../../dashboard(main)/RIR/GetPrefixAssignment';
 
 
 const GetPrefixAssignmentPage = () => {

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { tracePrefix } from '../../features/ipPrefix/ipPrefixSlice';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { tracePrefix } from '../../../features/ipPrefix/ipPrefixSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import toast from 'react-hot-toast';
 
 const TracePrefix = () => {
