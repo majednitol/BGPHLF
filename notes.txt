@@ -404,8 +404,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
   --peerAddresses peer0-org6:14051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c -c '{"Args":["RequestResource","req123","222","ipv4","1","20250524","BD","afrinic","2025-05-27T12:00:00Z"]}'
- \
+  -c -c '{"Args":["RequestResource","brac001","222","ipv4","1","20250524","BD","afrinic","2025-05-27T12:00:00Z"]}' \
   --waitForEvent
 ```
 
@@ -468,4 +467,4 @@ peer chaincode invoke -n basic -C mychannel -c '{"Args":["RequestResource","req1
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"function":"GetAllOwnedPrefixes","Args":["Org1MSP"]}'
+  -c '{"function":"ListPendingRequests","Args":["brac001"]}'

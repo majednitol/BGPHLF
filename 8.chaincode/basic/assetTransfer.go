@@ -960,7 +960,7 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 
 // View all submitted resource requests by member
 func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*ResourceRequest, error) {
-	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, "brac001")
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
 		return nil, err
