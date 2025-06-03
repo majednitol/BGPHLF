@@ -59,7 +59,7 @@ type Allocation struct {
 	Expiry    string            `json:"expiry"`
 	IssuedBy  string            `json:"issuedBy"`
 	Timestamp string            `json:"timestamp"`
-} 
+}
 type AS struct {
 	ASN        string `json:"asn"`
 	Prefix     string `json:"prefix"`
@@ -73,9 +73,9 @@ type SmartContract struct {
 }
 
 type Route struct {
-	Prefix     string   `json:"prefix"`
-	Origin     string   `json:"origin"`
-	Path       []string `json:"path"`
+	Prefix      string   `json:"prefix"`
+	Origin      string   `json:"origin"`
+	Path        []string `json:"path"`
 	AnnouncedBy string   `json:"announcedBy"`
 }
 
@@ -204,7 +204,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	}
 
 	return nil
-} 
+}
 func (s *SmartContract) CreateSystemManager(ctx contractapi.TransactionContextInterface, id, name, email, orgMSP, role, createdAt string) error {
 	if id == "" || name == "" || email == "" || orgMSP == "" || role == "" {
 		return fmt.Errorf("all fields except CreatedAt are required")
@@ -332,7 +332,7 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country,rir, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir, timestamp string) error {
 	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + memberID)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member not found")
@@ -690,8 +690,9 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	_ = json.Unmarshal(bytes, &assignment)
 	return &assignment, nil
 }
+
 // AS1-
-func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface,owner, asn, prefix string, pathJSON string) error {
+func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, owner, asn, prefix string, pathJSON string) error {
 	// orgMSP, err := getRIROrg(ctx)
 	// if err != nil {
 	// 	return err
@@ -726,16 +727,16 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	}
 
 	route := Route{
-		Prefix:     prefix,
-		Origin:     asn,
-		Path:       path,
+		Prefix:      prefix,
+		Origin:      asn,
+		Path:        path,
 		AnnouncedBy: owner,
 	}
 	routeBytes, _ := json.Marshal(route)
 	return ctx.GetStub().PutState("ROUTE_"+prefix, routeBytes)
 }
 
-func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {	
+func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
 	// Retrieve the on-chain route for the given prefix
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil {
