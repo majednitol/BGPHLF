@@ -691,7 +691,7 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	return &assignment, nil
 }
 
-// AS1-
+
 func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, owner, asn, prefix string, pathJSON string) error {
 	// orgMSP, err := getRIROrg(ctx)
 	// if err != nil {
