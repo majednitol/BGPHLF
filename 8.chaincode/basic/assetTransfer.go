@@ -54,8 +54,8 @@ type ResourceRequest struct {
 type Allocation struct {
 	ID        string            `json:"id"`
 	MemberID  string            `json:"memberId"`
-	ASN       string            `json:"asn,omitempty"`
-	Prefix    *PrefixAssignment `json:"prefix,omitempty"`
+	ASN       string            `json:"asn"`
+	Prefix    *PrefixAssignment `json:"prefix"`
 	Expiry    string            `json:"expiry"`
 	IssuedBy  string            `json:"issuedBy"`
 	Timestamp string            `json:"timestamp"`
