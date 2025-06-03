@@ -1,94 +1,117 @@
 'use client';
 
-import React, { useState } from 'react'
-
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../redux/hooks';
 import { getCompany } from '../../features/company/companySlice';
-import toast from 'react-hot-toast';
-import './styles/formStyles.css';
+
+const decodedUser = {
+  org: 'Org1MSP',
+  comapanyID: 'com001',
+};
 
 const GetCompany = () => {
   const dispatch = useAppDispatch();
-  const [comapanyID, setCompanyID] = useState('');
-const [org, setOrg] = useState('Org1');
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const result = await dispatch(getCompany({ comapanyID,org })).unwrap();
-      toast.success(`Company Data: ${JSON.stringify(result)}`);
-    } catch (err) {
-      toast.error(`Error: ${err}`);
-    }
-  };
+  const [companyData, setCompanyData] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      try {
+        const result = await dispatch(
+          getCompany({ comapanyID: decodedUser.comapanyID, org: decodedUser.org })
+        ).unwrap();
+        setCompanyData(result);
+      } catch (err) {
+        setError(`Error: ${err}`);
+      }
+    };
+
+    fetchCompany();
+  }, [dispatch]);
 
   return (
-    <div className="form-container">
-      <h2>Get Company</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="comapanyID"
-          placeholder="Company ID"
-          value={comapanyID}
-          onChange={(e) => setCompanyID(e.target.value)}
-          required
-              />
-              <select style={styles.select} value={org} onChange={(e) => setOrg(e.target.value)}>
-        {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-          <option key={o} value={o}>{o}</option>
-        ))}
-      </select>
-        <button type="submit">Fetch Company</button>
-      </form>
+    <div style={styles.container}>
+      <h2 style={styles.title}>📄 Company Information</h2>
+
+      <div style={styles.meta}>
+        <span><strong>Organization:</strong> {decodedUser.org}</span>
+        <span><strong>Company ID:</strong> {decodedUser.comapanyID}</span>
+      </div>
+
+      {error && <p style={styles.error}>{error}</p>}
+
+      {companyData && (
+        <div style={styles.card}>
+          {Object.entries(companyData).map(([key, value]) => (
+            <div key={key} style={styles.row}>
+              <span style={styles.key}>{formatLabel(key)}</span>
+              <span style={styles.value}>{String(value)}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
-const styles = {container: {
-    maxWidth: '400px',
-    margin: '30px auto',
-    padding: '20px',
-    border: '2px solid #ddd',
+
+// Helper to format snake_case keys into nice labels
+const formatLabel = (label) =>
+  label
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const styles = {
+  container: {
+    maxWidth: '700px',
+    margin: '40px auto',
+    padding: '30px',
+    backgroundColor: '#f8f9fa',
     borderRadius: '12px',
-    boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'Segoe UI, sans-serif',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
   },
-  header: {
+  title: {
+    textAlign: 'center',
+    fontSize: '24px',
     color: '#2c3e50',
-    marginBottom: '15px',
+    marginBottom: '20px',
   },
-  input: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    fontSize: '16px',
-    borderRadius: '6px',
-    border: '1px solid #ccc',
+  meta: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    backgroundColor: '#eef5ff',
+    padding: '10px 15px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '15px',
+    color: '#333',
   },
-  select: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    fontSize: '16px',
-    borderRadius: '6px',
-    border: '1px solid #ccc',
+  error: {
+    color: 'red',
+    textAlign: 'center',
   },
-  button: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    backgroundColor: '#27ae60',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
+  card: {
+    backgroundColor: '#ffffff',
+    padding: '20px',
+    borderRadius: '10px',
+    border: '1px solid #e0e0e0',
+    boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
   },
-  userCard: {
-    marginTop: '20px',
-    padding: '12px',
-    backgroundColor: '#ecf0f1',
-    borderRadius: '6px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
+  row: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '8px 0',
+    borderBottom: '1px solid #f0f0f0',
+  },
+  key: {
+    fontWeight: '500',
+    color: '#555',
+    width: '45%',
+  },
+  value: {
+    color: '#222',
+    width: '55%',
+    textAlign: 'right',
   },
 };
 

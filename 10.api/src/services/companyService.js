@@ -134,20 +134,38 @@ export async function ReviewRequest(request) {
 
 
 
-export async function GetCompanyByMemberID(request) {
+export async function GetAllocationsByMember(request) {
   try {
 
     const memberID = request.memberID;
 
     const contract = await smartContract(request, memberID);
     let result = await contract.evaluateTransaction(
-      "GetCompanyByMemberID",
+      "GetAllocationsByMember",
       memberID,
     );
     console.log("result", result);
     return JSON.parse(result);
   } catch (error) {
-    console.error("Error in GetCompanyByMemberID:", error);
+    console.error("Error in GetAllocationsByMember:", error);
+    throw error;
+  }
+}
+
+export async function GetResourceRequestsByMember(request) {
+  try {
+
+    const memberID = request.memberID;
+
+    const contract = await smartContract(request, memberID);
+    let result = await contract.evaluateTransaction(
+      "GetResourceRequestsByMember",
+      memberID,
+    );
+    console.log("result", result);
+    return JSON.parse(result);
+  } catch (error) {
+    console.error("Error in GetResourceRequestsByMember:", error);
     throw error;
   }
 }
@@ -155,18 +173,17 @@ export async function GetCompanyByMemberID(request) {
 export async function AssignResource(request) {
   try {
 
-   
+
     const memberID = request.memberID;
     const allocationID = request.allocationID;
     const parentPrefix = request.parentPrefix;
     const subPrefix = request.subPrefix;
     const expiry = request.expiry;
     const timestamp = request.timestamp;
-
+    const org = request.org;
     const contract = await smartContract(request, memberID);
     let result = await contract.submitTransaction(
-      "AssignResource",
-      allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp
+      "AssignResource", org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp
     );
     console.log("Transaction Result:", result);
 

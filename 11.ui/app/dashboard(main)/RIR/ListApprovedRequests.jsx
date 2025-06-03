@@ -153,7 +153,7 @@ const ListApprovedRequests = () => {
               >
                 <option value="">Select Parent Prefix</option>
                               {
-                                  prefix.map((item, idx) => (
+                                  prefix?.map((item, idx) => (
                                       <option key={idx} value={item.prefix}>
                                         {item.prefix}
                                       </option>

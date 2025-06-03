@@ -340,14 +340,14 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 	}
 	var member Member
 	_ = json.Unmarshal(memberBytes, &member)
-if !member.Approved  {
+	if !member.Approved {
 		return fmt.Errorf("member not approved")
 	}
 	resType = strings.ToLower(resType)
 	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
 		return fmt.Errorf("invalid resource type: %s", resType)
 	}
-msp, err := ctx.GetClientIdentity().GetMSPID()
+	msp, err := ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
 		return fmt.Errorf("failed to get MSP ID: %v", err)
 	}
@@ -356,13 +356,13 @@ msp, err := ctx.GetClientIdentity().GetMSPID()
 		MemberID:  memberID,
 		Type:      resType,
 		// Start:     start,
-		Value:     value,
-		Date:      date,
-		Status:    "pending",
-		Country:   country,
-		RIR:       msp,
+		Value:      value,
+		Date:       date,
+		Status:     "pending",
+		Country:    country,
+		RIR:        msp,
 		ReviewedBy: "not yet reviewed",
-		Timestamp: timestamp,
+		Timestamp:  timestamp,
 	}
 
 	data, err := json.Marshal(request)
@@ -383,7 +383,7 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	if err != nil {
 		return fmt.Errorf("failed to get MSP ID: %v", err)
 	}
-	if msp == "Org1MSP" || msp == "Org2MSP" || msp == "Org3MSP" || msp == "Org4MSP" || msp == "Org5MSP"{
+	if msp == "Org1MSP" || msp == "Org2MSP" || msp == "Org3MSP" || msp == "Org4MSP" || msp == "Org5MSP" {
 		return fmt.Errorf("only RIR can review requests")
 	}
 
@@ -427,8 +427,7 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 	return &member.Company, nil
 }
 func (s *SmartContract) AssignResource(
-	ctx contractapi.TransactionContextInterface,
-	allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
+	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
 ) error {
 	// check "ALLOC_"+allocationID already exists
 	exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID)
@@ -441,13 +440,6 @@ func (s *SmartContract) AssignResource(
 	memberBytes, err := ctx.GetStub().GetState(memberKey)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member %s not found", memberID)
-	}
-	msp, err := ctx.GetClientIdentity().GetMSPID()
-	if err != nil {
-		return fmt.Errorf("failed to get MSP ID: %v", err)
-	}
-	if msp != "Org1MSP" {
-		return fmt.Errorf("only AFRINIC (Org1MSP) can assign resources")
 	}
 
 	// ======== Generate ASN Automatically ========
@@ -465,7 +457,7 @@ func (s *SmartContract) AssignResource(
 	var parentAssignment PrefixAssignment
 	_ = json.Unmarshal(parentBytes, &parentAssignment)
 
-	if parentAssignment.AssignedTo != msp {
+	if parentAssignment.AssignedTo != org {
 		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
 	}
 
@@ -482,7 +474,7 @@ func (s *SmartContract) AssignResource(
 	prefixAssignment := PrefixAssignment{
 		Prefix:     subPrefix,
 		AssignedTo: memberID,
-		AssignedBy: msp,
+		AssignedBy: org,
 		Timestamp:  timestamp,
 	}
 	prefixBytes, _ := json.Marshal(prefixAssignment)
@@ -493,7 +485,7 @@ func (s *SmartContract) AssignResource(
 		ASN:        strconv.Itoa(newASN),
 		Prefix:     subPrefix,
 		AssignedTo: memberID,
-		AssignedBy: msp,
+		AssignedBy: org,
 		Timestamp:  timestamp,
 	}
 	asBytes, _ := json.Marshal(as)
@@ -507,7 +499,7 @@ func (s *SmartContract) AssignResource(
 		Prefix:    &prefixAssignment,
 		ASN:       strconv.Itoa(newASN),
 		Expiry:    expiry,
-		IssuedBy:  msp,
+		IssuedBy:  org,
 		Timestamp: timestamp,
 	}
 
@@ -566,7 +558,6 @@ func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterf
 	resultBytes, _ := json.Marshal(output)
 	return string(resultBytes), nil
 }
-
 
 func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
 	query := `{"selector":{"resource":"asn"}}`
@@ -836,7 +827,6 @@ func (s *SmartContract) GetAllPrefixesAssignedByOrg(ctx contractapi.TransactionC
 	return assignments, nil
 }
 
-
 func (s *SmartContract) GetCompany(ctx contractapi.TransactionContextInterface, comapanyID string) (*Company, error) {
 	bytes, err := ctx.GetStub().GetState("COM_" + comapanyID)
 	if err != nil || bytes == nil {
@@ -893,8 +883,8 @@ func (s *SmartContract) GetAllOwnedPrefixes(ctx contractapi.TransactionContextIn
 }
 
 // List all pending requests submitted to this RIR
-func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface,org string) ([]*ResourceRequest, error) {
-	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, org)
+func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface, rir string) ([]*ResourceRequest, error) {
+	query := fmt.Sprintf(`{"selector":{"rir":"%s","status":"pending"}}`, rir)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
 		return nil, err

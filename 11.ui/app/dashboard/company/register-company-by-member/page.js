@@ -2,7 +2,8 @@
 import React from 'react'
 import DashboardLayout from '../../../DashboardLayout/DashboardLayout'
 import IsAuth from '../../../ProtectedRoute/IsAuth'
-import RegisterCompanyWithMember from '../RegisterCompanyWithMember';
+import RegisterCompanyWithMember from '../../../dashboard(main)/company/RegisterCompanyWithMember';
+
 
 const RegisterCompanyWithMemberPage = () => {
   return (

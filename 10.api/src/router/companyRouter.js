@@ -9,6 +9,8 @@ import {
   requestResource,
   reviewRequest,
   getCompanyByMemberID,
+  getAllocationsByMember,
+  getResourceRequestsByMember,
 } from '../controllers/companyController.js';
 
 const companyRouter = express.Router();
@@ -25,7 +27,9 @@ companyRouter.post("/assign-resource", assignResource);
 companyRouter.post("/request-resource", requestResource);
 companyRouter.post("/review-request", reviewRequest);
 
-
+getResourceRequestsByMember
+companyRouter.get("/get-resource-requests-by-member", getResourceRequestsByMember);
+companyRouter.get("/get-allocations-by-member", getAllocationsByMember);
 companyRouter.get("/get-company-by-member-id", getCompanyByMemberID);
 
 export default companyRouter;

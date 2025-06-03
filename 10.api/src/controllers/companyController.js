@@ -1,4 +1,4 @@
-import { ApproveMember, AssignResource, GetCompany, GetCompanyByMemberID, RegisterCompanyWithMember, RequestResource, ReviewRequest } from "../services/companyService.js";
+import { ApproveMember, AssignResource, GetAllocationsByMember, GetCompany, GetCompanyByMemberID, GetResourceRequestsByMember, RegisterCompanyWithMember, RequestResource, ReviewRequest } from "../services/companyService.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function registerCompanyWithMember(req, res) {
@@ -156,6 +156,41 @@ export async function getCompanyByMemberID(req, res) {
     res.json(result);
   } catch (error) {
     console.error("Error in getCompanyByMemberID:", error);
+    res.status(500).send(error.toString());
+  }
+}
+export async function getAllocationsByMember(req, res) {
+  try {
+    const payload = {
+      "org": req.query.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "memberID": req.query.memberID || req.body.memberID,
+    };
+
+    console.log("Payload:", payload);
+    const result = await GetAllocationsByMember(payload);
+    res.json(result);
+  } catch (error) {
+    console.error("Error in GetAllocationsByMember:", error);
+    res.status(500).send(error.toString());
+  }
+}
+
+export async function getResourceRequestsByMember(req, res) {
+  try {
+    const payload = {
+      "org": req.query.org,
+      "channelName": "mychannel",
+      "chaincodeName": "basic",
+      "memberID": req.query.memberID || req.body.memberID,
+    };
+
+    console.log("Payload:", payload);
+    const result = await GetResourceRequestsByMember(payload);
+    res.json(result);
+  } catch (error) {
+    console.error("Error in GetAllocationsByMember:", error);
     res.status(500).send(error.toString());
   }
 }

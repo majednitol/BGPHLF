@@ -34,12 +34,12 @@ const navItems = {
     '/dashboard/ip/trace-prefix'
   ],
   company: [
-    '/dashboard/company/register-company-by-member',
-    '/dashboard/company/get-company',
-    '/dashboard/company/approve-member',
+    // '/dashboard/company/register-company-by-member',
+    // '/dashboard/company/get-company',
+    '/dashboard/company/my-allocation',
     '/dashboard/company/assign-resource',
     '/dashboard/company/request-resource',
-    '/dashboard/company/review-request',
+    '/dashboard/company/my-resource-request',
     '/dashboard/company/get-company-by-member-id'
   ],
   user: [
@@ -49,7 +49,7 @@ const navItems = {
     '/dashboard/user/login-user'
   ]
 };
-const ConnectedAccountUser = 'rir'; // TODO: Replace with actual user type
+const ConnectedAccountUser = 'company'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
 //   const { ConnectedAccountUser } = useContext(HealthContext);
 

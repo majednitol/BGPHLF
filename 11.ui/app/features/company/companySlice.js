@@ -148,7 +148,30 @@ export const getCompanyByMemberID = createAsyncThunk(
     }
   }
 );
-
+export const getResourceRequestsByMember = createAsyncThunk(
+  'company/getResourceRequestsByMember',
+  async ({ org, memberID }, thunkAPI) => {
+    try {
+      const params = { org, memberID }
+      const response = await apiRepository.get('company/get-resource-requests-by-member', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+export const getAllocationsByMember = createAsyncThunk(
+  'company/getAllocationsByMember',
+  async ({ org, memberID }, thunkAPI) => {
+    try {
+      const params = { org, memberID }
+      const response = await apiRepository.get('company/get-allocations-by-member', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 const initialState = {
   companyData: null,
   loading: false,
@@ -158,7 +181,14 @@ const initialState = {
 
 const companySlice = createSlice({
   name: 'company',
-  initialState,
+  initialState, reducers: {
+    resetState: (state) => {
+      state.companyData = null;
+      state.loading = false;
+      state.error = null;
+      state.success = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Register Company With Member
@@ -262,8 +292,34 @@ const companySlice = createSlice({
       .addCase(getCompanyByMemberID.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+    // Get Resource Requests By Member
+      .addCase(getResourceRequestsByMember.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getResourceRequestsByMember.fulfilled, (state, action) => {
+        state.loading = false;
+        state.companyData = action.payload;
+      })
+      .addCase(getResourceRequestsByMember.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+    // Get Allocations By Member
+      .addCase(getAllocationsByMember.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllocationsByMember.fulfilled, (state, action) => {
+        state.loading = false;
+        state.companyData = action.payload;
+      })
+      .addCase(getAllocationsByMember.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      }) 
   },
 });
-
+export const { resetState } = companySlice.actions;
 export default companySlice.reducer;
