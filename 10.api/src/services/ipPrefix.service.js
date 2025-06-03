@@ -104,7 +104,7 @@ export async function RevokeRoute(request) {
         const prefix = request.prefix
         const contract = await smartContract(request, memberID)
         let result = await contract.submitTransaction(
-            "RevokeRoute",
+            "RevokeRoute",memberID,
             asn,
             prefix
         );
