@@ -333,7 +333,7 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country,rir, timestamp string) error {
 	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + memberID)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member not found")
@@ -347,10 +347,10 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 	if resType != "asn" && resType != "ipv4" && resType != "ipv6" {
 		return fmt.Errorf("invalid resource type: %s", resType)
 	}
-	msp, err := ctx.GetClientIdentity().GetMSPID()
-	if err != nil {
-		return fmt.Errorf("failed to get MSP ID: %v", err)
-	}
+	// msp, err := ctx.GetClientIdentity().GetMSPID()
+	// if err != nil {
+	// 	return fmt.Errorf("failed to get MSP ID: %v", err)
+	// }
 	request := ResourceRequest{
 		RequestID: reqID,
 		MemberID:  memberID,
@@ -360,7 +360,7 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 		Date:       date,
 		Status:     "pending",
 		Country:    country,
-		RIR:        msp,
+		RIR:        rir,
 		ReviewedBy: "not yet reviewed",
 		Timestamp:  timestamp,
 	}

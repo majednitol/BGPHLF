@@ -37,7 +37,6 @@ const navItems = {
     // '/dashboard/company/register-company-by-member',
     // '/dashboard/company/get-company',
     '/dashboard/company/my-allocation',
-    '/dashboard/company/assign-resource',
     '/dashboard/company/request-resource',
     '/dashboard/company/my-resource-request',
     '/dashboard/company/get-company-by-member-id'

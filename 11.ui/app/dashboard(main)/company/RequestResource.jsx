@@ -19,7 +19,7 @@ const RequestResource = () => {
     date: '',
     country: '',
     rir: '',
-    timestamp: '',
+    timestamp: new Date().toISOString().slice(0, 16),
   });
 
   useEffect(() => {
@@ -43,6 +43,7 @@ const RequestResource = () => {
     };
 
     try {
+      console.log("payload",payload)
       await dispatch(requestResource(payload)).unwrap();
       toast.success('Resource request submitted successfully!');
       setFormData({
@@ -52,7 +53,7 @@ const RequestResource = () => {
         date: '',
         country: '',
         rir: '',
-        timestamp: '',
+        timestamp: new Date().toISOString().slice(0, 16),
       });
     } catch (error) {
       toast.error(`Error: ${error}`);
@@ -107,21 +108,20 @@ const RequestResource = () => {
           style={styles.input}
           required
         />
-           <select name="rir" value={formData.rir} onChange={handleChange} style={styles.select}>
-          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select> 
-        <input
-          name="timestamp"
-          type="datetime-local"
-          value={formData.timestamp}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
+           <select
+  name="rir"
+  value={formData.rir}
+  onChange={handleChange}
+  style={styles.select}
+  required
+>
+  <option value="">Select RIR</option> {/* <-- Add this */}
+  {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
+    <option key={o} value={o}>
+      {o}
+    </option>
+  ))}
+</select> 
         <button type="submit" style={styles.button}>Submit Request</button>
       </form>
     </div>

@@ -38,26 +38,26 @@ const AllocationsList = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Allocation ID</th>
-              <th style={styles.th}>Resource Type</th>
-              <th style={styles.th}>Parent Prefix</th>
-              <th style={styles.th}>Sub Prefix</th>
+              <th style={styles.th}>ID</th>
+              <th style={styles.th}>ASN</th>
+              <th style={styles.th}>Prefix</th>
               <th style={styles.th}>Expiry</th>
+              <th style={styles.th}>Issued By</th>
               <th style={styles.th}>Timestamp</th>
             </tr>
           </thead>
           <tbody>
-            {companyData.map((allocation, idx) => (
+            {companyData.map((item, idx) => (
               <tr key={idx}>
-                <td style={styles.td}>{allocation.allocationID || '-'}</td>
-                <td style={styles.td}>{allocation.resType || '-'}</td>
-                <td style={styles.td}>{allocation.parentPrefix || '-'}</td>
-                <td style={styles.td}>{allocation.subPrefix || '-'}</td>
+                <td style={styles.td}>{item.id || '-'}</td>
+                <td style={styles.td}>{item.asn || '-'}</td>
+                <td style={styles.td}>{item.prefix || '-'}</td>
+                <td style={styles.td}>{item.expiry || '-'}</td>
+                <td style={styles.td}>{item.issuedBy || '-'}</td>
                 <td style={styles.td}>
-                  {allocation.expiry ? new Date(allocation.expiry).toLocaleDateString() : '-'}
-                </td>
-                <td style={styles.td}>
-                  {allocation.timestamp ? new Date(allocation.timestamp).toLocaleString() : '-'}
+                  {item.timestamp && !isNaN(Date.parse(item.timestamp))
+                    ? new Date(item.timestamp).toLocaleString()
+                    : item.timestamp || '-'}
                 </td>
               </tr>
             ))}

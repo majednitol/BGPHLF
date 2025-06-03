@@ -105,6 +105,7 @@ export const requestResource = createAsyncThunk(
         resType,
         value, date, country, rir, timestamp
       }
+      console.log("data",data)
       const response = await apiRepository.post('company/request-resource', data, true);
       return response.data;
     } catch (error) {

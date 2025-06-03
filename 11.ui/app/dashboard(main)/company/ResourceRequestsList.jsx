@@ -67,7 +67,7 @@ const ResourceRequestsList = () => {
                 <td style={styles.td}>{req.status || '-'}</td>
                 <td style={styles.td}>{req.reviewedBy || '-'}</td>
                 <td style={styles.td}>
-                  {req.timestamp ? new Date(req.timestamp).toLocaleString() : '-'}
+                  {req.timestamp }
                 </td>
               </tr>
             ))}
