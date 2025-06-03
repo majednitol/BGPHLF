@@ -79,7 +79,7 @@ export async function AnnounceRoute(request) {
         const memberID = request.memberID
         const asn = request.asn
         const prefix = request.prefix
-        const pathJSON = request.pathJSON
+        const pathJSON = JSON.stringify(request.pathJSON);
         const contract = await smartContract(request, memberID)
         let result = await contract.submitTransaction(
             "AnnounceRoute",
