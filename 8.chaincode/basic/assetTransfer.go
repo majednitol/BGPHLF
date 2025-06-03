@@ -47,7 +47,7 @@ type ResourceRequest struct {
 	Status     string `json:"status"` // allocated, reserved, etc.
 	Country    string `json:"country"`
 	RIR        string `json:"rir"`
-	ReviewedBy string `json:"reviewedBy,omitempty"`
+	ReviewedBy string `json:"reviewedBy"`
 	Timestamp  string `json:"timestamp"`
 }
 
@@ -960,7 +960,7 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 
 // View all submitted resource requests by member
 func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*ResourceRequest, error) {
-	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, "brac001")
+	query := fmt.Sprintf(`{"selector":{"memberId":"%s"}}`, memberID)
 	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
 		return nil, err
