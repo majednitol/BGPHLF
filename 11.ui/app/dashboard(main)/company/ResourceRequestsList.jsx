@@ -28,36 +28,47 @@ const ResourceRequestsList = () => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>📨 Resource Requests for Member ID: {decodedUser.memberID}</h2>
-      {loading && <p style={styles.info}>Loading resource requests...</p>}
+      <h2 style={styles.heading}>📨 Resource Requests for Member ID: {decodedUser.memberID}</h2>
 
-      {!loading && companyData && companyData.length === 0 && (
-        <p style={styles.info}>No resource requests found.</p>
+      {loading && <p style={styles.loadingText}>Loading resource requests...</p>}
+
+      {error && <p style={styles.errorText}>Error: {error}</p>}
+
+      {!loading && Array.isArray(companyData) && companyData.length === 0 && (
+        <p style={styles.noDataText}>No resource requests found.</p>
       )}
 
-      {!loading && companyData && companyData.length > 0 && (
+      {!loading && Array.isArray(companyData) && companyData.length > 0 && (
         <table style={styles.table}>
           <thead>
             <tr>
-              <th>Request ID</th>
-              <th>Resource Type</th>
-              <th>Value</th>
-              <th>Date</th>
-              <th>Country</th>
-              <th>RIR</th>
-              <th>Timestamp</th>
+              <th style={styles.th}>Request ID</th>
+              <th style={styles.th}>Type</th>
+              <th style={styles.th}>Value</th>
+              <th style={styles.th}>Date</th>
+              <th style={styles.th}>Country</th>
+              <th style={styles.th}>RIR</th>
+              <th style={styles.th}>Status</th>
+              <th style={styles.th}>Reviewed By</th>
+              <th style={styles.th}>Timestamp</th>
             </tr>
           </thead>
           <tbody>
-            {companyData.map((request) => (
-              <tr key={request.reqID}>
-                <td>{request.reqID}</td>
-                <td>{request.resType}</td>
-                <td>{request.value}</td>
-                <td>{new Date(request.date).toLocaleDateString()}</td>
-                <td>{request.country}</td>
-                <td>{request.rir}</td>
-                <td>{new Date(request.timestamp).toLocaleString()}</td>
+            {companyData.map((req, idx) => (
+              <tr key={idx}>
+                <td style={styles.td}>{req.requestId || '-'}</td>
+                <td style={styles.td}>{req.type || '-'}</td>
+                <td style={styles.td}>{req.value || '-'}</td>
+                <td style={styles.td}>
+                  {req.date ? new Date(req.date).toLocaleDateString() : '-'}
+                </td>
+                <td style={styles.td}>{req.country || '-'}</td>
+                <td style={styles.td}>{req.rir || '-'}</td>
+                <td style={styles.td}>{req.status || '-'}</td>
+                <td style={styles.td}>{req.reviewedBy || '-'}</td>
+                <td style={styles.td}>
+                  {req.timestamp ? new Date(req.timestamp).toLocaleString() : '-'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -69,41 +80,46 @@ const ResourceRequestsList = () => {
 
 const styles = {
   container: {
-    maxWidth: '900px',
+    maxWidth: '1000px',
     margin: '40px auto',
     padding: '30px',
-    backgroundColor: '#f9fafb',
-    borderRadius: '12px',
-    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+    backgroundColor: '#eaf4ff',
+    borderRadius: '10px',
+    boxShadow: '0 0 10px rgba(0, 128, 255, 0.1)',
   },
-  title: {
-    marginBottom: '25px',
-    color: '#2d3748',
-    fontSize: '26px',
+  heading: {
     textAlign: 'center',
+    marginBottom: '20px',
+    color: '#0077cc',
   },
-  info: {
+  loadingText: {
     textAlign: 'center',
-    color: '#718096',
-    fontSize: '18px',
+    color: '#444',
+  },
+  errorText: {
+    textAlign: 'center',
+    color: 'red',
+  },
+  noDataText: {
+    textAlign: 'center',
+    color: '#777',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    fontSize: '16px',
+    marginTop: '20px',
   },
-  'table th, table td': {
-    border: '1px solid #e2e8f0',
+  th: {
+    backgroundColor: '#0077cc',
+    color: 'white',
     padding: '10px',
-    textAlign: 'left',
+    border: '1px solid #ccc',
   },
-  'table th': {
-    backgroundColor: '#e2e8f0',
-    color: '#1a202c',
-  },
-  'table tr:nth-child(even)': {
-    backgroundColor: '#edf2f7',
+  td: {
+    padding: '10px',
+    border: '1px solid #ccc',
+    textAlign: 'center',
+    backgroundColor: '#fff',
   },
 };
 
