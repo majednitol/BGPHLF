@@ -5,12 +5,14 @@ import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import {
   announceRoute,
+  listAllASNValues,
   resetState as resetIpPrefixState,
 } from '../../features/ipPrefix/ipPrefixSlice';
 import {
   getAllocationsByMember,
   resetState as resetCompanyState,
 } from '../../features/company/companySlice';
+
 
 const decodedUser = {
   org: 'Org1MSP',
@@ -19,8 +21,8 @@ const decodedUser = {
 
 const AnnounceRoute = () => {
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.ipPrefix);
-  const { companyData, loading: companyLoading, error } = useAppSelector((state) => state.company);
+  const { data: asnData, loading: ipLoading, error: ipError } = useAppSelector((state) => state.ipPrefix);
+  const { companyData, loading: companyLoading, error: companyError } = useAppSelector((state) => state.company);
 
   const [form, setForm] = useState({
     org: decodedUser.org,
@@ -30,8 +32,12 @@ const AnnounceRoute = () => {
     pathJSON: '',
   });
 
+  const [selectedASNs, setSelectedASNs] = useState([]);
+
   useEffect(() => {
     dispatch(getAllocationsByMember({ org: decodedUser.org, memberID: decodedUser.memberID }));
+    dispatch(listAllASNValues({ org: decodedUser.org, memberID: decodedUser.memberID }));
+
     return () => {
       dispatch(resetCompanyState());
       dispatch(resetIpPrefixState());
@@ -39,8 +45,10 @@ const AnnounceRoute = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (error) toast.error(error);
-  }, [error]);
+    if (ipError || companyError) {
+      toast.error(ipError || companyError);
+    }
+  }, [ipError, companyError]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,16 +56,23 @@ const AnnounceRoute = () => {
   };
 
   const handleAllocationChange = (e) => {
-    console.log(companyData?.length)
     const selectedIndex = e.target.value;
     const selected = companyData[selectedIndex];
     if (selected && selected.asn && selected.prefix) {
       setForm((prev) => ({
         ...prev,
         asn: selected.asn,
-        prefix: typeof selected.prefix === 'object' ? selected.prefix.prefix : selected.prefix,
+        prefix: typeof selected.prefix === 'object' ? selected?.prefix?.prefix : selected.prefix,
       }));
     }
+  };
+
+  const handleCheckboxChange = (asn) => {
+    const updated = selectedASNs.includes(asn)
+      ? selectedASNs.filter((a) => a !== asn)
+      : [...selectedASNs, asn];
+    setSelectedASNs(updated);
+    setForm((prev) => ({ ...prev, pathJSON: JSON.stringify(updated) }));
   };
 
   const handleSubmit = async (e) => {
@@ -67,6 +82,7 @@ const AnnounceRoute = () => {
       await dispatch(announceRoute({ ...form, pathJSON: parsedPath })).unwrap();
       toast.success('Route announced successfully');
       setForm((prev) => ({ ...prev, pathJSON: '' }));
+      setSelectedASNs([]);
     } catch (err) {
       toast.error(`Announcement failed: ${err.message || err}`);
     }
@@ -76,17 +92,11 @@ const AnnounceRoute = () => {
     <form onSubmit={handleSubmit} style={styles.form}>
       <h2>📡 Announce Route</h2>
 
-
-      <label style={styles.label}>member ID</label>
-      <input
-        name="memberID"
-        value={form.memberID}
-        style={styles.input}
-        disabled
-      />
+      <label style={styles.label}>Member ID</label>
+      <input name="memberID" value={form.memberID} style={styles.input} disabled />
 
       <label style={styles.label}>Select Allocation</label>
-      <select onChange={handleAllocationChange} style={styles.input}>
+      <select onChange={handleAllocationChange} style={styles.input} required>
         <option value="">-- Select an allocation --</option>
         {companyData?.map((alloc, index) => {
           const prefix = typeof alloc.prefix === 'object' ? alloc?.prefix?.prefix : alloc.prefix;
@@ -106,7 +116,6 @@ const AnnounceRoute = () => {
         value={form.asn}
         onChange={handleChange}
         readOnly
-        placeholder="e.g. 65001"
         required
         style={styles.input}
       />
@@ -117,24 +126,40 @@ const AnnounceRoute = () => {
         value={form.prefix}
         onChange={handleChange}
         readOnly
-        placeholder="e.g. 192.0.2.0/24"
         required
         style={styles.input}
       />
 
-      <label style={styles.label}>Path JSON</label>
-      <textarea
-        name="pathJSON"
-        value={form.pathJSON}
-        onChange={handleChange}
-        placeholder='e.g. ["AS1", "AS2", "AS3"]'
-        required
-        rows={4}
-        style={styles.textarea}
-      />
+      <label style={styles.label}>Select Path (ASN)</label>
+      {ipLoading ? (
+        <p>Loading ASN values...</p>
+      ) : asnData && asnData.length > 0 ? (
+        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+          {asnData.map((asn) => (
+            <li key={asn}>
+              <label>
+                <input
+                  type="checkbox"
+                  value={asn}
+                  checked={selectedASNs.includes(asn)}
+                  onChange={() => handleCheckboxChange(asn)}
+                />{' '}
+                ASN {asn}
+              </label>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No ASN values found.</p>
+      )}
 
-      <button type="submit" disabled={loading || companyLoading} style={styles.button}>
-        {loading ? 'Announcing...' : 'Announce Route'}
+      <div>
+        <strong>Selected Path JSON:</strong>
+        <pre>{form.pathJSON}</pre>
+      </div>
+
+      <button type="submit" disabled={ipLoading || companyLoading} style={styles.button}>
+        {ipLoading ? 'Announcing...' : 'Announce Route'}
       </button>
     </form>
   );
@@ -156,12 +181,6 @@ const styles = {
     fontWeight: 'bold',
   },
   input: {
-    padding: 10,
-    fontSize: 16,
-    borderRadius: 5,
-    border: '1px solid #ccc',
-  },
-  textarea: {
     padding: 10,
     fontSize: 16,
     borderRadius: 5,

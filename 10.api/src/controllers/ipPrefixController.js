@@ -9,7 +9,7 @@ export async function validatePath(req, res) {
             "org": req.body.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.body.comapanyID ? req.body.comapanyID : req.comapanyID,
+            "memberID": req.body.memberID ? req.body.memberID : req.memberID,
             "prefix": req.body.prefix,
             "pathJSON": req.body.pathJSON
 
@@ -75,7 +75,7 @@ export async function announceRoute(req, res) {
             "org": req.body.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.body.comapanyID ? req.body.comapanyID : req.comapanyID,
+            "memberID": req.body.memberID ? req.body.memberID : req.memberID,
             "asn": req.body.asn,
             "prefix": req.body.prefix,
             "pathJSON": req.body.pathJSON
@@ -97,7 +97,7 @@ export async function revokeRoute(req, res) {
             "org": req.body.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.body.comapanyID ? req.body.comapanyID : req.comapanyID,
+            "comapanyID": req.body.memberID ? req.body.memberID : req.memberID,
             "asn": req.body.asn,
             "prefix": req.body.prefix
 

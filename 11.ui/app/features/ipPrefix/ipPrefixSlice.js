@@ -52,12 +52,12 @@ export const assignPrefix = createAsyncThunk(
 // ✅ Announce Route
 export const announceRoute = createAsyncThunk(
   'ipPrefix/announceRoute',
-  async ({org, comapanyID, asn,
+  async ({org, memberID, asn,
     prefix,
     pathJSON }, thunkAPI) => {
     try {
       const data = {org,
-        comapanyID, asn,
+        memberID, asn,
         prefix,
         pathJSON
       }
