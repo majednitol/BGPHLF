@@ -952,20 +952,11 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 		result, _ := iter.Next()
 		var alloc Allocation
 		if err := json.Unmarshal(result.Value, &alloc); err == nil {
-			// Ensure required fields exist
-			if alloc.ASN != "" && alloc.Prefix != nil {
-				allocations = append(allocations, &alloc)
-			}
+			allocations = append(allocations, &alloc)
 		}
 	}
-
-	if len(allocations) == 0 {
-		return nil, fmt.Errorf("no allocations found for member ID: %s", memberID)
-	}
-
 	return allocations, nil
 }
-
 
 // View all submitted resource requests by member
 func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionContextInterface, memberID string) ([]*ResourceRequest, error) {
