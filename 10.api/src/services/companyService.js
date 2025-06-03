@@ -193,4 +193,20 @@ export async function AssignResource(request) {
     throw error;
   }
 }
+export async function GetCompanyByMemberID(request) {
+  try {
 
+    const memberID = request.memberID;
+
+    const contract = await smartContract(request, memberID);
+    let result = await contract.evaluateTransaction(
+      "GetCompanyByMemberID",
+      memberID,
+    );
+    console.log("result", result);
+    return JSON.parse(result);
+  } catch (error) {
+    console.error("Error in GetCompanyByMemberID:", error);
+    throw error;
+  }
+}
