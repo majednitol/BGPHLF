@@ -59,7 +59,7 @@ type Allocation struct {
 	Expiry    string            `json:"expiry"`
 	IssuedBy  string            `json:"issuedBy"`
 	Timestamp string            `json:"timestamp"`
-}
+} 
 type AS struct {
 	ASN        string `json:"asn"`
 	Prefix     string `json:"prefix"`
