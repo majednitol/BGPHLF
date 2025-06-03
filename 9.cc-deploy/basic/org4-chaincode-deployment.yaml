@@ -18,7 +18,7 @@ spec:
         app: chaincode-basic-org4
     spec:
       containers:
-        - image: majedur708/hlf-api:18.0.19
+        - image: majedur708/hlf-api:18.0.22
           name: chaincode-basic-org4
           imagePullPolicy: Always
           env:
