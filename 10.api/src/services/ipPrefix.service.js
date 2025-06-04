@@ -99,25 +99,25 @@ export async function AnnounceRoute(request) {
 }
 
 export async function RevokeRoute(request) {
-    try {
+  try {
+    const { memberID, asn, prefix } = request;
 
-        const memberID = request.memberID
-        const asn = request.asn
-        const prefix = request.prefix
-        const contract = await smartContract(request, memberID)
-        let result = await contract.submitTransaction(
-            "RevokeRoute",memberID,
-            asn,
-            prefix
-        );
-        console.log("Transaction Result:", result.toString());
-
-        return result.toString();
-    } catch (error) {
-        console.error("Error in createAsset:", error.toString());
-        throw error;
+    if (!memberID || !asn || !prefix) {
+      throw new Error("Missing required fields: memberID, asn, or prefix");
     }
+
+    const contract = await smartContract(request, memberID);
+    const result = await contract.submitTransaction("RevokeRoute", memberID, asn, prefix);
+
+    console.log("Transaction Result:", result.toString());
+    return result.toString();
+
+  } catch (error) {
+    console.error("Error in RevokeRoute:", error?.message || error.toString());
+    throw new Error(`Fabric RevokeRoute failed: ${error?.message || error.toString()}`);
+  }
 }
+
 
 
 // export async function RegisterAS(request) {

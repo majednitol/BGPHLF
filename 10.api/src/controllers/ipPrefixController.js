@@ -109,25 +109,36 @@ export async function announceRoute(req, res) {
 }
 
 export async function revokeRoute(req, res) {
-    try {
-        let payload = {
-            "org": req.body.org,
-            "channelName": channelName,
-            "chaincodeName": chaincodeName,
-            "comapanyID": req.body.memberID ? req.body.memberID : req.memberID,
-            "asn": req.body.asn,
-            "prefix": req.body.prefix
+  try {
+    const { org, asn, prefix, memberID } = req.body;
 
-        }
-        console.log("payload", payload)
-        let result = await RevokeRoute(payload);
-        console.log(result)
-        res.send(result)
-    } catch (error) {
-        console.log(error)
-        res.status(500).send(error)
+    if (!org || !asn || !prefix || !memberID) {
+      return res.status(400).json({ error: "Missing required fields: org, asn, prefix, or memberID" });
     }
+
+    const payload = {
+      org,
+      channelName,
+      chaincodeName,
+      memberID,
+      asn,
+      prefix
+    };
+
+    console.log("Revoking route with payload:", payload);
+    const result = await RevokeRoute(payload);
+
+    res.send({ message: "Route revoked successfully", result });
+
+  } catch (error) {
+    console.error("Error in revokeRoute handler:", error);
+    res.status(500).json({
+      error: "Failed to revoke route",
+      details: error?.message || error.toString()
+    });
+  }
 }
+
 export async function getPrefixAssignment(req, res) {
     try {
         let payload = {

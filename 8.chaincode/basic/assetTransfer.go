@@ -777,29 +777,52 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 	return "VALID: AS path verified", nil
 }
 
-func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface,owner, asn, prefix string) error {
-	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
-	if err != nil || routeBytes == nil {
-		return fmt.Errorf("no route to revoke")
+func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, owner, asn, prefix string) error {
+	if owner == "" || asn == "" || prefix == "" {
+		return fmt.Errorf("owner, asn, and prefix are required")
 	}
+
+	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
+	if err != nil {
+		return fmt.Errorf("failed to read route state: %v", err)
+	}
+	if routeBytes == nil {
+		return fmt.Errorf("no route found for prefix %s", prefix)
+	}
+
 	var route Route
-	_ = json.Unmarshal(routeBytes, &route)
+	if err := json.Unmarshal(routeBytes, &route); err != nil {
+		return fmt.Errorf("failed to unmarshal route data: %v", err)
+	}
 
 	if route.Origin != asn {
-		return fmt.Errorf("only origin AS %s can revoke this route", route.Origin)
+		return fmt.Errorf("only origin ASN %s can revoke this route, not %s", route.Origin, asn)
 	}
 
 	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
-	if err != nil || prefixMetaBytes == nil {
+	if err != nil {
+		return fmt.Errorf("failed to read prefix assignment: %v", err)
+	}
+	if prefixMetaBytes == nil {
 		return fmt.Errorf("prefix %s has not been assigned", prefix)
 	}
+
 	var assignment PrefixAssignment
-	_ = json.Unmarshal(prefixMetaBytes, &assignment)
+	if err := json.Unmarshal(prefixMetaBytes, &assignment); err != nil {
+		return fmt.Errorf("failed to unmarshal prefix assignment: %v", err)
+	}
+
 	if assignment.AssignedTo != owner {
 		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, owner)
 	}
-	return ctx.GetStub().DelState("ROUTE_" + prefix)
+
+	if err := ctx.GetStub().DelState("ROUTE_" + prefix); err != nil {
+		return fmt.Errorf("failed to delete route: %v", err)
+	}
+
+	return nil
 }
+
 
 func (s *SmartContract) GetUser(ctx contractapi.TransactionContextInterface, userID string) (*User, error) {
 	bytes, err := ctx.GetStub().GetState("USER_" + userID)
