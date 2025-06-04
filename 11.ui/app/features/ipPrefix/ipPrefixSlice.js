@@ -9,8 +9,10 @@ export const validatePath = createAsyncThunk(
       const data = { org, memberID, prefix, pathJSON }
       console.log("daat",data)
       const response = await apiRepository.post('ip/validate-path', data, true);
+      console.log("response",response)
       return response.data;
     } catch (error) {
+      console.log("error",error)
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
     }
   }

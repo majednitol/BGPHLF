@@ -4,25 +4,42 @@ const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function validatePath(req, res) {
     try {
-
         let payload = {
-            "org": req.body.org,
-            "channelName": channelName,
-            "chaincodeName": chaincodeName,
-            "memberID": req.body.memberID ? req.body.memberID : req.memberID,
-            "prefix": req.body.prefix,
-            "pathJSON": req.body.pathJSON
+            org: req.body.org,
+            channelName: channelName,
+            chaincodeName: chaincodeName,
+            memberID: req.body.memberID || req.memberID,
+            prefix: req.body.prefix,
+            pathJSON: req.body.pathJSON
+        };
 
-        }
-        console.log("payload", payload)
+        console.log("payload", payload);
         let result = await ValidatePath(payload);
-        console.log(result)
-        res.send(result)
+        console.log("result", result);
+
+        // Detect invalid response based on returned string
+        if (typeof result === "string" && result.startsWith("INVALID")) {
+            return res.status(400).json({
+                success: false,
+                message: result
+            });
+        }
+
+        // Valid response
+        return res.status(200).json({
+            success: true,
+            result
+        });
+
     } catch (error) {
-        console.log(error)
-        res.status(500).send(error)
+        console.error("Unexpected error in validatePath:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error"
+        });
     }
 }
+
 
 export async function assignPrefix(req, res) {
     try {
