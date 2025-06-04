@@ -70,10 +70,8 @@ const handleChange = (e) => {
     try {
       const selectedRequest = data.find((req) => req.memberId === selectedMemberID);
       const requiredIPs = Number(selectedRequest?.value || 0);
-
       const subnets = calculateSubnets(value, requiredIPs);
-      const firstSubnet = subnets[0] || '';
-console.log("firstSubnet",firstSubnet)
+      const firstSubnet = subnets || '';
       setFormData((prev) => ({
         ...prev,
         parentPrefix: value,

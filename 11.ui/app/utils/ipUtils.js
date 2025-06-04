@@ -1,3 +1,4 @@
+
 import { Netmask } from 'netmask';
 
 function ipToInt(ip) {
@@ -8,32 +9,61 @@ function intToIp(int) {
   return [24, 16, 8, 0].map(shift => (int >> shift) & 255).join('.');
 }
 
-export function calculateSubnets(parentPrefix, requiredIPs) {
-  const parent = new Netmask(parentPrefix);
-  const parentStart = ipToInt(parent.base);
-  const parentEnd = ipToInt(parent.broadcast);
+function ipCountToPrefix(requiredIPs) {
+  let total = 1;
+  while (total < requiredIPs + 2) total *= 2; 
+  return 32 - Math.log2(total);
+}
 
-  let remaining = requiredIPs;
-  let currentIP = parentStart;
+function overlaps(a, b) {
+  const aStart = ipToInt(a.base);
+  const aEnd = ipToInt(a.broadcast);
+  const bStart = ipToInt(b.base);
+  const bEnd = ipToInt(b.broadcast);
+  return !(bEnd < aStart || bStart > aEnd);
+}
+
+function generateSubnets(baseCidr, newPrefix) {
+  const base = new Netmask(baseCidr);
+  const baseStart = ipToInt(base.base);
+  const baseEnd = ipToInt(base.broadcast);
+  const basePrefix = base.bitmask;
+console.log("newPrefix",newPrefix)
+  if (newPrefix < basePrefix) {
+    throw new Error("Not enough space in parent prefix");
+  }
+
+  const blockSize = 2 ** (32 - newPrefix);
   const subnets = [];
 
-  while (remaining > 0 && currentIP <= parentEnd) {
-    for (let cidr = 30; cidr <= 32; cidr++) {
-      const total = 2 ** (32 - cidr);
-      const usable = cidr >= 31 ? (cidr === 31 ? 2 : 1) : total - 2;
-
-      if (usable >= remaining && currentIP + total - 1 <= parentEnd) {
-        subnets.push(`${intToIp(currentIP)}/${cidr}`);
-        remaining -= usable;
-        currentIP += total;
-        break;
-      }
+  for (let i = baseStart; i + blockSize - 1 <= baseEnd; i += blockSize) {
+    if (i % blockSize === 0) {
+      const cidr = `${intToIp(i)}/${newPrefix}`;
+      subnets.push(new Netmask(cidr));
     }
   }
 
-  if (remaining > 0) {
-    throw new Error('Not enough space in parent prefix');
+  return subnets;
+}
+
+export function calculateSubnets(patientPrefix, requiredIPs) {
+  const requiredPrefix = ipCountToPrefix(requiredIPs);
+  const candidates = generateSubnets(patientPrefix, requiredPrefix);
+
+  const allocated = []; 
+
+  for (const candidate of candidates) {
+    let conflict = false;
+    for (const alloc of allocated) {
+      if (overlaps(candidate, alloc)) {
+        conflict = true;
+        break;
+      }
+    }
+    if (!conflict) {
+      return candidate.toString(); 
+    }
   }
 
-  return subnets;
+  return null;
 }
