@@ -777,7 +777,7 @@ func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface
 	return "VALID: AS path verified", nil
 }
 
-func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, asn, prefix string) error {
+func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface,owner, asn, prefix string) error {
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil || routeBytes == nil {
 		return fmt.Errorf("no route to revoke")
@@ -787,6 +787,16 @@ func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface,
 
 	if route.Origin != asn {
 		return fmt.Errorf("only origin AS %s can revoke this route", route.Origin)
+	}
+
+	prefixMetaBytes, err := ctx.GetStub().GetState("PREFIX_" + prefix)
+	if err != nil || prefixMetaBytes == nil {
+		return fmt.Errorf("prefix %s has not been assigned", prefix)
+	}
+	var assignment PrefixAssignment
+	_ = json.Unmarshal(prefixMetaBytes, &assignment)
+	if assignment.AssignedTo != owner {
+		return fmt.Errorf("prefix %s is not assigned to your org (%s)", prefix, owner)
 	}
 	return ctx.GetStub().DelState("ROUTE_" + prefix)
 }

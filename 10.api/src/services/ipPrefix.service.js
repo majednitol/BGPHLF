@@ -110,11 +110,11 @@ export async function RevokeRoute(request) {
             asn,
             prefix
         );
-        console.log("Transaction Result:", result);
+        console.log("Transaction Result:", result.toString());
 
-        return result;
+        return result.toString();
     } catch (error) {
-        console.error("Error in createAsset:", error);
+        console.error("Error in createAsset:", error.toString());
         throw error;
     }
 }

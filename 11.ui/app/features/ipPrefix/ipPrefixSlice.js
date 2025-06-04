@@ -75,11 +75,13 @@ export const announceRoute = createAsyncThunk(
 // ✅ Revoke Route
 export const revokeRoute = createAsyncThunk(
   'ipPrefix/revokeRoute',
-  async ({org, comapanyID, asn,
+  async ({org, memberID, asn,
     prefix }, thunkAPI) => {
     try {
-      const data = {org,comapanyID, asn,
-    prefix}
+      const data = {org,memberID, asn,
+        prefix
+      }
+      console.log("payload",data)
       const response = await apiRepository.post('ip/revoke-route', data, true);
       return response.data;
     } catch (error) {
