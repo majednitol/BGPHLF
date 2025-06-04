@@ -40,18 +40,5 @@ export function calculateSubnets(parentPrefix, requiredIPs) {
 
 // ------------------ Test Cases ------------------
 
-function runTests() {
-  try {
-    console.log('Test Case 1:');
-    const result1 = calculateSubnets('192.168.0.0/24', 5);
-    console.log('Expected ~1 subnet (e.g. /29):', result1);
-
-    console.log('\nTest Case 2:');
-    const result2 = calculateSubnets('192.168.1.0/28', 10);
-    console.log('Expected ~error or multiple subnets:', result2);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-}
-
-runTests();
+const result1 = calculateSubnets('192.168.0.0/24', 5);
+console.log("result1",result1)

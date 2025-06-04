@@ -5,9 +5,11 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/big"
 	"net"
 	"os"
 	"strconv"
@@ -425,26 +427,149 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 	// Return embedded company
 	return &member.Company, nil
 }
+// func (s *SmartContract) AssignResource(
+// 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
+// ) error {
+// 	// check "ALLOC_"+allocationID already exists
+// 	exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID)
+// 	if exists != nil {
+// 		return fmt.Errorf("allocation %s already exists", allocationID)
+// 	}
+
+// 	// check if member exists
+// 	memberKey := "MEMBER_" + memberID
+// 	memberBytes, err := ctx.GetStub().GetState(memberKey)
+// 	if err != nil || memberBytes == nil {
+// 		return fmt.Errorf("member %s not found", memberID)
+// 	}
+// // check a member alredy has a asn number . check it by GetAllocationsByMember
+// 	allocations, err := s.GetAllocationsByMember(ctx, memberID)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to get allocations by member: %v", err)
+// 	}
+// 	if len(allocations) > 0 {
+// 		return fmt.Errorf("member already has an allocation")
+// 	}
+// 	var newASN string 
+// 		for _, allocation := range allocations {
+// 		if allocation.ASN != "" {
+// 			newASN = allocation.ASN
+// 			break
+// 		}else {
+// asn, err := s.generateNextASN(ctx)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to generate ASN: %v", err)
+// 	}
+// 	newASN = strconv.Itoa(asn)
+// 		} 
+// 	}
+
+// 	// ======== Validate Parent Prefix ========
+// 	parentKey := "PREFIX_" + parentPrefix
+// 	parentBytes, err := ctx.GetStub().GetState(parentKey)
+// 	if err != nil || parentBytes == nil {
+// 		return fmt.Errorf("parent prefix %s not found", parentPrefix)
+// 	}
+// 	var parentAssignment PrefixAssignment
+// 	_ = json.Unmarshal(parentBytes, &parentAssignment)
+
+// 	if parentAssignment.AssignedTo != org {
+// 		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
+// 	}
+
+// 	// ======== Validate Sub Prefix ========
+// 	if !isPrefixInRange(parentPrefix, subPrefix) {
+// 		return fmt.Errorf("sub-prefix %s is not within parent prefix %s", subPrefix, parentPrefix)
+// 	}
+// 	subKey := "PREFIX_" + subPrefix
+// 	if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
+// 		return fmt.Errorf("prefix %s already assigned", subPrefix)
+// 	}
+
+// 	// ======== Create and Store Sub Prefix Assignment ========
+// 	prefixAssignment := PrefixAssignment{
+// 		Prefix:     subPrefix,
+// 		AssignedTo: memberID,
+// 		AssignedBy: org,
+// 		Timestamp:  timestamp,
+// 	}
+// 	prefixBytes, _ := json.Marshal(prefixAssignment)
+// 	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
+// 		return fmt.Errorf("failed to save prefix assignment: %v", err)
+// 	}
+// 	as := AS{
+// 		ASN:        newASN,
+// 		Prefix:     subPrefix,
+// 		AssignedTo: memberID,
+// 		AssignedBy: org,
+// 		Timestamp:  timestamp,
+// 	}
+// 	asBytes, _ := json.Marshal(as)
+// 	asnStr := newASN
+// 	if err := ctx.GetStub().PutState("AS_"+asnStr, asBytes); err != nil {
+// 		return fmt.Errorf("failed to save ASN: %v", err)
+// 	}
+// 	alloc := Allocation{
+// 		ID:        allocationID,
+// 		MemberID:  memberID,
+// 		Prefix:    &prefixAssignment,
+// 		ASN:       newASN,
+// 		Expiry:    expiry,
+// 		IssuedBy:  org,
+// 		Timestamp: timestamp,
+// 	}
+
+// 	allocBytes, _ := json.Marshal(alloc)
+// 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
+// }
+
+
+
 func (s *SmartContract) AssignResource(
 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
 ) error {
-	// check "ALLOC_"+allocationID already exists
-	exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID)
-	if exists != nil {
+	// Check if allocation already exists
+	if exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID); exists != nil {
 		return fmt.Errorf("allocation %s already exists", allocationID)
 	}
 
-	// check if member exists
+	// Check if member exists
 	memberKey := "MEMBER_" + memberID
 	memberBytes, err := ctx.GetStub().GetState(memberKey)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member %s not found", memberID)
 	}
 
-	// ======== Generate ASN Automatically ========
-	newASN, err := s.generateNextASN(ctx)
+	// Get previous allocations for member
+	allocations, err := s.GetAllocationsByMember(ctx, memberID)
 	if err != nil {
-		return fmt.Errorf("failed to generate ASN: %v", err)
+		return fmt.Errorf("failed to get allocations by member: %v", err)
+	}
+
+	var newASN string
+	if len(allocations) > 0 {
+		// Reuse ASN from first allocation
+		newASN = allocations[0].ASN
+	} else {
+		// Generate new ASN
+		asn, err := s.generateNextASN(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to generate ASN: %v", err)
+		}
+		newASN = strconv.Itoa(asn)
+
+		// Store ASN info
+		as := AS{
+			ASN:        newASN,
+			Prefix:     subPrefix,
+			AssignedTo: memberID,
+			AssignedBy: org,
+			Timestamp:  timestamp,
+		}
+		asBytes, _ := json.Marshal(as)
+		if err := ctx.GetStub().PutState("AS_"+newASN, asBytes); err != nil {
+			return fmt.Errorf("failed to save ASN: %v", err)
+		}
 	}
 
 	// ======== Validate Parent Prefix ========
@@ -469,7 +594,7 @@ func (s *SmartContract) AssignResource(
 		return fmt.Errorf("prefix %s already assigned", subPrefix)
 	}
 
-	// ======== Create and Store Sub Prefix Assignment ========
+	// ======== Store Prefix Assignment ========
 	prefixAssignment := PrefixAssignment{
 		Prefix:     subPrefix,
 		AssignedTo: memberID,
@@ -480,31 +605,21 @@ func (s *SmartContract) AssignResource(
 	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 		return fmt.Errorf("failed to save prefix assignment: %v", err)
 	}
-	as := AS{
-		ASN:        strconv.Itoa(newASN),
-		Prefix:     subPrefix,
-		AssignedTo: memberID,
-		AssignedBy: org,
-		Timestamp:  timestamp,
-	}
-	asBytes, _ := json.Marshal(as)
-	asnStr := strconv.Itoa(newASN)
-	if err := ctx.GetStub().PutState("AS_"+asnStr, asBytes); err != nil {
-		return fmt.Errorf("failed to save ASN: %v", err)
-	}
+
+	// ======== Save Allocation ========
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
 		Prefix:    &prefixAssignment,
-		ASN:       strconv.Itoa(newASN),
+		ASN:       newASN,
 		Expiry:    expiry,
 		IssuedBy:  org,
 		Timestamp: timestamp,
 	}
-
 	allocBytes, _ := json.Marshal(alloc)
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 }
+
 func (s *SmartContract) SetLoggedInUser(ctx contractapi.TransactionContextInterface, id, orgMSP, role string) error {
 	if id == "" {
 		return fmt.Errorf("user ID cannot be empty")
@@ -559,32 +674,37 @@ func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterf
 }
 
 func (s *SmartContract) generateNextASN(ctx contractapi.TransactionContextInterface) (int, error) {
-	query := `{"selector":{"resource":"asn"}}`
-	iter, err := ctx.GetStub().GetQueryResult(query)
+	const minASN = 10000
+	const maxASN = 99999
+	const maxAttempts = 10
+
+	for i := 0; i < maxAttempts; i++ {
+		randomASN, err := randomNumber(minASN, maxASN)
+		if err != nil {
+			return 0, fmt.Errorf("failed to generate random ASN: %v", err)
+		}
+
+		// Check if ASN already exists
+		asnKey := "AS_" + strconv.Itoa(randomASN)
+		existing, err := ctx.GetStub().GetState(asnKey)
+		if err != nil {
+			return 0, fmt.Errorf("failed to check ASN existence: %v", err)
+		}
+		if existing == nil {
+			// Not yet used
+			return randomASN, nil
+		}
+	}
+
+	return 0, fmt.Errorf("could not generate unique ASN after %d attempts", maxAttempts)
+}
+
+func randomNumber(min, max int) (int, error) {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(max-min+1)))
 	if err != nil {
 		return 0, err
 	}
-	defer iter.Close()
-
-	maxASN := 64511 // Starting value for assignment
-
-	for iter.HasNext() {
-		result, err := iter.Next()
-		if err != nil {
-			continue
-		}
-		var alloc Allocation
-		if err := json.Unmarshal(result.Value, &alloc); err != nil {
-			continue
-		}
-		var asnVal int
-		if _, err := fmt.Sscanf(alloc.ID, "%d", &asnVal); err == nil {
-			if asnVal > maxASN {
-				maxASN = asnVal
-			}
-		}
-	}
-	return maxASN + 1, nil
+	return int(nBig.Int64()) + min, nil
 }
 
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {

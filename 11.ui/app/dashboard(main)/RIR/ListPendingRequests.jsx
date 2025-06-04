@@ -8,8 +8,8 @@ import toast from 'react-hot-toast';
 import ReviewRequest from './ReviewRequest';
 
 const decodedUser = {
-  org: 'Org6MSP',
-  userID: '222',
+  org: 'Org1MSP',
+  userID: 'sys002',
 };
 
 const ListPendingRequests = () => {
