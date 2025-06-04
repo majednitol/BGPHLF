@@ -1,24 +1,49 @@
 'use client';
 
-import React, { useState } from 'react';
-import { validatePath } from '../../features/ipPrefix/ipPrefixSlice';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { validatePath, listAllASNValues } from '../../features/ipPrefix/ipPrefixSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+
+// Simulated decoded token values
+const decodedUser = {
+  org: 'Org1MSP',
+  memberID: 'brac001',
+};
 
 const ValidatePath = () => {
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.ipPrefix);
+  const { loading, data: asnData, error } = useAppSelector((state) => state.ipPrefix);
 
   const [form, setForm] = useState({
-    org: 'Org1MSP',
-    companyID: '',
+    org: decodedUser.org,
+    memberID: decodedUser.memberID,
     prefix: '',
     pathJSON: '',
   });
 
+  const [selectedASNs, setSelectedASNs] = useState([]);
+
+  useEffect(() => {
+    dispatch(listAllASNValues({ org: decodedUser.org, memberID: decodedUser.memberID }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (asn) => {
+    const updated = selectedASNs.includes(asn)
+      ? selectedASNs.filter((a) => a !== asn)
+      : [...selectedASNs, asn];
+
+    setSelectedASNs(updated);
+    setForm((prev) => ({ ...prev, pathJSON: JSON.stringify(updated) }));
   };
 
   const handleSubmit = async (e) => {
@@ -35,36 +60,20 @@ const ValidatePath = () => {
     try {
       await dispatch(validatePath({ ...form, pathJSON: parsedPath })).unwrap();
       toast.success('Path validated successfully');
-      // Optional: reset only pathJSON or whole form except org
-      setForm((prev) => ({ ...prev, pathJSON: '' }));
+      setForm((prev) => ({ ...prev, prefix: '', pathJSON: '' }));
+      setSelectedASNs([]);
     } catch (err) {
-      toast.error(`Validation failed: ${err}`);
+      toast.error(`Validation failed: ${err.message || err}`);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
-      <h2>Validate Path</h2>
+      <h2>✅ Validate Path</h2>
 
-      <label style={styles.label}>Organization</label>
-      <select name="org" value={form.org} onChange={handleChange} style={styles.input}>
-        {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-
-      <label style={styles.label}>Company ID</label>
-      <input
-        type="text"
-        name="companyID"
-        value={form.companyID}
-        onChange={handleChange}
-        placeholder="Company ID"
-        required
-        style={styles.input}
-      />
+      <div style={styles.infoBox}>
+        <p><strong>Member ID:</strong> {form.memberID}</p>
+      </div>
 
       <label style={styles.label}>Prefix</label>
       <input
@@ -77,16 +86,33 @@ const ValidatePath = () => {
         style={styles.input}
       />
 
-      <label style={styles.label}>Path JSON</label>
-      <textarea
-        name="pathJSON"
-        value={form.pathJSON}
-        onChange={handleChange}
-        placeholder='Enter path JSON here (e.g. ["AS123", "AS456"])'
-        required
-        rows={6}
-        style={{ ...styles.input, fontFamily: 'monospace' }}
-      />
+      <label style={styles.label}>Select Path (ASN)</label>
+      {loading ? (
+        <p>Loading ASN values...</p>
+      ) : asnData?.length > 0 ? (
+        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+          {asnData.map((asn) => (
+            <li key={asn}>
+              <label>
+                <input
+                  type="checkbox"
+                  value={asn}
+                  checked={selectedASNs.includes(asn)}
+                  onChange={() => handleCheckboxChange(asn)}
+                />{' '}
+                ASN {asn}
+              </label>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No ASN values found.</p>
+      )}
+
+      <div>
+        <strong>Selected Path JSON:</strong>
+        <pre>{form.pathJSON}</pre>
+      </div>
 
       <button type="submit" disabled={loading} style={styles.button}>
         {loading ? 'Validating...' : 'Validate Path'}
@@ -107,6 +133,13 @@ const styles = {
     flexDirection: 'column',
     gap: 14,
     fontFamily: 'Arial, sans-serif',
+  },
+  infoBox: {
+    backgroundColor: '#eef',
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 14,
+    lineHeight: 1.5,
   },
   label: {
     fontWeight: '600',

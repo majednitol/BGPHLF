@@ -4,9 +4,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ✅ Validate Path
 export const validatePath = createAsyncThunk(
   'ipPrefix/validatePath',
-  async ({ org ,comapanyID, prefix, pathJSON }, thunkAPI) => {
+  async ({ org ,memberID, prefix, pathJSON }, thunkAPI) => {
     try {
-      const data = {org, comapanyID, prefix, pathJSON }
+      const data = { org, memberID, prefix, pathJSON }
+      console.log("daat",data)
       const response = await apiRepository.post('ip/validate-path', data, true);
       return response.data;
     } catch (error) {

@@ -15,10 +15,10 @@ export async function GetPrefixAssignment(request) {
 }
 export async function ValidatePath(request) {
     try {
-        const userID = request.comapanyID
+        const memberID = request.memberID
         const prefix = request.prefix
-        const pathJSON = request.pathJSON
-        const contract = await smartContract(request, userID)
+        const pathJSON = JSON.stringify(request.pathJSON);
+        const contract = await smartContract(request, memberID)
         let result = await contract.evaluateTransaction("ValidatePath", prefix, pathJSON);
         console.log("result", result)
         return JSON.parse(result);
