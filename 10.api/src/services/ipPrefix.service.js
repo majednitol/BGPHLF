@@ -21,9 +21,10 @@ export async function ValidatePath(request) {
         const contract = await smartContract(request, memberID)
         let result = await contract.evaluateTransaction("ValidatePath", prefix, pathJSON);
         console.log("result", result)
-        return JSON.parse(result);
+        return result.toString();
     } catch (error) {
-        console.log(error)
+        console.error("Error in createAsset:", error);
+        throw error;
     }
 }
 export async function AssignPrefix(request) {
