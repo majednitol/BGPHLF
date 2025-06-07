@@ -82,12 +82,12 @@ type Route struct {
 }
 
 type PrefixAssignment struct {
-	Prefix     string `json:"prefix"`
+	Prefix string `json:"prefix"`
 	// alreadyAllocated array of prefix
 	AlreadyAllocated []string `json:"alreadyAllocated"`
-	AssignedTo string `json:"assignedTo"`
-	AssignedBy string `json:"assignedBy"`
-	Timestamp  string `json:"timestamp"`
+	AssignedTo       string   `json:"assignedTo"`
+	AssignedBy       string   `json:"assignedBy"`
+	Timestamp        string   `json:"timestamp"`
 }
 
 type Company struct {
@@ -429,6 +429,7 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 	// Return embedded company
 	return &member.Company, nil
 }
+
 // func (s *SmartContract) AssignResource(
 // 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
 // ) error {
@@ -452,7 +453,7 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 // 	if len(allocations) > 0 {
 // 		return fmt.Errorf("member already has an allocation")
 // 	}
-// 	var newASN string 
+// 	var newASN string
 // 		for _, allocation := range allocations {
 // 		if allocation.ASN != "" {
 // 			newASN = allocation.ASN
@@ -463,7 +464,7 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 // 		return fmt.Errorf("failed to generate ASN: %v", err)
 // 	}
 // 	newASN = strconv.Itoa(asn)
-// 		} 
+// 		}
 // 	}
 
 // 	// ======== Validate Parent Prefix ========
@@ -525,8 +526,6 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 // 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 // }
 
-
-
 func (s *SmartContract) AssignResource(
 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp string,
 ) error {
@@ -586,8 +585,14 @@ func (s *SmartContract) AssignResource(
 	if parentAssignment.AssignedTo != org {
 		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
 	}
-	parentAssignment.AlreadyAllocated = append(parentAssignment.AlreadyAllocated,subPrefix )
-
+	parentAssignment.AlreadyAllocated = append(parentAssignment.AlreadyAllocated, subPrefix)
+	updatedParentBytes, err := json.Marshal(parentAssignment)
+	if err != nil {
+		return fmt.Errorf("failed to marshal updated parent assignment: %v", err)
+	}
+	if err := ctx.GetStub().PutState(parentKey, updatedParentBytes); err != nil {
+		return fmt.Errorf("failed to update parent prefix with new allocation: %v", err)
+	}
 	// ======== Validate Sub Prefix ========
 	if !isPrefixInRange(parentPrefix, subPrefix) {
 		return fmt.Errorf("sub-prefix %s is not within parent prefix %s", subPrefix, parentPrefix)
@@ -789,10 +794,10 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 	}
 
 	assignment := PrefixAssignment{
-		Prefix:     prefix,
-		AssignedTo: assignedTo,
-		AssignedBy: mspID,
-		Timestamp:  timestamp,
+		Prefix:           prefix,
+		AssignedTo:       assignedTo,
+		AssignedBy:       mspID,
+		Timestamp:        timestamp,
 		AlreadyAllocated: []string{},
 	}
 
@@ -814,7 +819,6 @@ func (s *SmartContract) GetPrefixAssignment(ctx contractapi.TransactionContextIn
 	_ = json.Unmarshal(bytes, &assignment)
 	return &assignment, nil
 }
-
 
 func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterface, owner, asn, prefix string, pathJSON string) error {
 	// orgMSP, err := getRIROrg(ctx)
@@ -946,7 +950,6 @@ func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface,
 
 	return nil
 }
-
 
 func (s *SmartContract) GetUser(ctx contractapi.TransactionContextInterface, userID string) (*User, error) {
 	bytes, err := ctx.GetStub().GetState("USER_" + userID)

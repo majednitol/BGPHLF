@@ -57,6 +57,7 @@ export function calculateSubnets(parentPrefix, requiredIPs, alreadyAllocated = [
   for (const candidate of candidates) {
     const hasConflict = allocatedBlocks.some(alloc => overlaps(candidate, alloc));
     if (!hasConflict) {
+      console.log("candidate",candidate)
       return candidate.toString();
     }
   }
