@@ -26,7 +26,6 @@ const ListApprovedRequests = () => {
     subPrefix: '',
     expiry: '',
     org: decodedUser.org,
-    alreadyAllocated: [],
   });
 
   useEffect(() => {
@@ -60,8 +59,6 @@ const ListApprovedRequests = () => {
       subPrefix: '',
       expiry: '',
       org: decodedUser.org,
-      alreadyAllocated: [],
-
     });
     setShowModal(true);
   };
@@ -73,7 +70,7 @@ const handleChange = (e) => {
     try {
       const selectedRequest = data.find((req) => req.memberId === selectedMemberID);
       const requiredIPs = Number(selectedRequest?.value || 0);
-      const subnets = calculateSubnets(value, requiredIPs,alreadyAllocated);
+      const subnets = calculateSubnets(value, requiredIPs);
       console.log(subnets)
       const firstSubnet = subnets || '';
       setFormData((prev) => ({
