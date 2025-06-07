@@ -586,6 +586,7 @@ func (s *SmartContract) AssignResource(
 	if parentAssignment.AssignedTo != org {
 		return fmt.Errorf("unauthorized: your org is not the assignee of the parent prefix")
 	}
+	parentAssignment.AlreadyAllocated = append(parentAssignment.AlreadyAllocated,subPrefix )
 
 	// ======== Validate Sub Prefix ========
 	if !isPrefixInRange(parentPrefix, subPrefix) {
@@ -603,7 +604,6 @@ func (s *SmartContract) AssignResource(
 		AssignedBy: org,
 		Timestamp:  timestamp,
 	}
-	prefixAssignment.AlreadyAllocated = append(prefixAssignment.AlreadyAllocated,subPrefix )
 	prefixBytes, _ := json.Marshal(prefixAssignment)
 	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 		return fmt.Errorf("failed to save prefix assignment: %v", err)
