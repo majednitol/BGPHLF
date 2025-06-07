@@ -6,7 +6,7 @@ import { getCompanyByMemberID, resetState } from '../../features/company/company
 
 const decodedUser = {
   org: 'Org1MSP',
-  memberID: 'brac001',
+  memberID: 'brac0011',
 };
 
 const GetCompanyByMemberID = () => {

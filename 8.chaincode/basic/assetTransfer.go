@@ -318,10 +318,10 @@ func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInt
 }
 
 func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterface, id string) error {
-	msp, _ := ctx.GetClientIdentity().GetMSPID()
-	if msp != "Org1MSP" {
-		return fmt.Errorf("only AFRINIC (Org1) can approve members")
-	}
+	// msp, _ := ctx.GetClientIdentity().GetMSPID()
+	// if msp != "Org1MSP" {
+	// 	return fmt.Errorf("only AFRINIC (Org1) can approve members")
+	// }
 
 	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + id)
 	if err != nil || memberBytes == nil {

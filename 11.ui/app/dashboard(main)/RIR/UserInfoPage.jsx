@@ -11,7 +11,7 @@ const GetRIRUser = () => {
 
   // Simulated token-based values (replace with actual token logic)
   const payload = {
-    userId: 'sys002',
+    userId: 'sys001',
     org: 'Org1MSP',
   };
 
