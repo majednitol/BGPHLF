@@ -33,3 +33,7 @@ minikube start --mount --mount-string="/Users/majedurrahman/nfs_share:/mnt/data"
 minikube delete
 minikube stop
  minikube mount ../nfs_share:/mnt/data  
+
+
+ssh root@142.93.211.107
+vm mAjed2377a
