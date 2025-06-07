@@ -83,6 +83,8 @@ type Route struct {
 
 type PrefixAssignment struct {
 	Prefix     string `json:"prefix"`
+	// alreadyAllocated array of prefix
+	AlreadyAllocated []string `json:"alreadyAllocated"`
 	AssignedTo string `json:"assignedTo"`
 	AssignedBy string `json:"assignedBy"`
 	Timestamp  string `json:"timestamp"`
@@ -601,6 +603,7 @@ func (s *SmartContract) AssignResource(
 		AssignedBy: org,
 		Timestamp:  timestamp,
 	}
+	prefixAssignment.AlreadyAllocated = append(prefixAssignment.AlreadyAllocated,subPrefix )
 	prefixBytes, _ := json.Marshal(prefixAssignment)
 	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 		return fmt.Errorf("failed to save prefix assignment: %v", err)
@@ -790,6 +793,7 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 		AssignedTo: assignedTo,
 		AssignedBy: mspID,
 		Timestamp:  timestamp,
+		AlreadyAllocated: []string{},
 	}
 
 	data, _ := json.Marshal(assignment)
