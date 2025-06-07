@@ -2,9 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { listApprovedRequests, resetState } from '../../features/ipPrefix/ipPrefixSlice';
+import {
+  listApprovedRequests,
+  getAllOwnedPrefixes,
+  resetState,
+} from '../../features/ipPrefix/ipPrefixSlice';
 import { assignResource } from '../../features/company/companySlice';
-import { getAllOwnedPrefixes } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
 import { calculateSubnets } from '../../utils/ipUtils';
 
@@ -18,7 +21,7 @@ const ListApprovedRequests = () => {
   const { data, loading, error, prefix } = useAppSelector((state) => state.ipPrefix);
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedMemberID, setSelectedMemberID] = useState('');
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [formData, setFormData] = useState({
     allocationID: '',
     memberID: '',
@@ -29,32 +32,29 @@ const ListApprovedRequests = () => {
   });
 
   useEffect(() => {
-    const fetchApprovedRequests = async () => {
-      try {
-        await dispatch(listApprovedRequests(decodedUser)).unwrap();
-      } catch {
-        toast.error('Failed to fetch approved requests');
-      }
-    };
+    dispatch(listApprovedRequests(decodedUser))
+      .unwrap()
+      .catch(() => toast.error('Failed to fetch approved requests'));
 
-    fetchApprovedRequests();
-    return () => dispatch(resetState());
+    return () => {
+      dispatch(resetState());
+    };
   }, [dispatch]);
 
   const fetchOwnedPrefixes = async () => {
     try {
       await dispatch(getAllOwnedPrefixes(decodedUser)).unwrap();
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch owned prefixes');
     }
   };
 
-  const handleAssignClick = (memberID) => {
-    fetchOwnedPrefixes();
-    setSelectedMemberID(memberID);
+  const handleAssignClick = async (request) => {
+    await fetchOwnedPrefixes();
+    setSelectedRequest(request);
     setFormData({
-      allocationID: '',
-      memberID,
+      allocationID: "",
+      memberID: request.memberId || '',
       parentPrefix: '',
       subPrefix: '',
       expiry: '',
@@ -63,45 +63,47 @@ const ListApprovedRequests = () => {
     setShowModal(true);
   };
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  if (name === 'parentPrefix') {
-    try {
-      const selectedRequest = data.find((req) => req.memberId === selectedMemberID);
-      const requiredIPs = Number(selectedRequest?.value || 0);
-      const subnets = calculateSubnets(value, requiredIPs);
-      console.log(subnets)
-      const firstSubnet = subnets || '';
+    if (name === 'parentPrefix') {
+      try {
+        const requiredIPs = Number(selectedRequest?.value || 0);
+        const alreadyAllocated = prefix.find(p => p.prefix === value)?.alreadyAllocated || [];
+console.log("alreadyAllocated",alreadyAllocated)
+        const subnets = calculateSubnets(value, requiredIPs, alreadyAllocated);
+        const firstSubnet = subnets || '';
+
+        setFormData((prev) => ({
+          ...prev,
+          parentPrefix: value,
+          subPrefix: firstSubnet,
+        }));
+      } catch (err) {
+        toast.error(`Subnet calculation failed: ${err.message}`);
+      }
+    } else {
       setFormData((prev) => ({
         ...prev,
-        parentPrefix: value,
-        subPrefix: firstSubnet,
+        [name]: value,
       }));
-    } catch (err) {
-      toast.error(`Subnet calc failed: ${err.message}`);
     }
-  } else {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-};
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const payload = {
       ...formData,
       timestamp: new Date().toISOString(),
     };
-
+console.log(payload)
     try {
       await dispatch(assignResource(payload)).unwrap();
       toast.success('Resource assigned successfully!');
       setShowModal(false);
     } catch (err) {
-      toast.error(`Error: ${err}`);
+      toast.error(`Assignment failed: ${err}`);
     }
   };
 
@@ -126,15 +128,12 @@ const handleChange = (e) => {
             {data.map((item, idx) => (
               <tr key={idx}>
                 {Object.values(item).map((val, i) => (
-  <td key={i} style={styles.td}>
-    {typeof val === 'object' && val !== null
-      ? JSON.stringify(val)
-      : String(val)}
-  </td>
-))}
-
+                  <td key={i} style={styles.td}>
+                    {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                  </td>
+                ))}
                 <td style={styles.td}>
-                  <button style={styles.assignBtn} onClick={() => handleAssignClick(item.memberId)}>
+                  <button style={styles.assignBtn} onClick={() => handleAssignClick(item)}>
                     Assign Resource
                   </button>
                 </td>
@@ -142,7 +141,9 @@ const handleChange = (e) => {
             ))}
           </tbody>
         </table>
-      ) : !loading && <p style={styles.noDataText}>No approved requests found.</p>}
+      ) : (
+        !loading && <p style={styles.noDataText}>No approved requests found.</p>
+      )}
 
       {showModal && (
         <div style={styles.modalBackdrop}>
@@ -157,12 +158,12 @@ const handleChange = (e) => {
                 required
               />
               <input
-                value={selectedMemberID}
-                readOnly
+                name="memberID"
+                placeholder="Member ID"
+                value={formData.memberID}
                 style={styles.input}
+                readOnly
               />
-
-              {/* UPDATED PARENT PREFIX FIELD AS SELECT */}
               <select
                 name="parentPrefix"
                 value={formData.parentPrefix}
@@ -171,29 +172,25 @@ const handleChange = (e) => {
                 required
               >
                 <option value="">Select Parent Prefix</option>
-                              {
-                                  prefix?.map((item, idx) => (
-                                      <option key={idx} value={item.prefix}>
-                                        {item.prefix}
-                                      </option>
-                                  ))
-               }
+                {prefix?.map((item, idx) => (
+                  <option key={idx} value={item.prefix}>
+                    {item.prefix}
+                  </option>
+                ))}
               </select>
-
               <input
-  name="subPrefix"
-  value={formData.subPrefix} 
-  placeholder="Sub Prefix"
-  style={styles.input}
-  onChange={handleChange}
-  required
-/>
-              
+                name="subPrefix"
+                value={formData.subPrefix}
+                placeholder="Sub Prefix"
+                style={styles.input}
+                readOnly
+              />
               <input
                 name="expiry"
                 type="date"
-                style={styles.input}
+                value={formData.expiry}
                 onChange={handleChange}
+                style={styles.input}
                 required
               />
               <select
@@ -203,12 +200,18 @@ const handleChange = (e) => {
                 style={styles.input}
               >
                 {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP'].map((org) => (
-                  <option key={org} value={org}>{org}</option>
+                  <option key={org} value={org}>
+                    {org}
+                  </option>
                 ))}
               </select>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-                <button type="submit" style={styles.button}>Assign</button>
-                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelButton}>Cancel</button>
+                <button type="submit" style={styles.button}>
+                  Assign
+                </button>
+                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelButton}>
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -218,6 +221,7 @@ const handleChange = (e) => {
   );
 };
 
+// Styling stays the same
 const styles = {
   container: {
     maxWidth: '1000px',

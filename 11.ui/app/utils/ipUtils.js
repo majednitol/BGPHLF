@@ -49,6 +49,7 @@ function generateSubnets(baseCidr, newPrefix) {
 
 
 export function calculateSubnets(parentPrefix, requiredIPs, alreadyAllocated = []) {
+  console.log("requiredIPs",requiredIPs)
   const requiredPrefix = ipCountToPrefix(requiredIPs);
   const candidates = generateSubnets(parentPrefix, requiredPrefix);
 
