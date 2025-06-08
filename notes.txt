@@ -345,6 +345,64 @@ kubectl port-forward services/api 4000
 
 
 
+Sure! Here are some example `curl` commands to interact with your GoBGP API server for the instance `rono` once your server is running on port 2000.
+
+---
+
+### 1. **Add a peer**
+
+```bash
+curl -X POST "http://localhost:2000/add-peer?instance=rono" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "neighbor_address": "192.0.2.1",
+        "peer_as": 65001
+      }'
+```
+
+---
+
+### 2. **Announce a route**
+
+```bash
+curl -X POST "http://localhost:2000/announce-route?instance=rono" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "prefix": "10.10.0.0",
+        "prefix_len": 24,
+        "next_hop": "192.0.2.2"
+      }'
+```
+
+---
+
+### 3. **Withdraw a route**
+
+```bash
+curl -X POST "http://localhost:2000/withdraw-route?instance=rono" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "prefix": "10.10.0.0",
+        "prefix_len": 24,
+        "next_hop": "192.0.2.2"
+      }'
+```
+
+---
+
+### 4. **List routes**
+
+```bash
+curl "http://localhost:2000/routes?instance=rono"
+```
+
+---
+
+If you want, I can also help you with **zsh escaping** (if you get errors like `no matches found` in zsh shell) — just wrap URLs in quotes like above, or escape `?` with `\?`.
+
+---
+
+Let me know if you want me to explain or help with anything else!
 
 
 
