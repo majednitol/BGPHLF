@@ -267,11 +267,7 @@ spec:
     spec:
       containers:
         - name: gobgp-api
-<<<<<<< HEAD
           image: majedur708/hlf-api:50.2  # Replace with your actual image tag
-=======
-          image: majedur708/hlf-api:50.1  # Replace with your actual image
->>>>>>> ddc97841af173079bd6eefffac3dd0fafa277f1c
           ports:
             - containerPort: 2000
           env:
