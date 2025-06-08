@@ -46,8 +46,7 @@ spec:
             - containerPort: 179
             - containerPort: 50051
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
             capabilities:
               add: ["NET_BIND_SERVICE"]
           volumeMounts:
@@ -131,8 +130,7 @@ spec:
             - containerPort: 179
             - containerPort: 50051
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
             capabilities:
               add: ["NET_BIND_SERVICE"]
           volumeMounts:
@@ -211,8 +209,7 @@ spec:
             - containerPort: 179
             - containerPort: 50051
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
             capabilities:
               add: ["NET_BIND_SERVICE"]
           volumeMounts:
@@ -267,7 +264,7 @@ spec:
     spec:
       containers:
         - name: gobgp-api
-          image: majedur708/hlf-api:50.1  # Replace with your actual image
+          image: majedur708/hlf-api:50.3  # Replace with your actual image
           ports:
             - containerPort: 2000
           env:
