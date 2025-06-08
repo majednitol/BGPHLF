@@ -190,6 +190,9 @@ func withdrawRouteHandler(c *gin.Context) {
 			Prefix:    req.Prefix,
 			PrefixLen: req.PrefixLen,
 		}),
+		Pattrs: []*anypb.Any{
+			mustMarshal(&apipb.NextHopAttribute{NextHop: req.NextHop}),
+		},
 	}
 
 	_, err := client.DeletePath(c.Request.Context(), &apipb.DeletePathRequest{Path: path})
@@ -200,6 +203,7 @@ func withdrawRouteHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Route withdrawn"})
 }
+
 
 // GET /routes
 func getRoutesHandler(c *gin.Context) {
