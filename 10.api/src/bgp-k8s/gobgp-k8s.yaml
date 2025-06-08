@@ -295,3 +295,4 @@ spec:
       targetPort: 2000
       protocol: TCP
   type: ClusterIP
+ 
