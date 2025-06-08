@@ -1,0 +1,113 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gobgp-config
+data:
+  gobgp.conf: |
+    [global.config]
+      as = 65001
+      router-id = "192.0.2.1"
+
+    [[neighbors]]
+      [neighbors.config]
+        neighbor-address = "192.0.2.2"
+        peer-as = 65002
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gobgp
+  labels:
+    app: gobgp
+spec:
+  restartPolicy: Always
+  containers:
+    - name: gobgp
+      image: jauderho/gobgp:latest
+      command: ["gobgpd", "-f", "/gobgp/gobgp.conf"]
+      ports:
+        - containerPort: 179
+        - containerPort: 50051
+      securityContext:
+        runAsUser: 0
+        capabilities:
+          add: ["NET_BIND_SERVICE"]
+      resources:
+        requests:
+          memory: "100Mi"
+          cpu: "100m"
+        limits:
+          memory: "200Mi"
+          cpu: "200m"
+      volumeMounts:
+        - name: gobgp-conf
+          mountPath: /gobgp/gobgp.conf
+          subPath: gobgp.conf
+  volumes:
+    - name: gobgp-conf
+      configMap:
+        name: gobgp-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gobgp
+spec:
+  selector:
+    app: gobgp
+  ports:
+    - name: bgp
+      port: 179
+      targetPort: 179
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gobgp-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gobgp-api
+  template:
+    metadata:
+      labels:
+        app: gobgp-api
+    spec:
+      containers:
+        - name: gobgp-api
+          image: majedur708/hlf-api:50.1  # Replace with your actual image tag
+          ports:
+            - containerPort: 2000
+          env:
+            - name: GOBGPD_ADDR
+              value: "gobgp:50051"
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "200m"
+            limits:
+              memory: "350Mi"
+              cpu: "300m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gobgp-api
+spec:
+  selector:
+    app: gobgp-api
+  ports:
+    - port: 2000
+      targetPort: 2000
+      protocol: TCP
+  type: ClusterIP  # Optional: Use NodePort or LoadBalancer if needed
