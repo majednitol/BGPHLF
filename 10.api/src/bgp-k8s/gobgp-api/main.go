@@ -1,19 +1,19 @@
 package main
 
 import (
-    "context"
-    "fmt"
-    "io"
-    "net/http"
-    "os"
-    "strings"
+	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
 
-    "github.com/gin-gonic/gin"
-    apipb "github.com/osrg/gobgp/v3/api"
-    "google.golang.org/grpc"
-    "google.golang.org/grpc/credentials/insecure"
-    "google.golang.org/protobuf/proto"
-    "google.golang.org/protobuf/types/known/anypb"
+	"github.com/gin-gonic/gin"
+	apipb "github.com/osrg/gobgp/v3/api"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // BGPConnection holds a BGP client and its gRPC connection
@@ -33,12 +33,17 @@ func mustMarshal(pb proto.Message) *anypb.Any {
     return a
 }
 
+
 func connectBGPInstances() {
-    instanceStr := os.Getenv("GOBGP_INSTANCES")
-    if instanceStr == "" {
-        instanceStr = "rono=localhost:50051"
+    // instanceStr := os.Getenv("GOBGP_INSTANCES")
+    // if instanceStr == "" {
+    //     instanceStr = "rono=localhost:50051"
+    // }
+    bgpAddr := os.Getenv("GOBGPD_ADDR")
+    if bgpAddr == "" {
+        bgpAddr = "localhost:50051" // fallback for local dev
     }
-    for _, inst := range strings.Split(instanceStr, ",") {
+    for _, inst := range strings.Split(bgpAddr, ",") {
         parts := strings.SplitN(strings.TrimSpace(inst), "=", 2)
         if len(parts) != 2 {
             fmt.Printf("⚠ Invalid instance: %s\n", inst)
@@ -54,10 +59,11 @@ func connectBGPInstances() {
             Client: apipb.NewGobgpApiClient(conn),
             Conn:   conn,
         }
-        fmt.Printf("✅ Connected to BGP instance '%s' at %s\n", name, addr)
+        fmt.Printf("✅ Connected to BGP  '%s' at %s\n", name, addr)
     }
 }
 
+// getBGPClient returns the GobgpApiClient based on query param or env/default
 func getBGPClient(c *gin.Context) apipb.GobgpApiClient {
     instance := c.Query("instance")
     if instance == "" {
@@ -75,10 +81,13 @@ func getBGPClient(c *gin.Context) apipb.GobgpApiClient {
     return bc.Client
 }
 
+// AddPeerRequest represents JSON input to add a peer
 type AddPeerRequest struct {
     NeighborAddress string `json:"neighbor_address"`
     PeerAS          uint32 `json:"peer_as"`
 }
+
+// AddRouteRequest represents JSON input to add or withdraw a route
 type AddRouteRequest struct {
     Prefix    string `json:"prefix"`
     PrefixLen uint32 `json:"prefix_len"`
@@ -127,7 +136,7 @@ func addRouteHandler(c *gin.Context) {
             PrefixLen: req.PrefixLen,
         }),
         Pattrs: []*anypb.Any{
-            mustMarshal(&apipb.OriginAttribute{Origin: 0}),
+            mustMarshal(&apipb.OriginAttribute{Origin: 0}), // IGP origin
             mustMarshal(&apipb.NextHopAttribute{NextHop: req.NextHop}),
         },
     }
@@ -167,47 +176,12 @@ func withdrawRouteHandler(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Route withdrawn successfully"})
 }
 
-func getRoutesHandler(c *gin.Context) {
-    client := getBGPClient(c)
-    if client == nil {
-        return
-    }
-    stream, err := client.ListPath(c, &apipb.ListPathRequest{
-        Family: &apipb.Family{Afi: apipb.Family_AFI_IP, Safi: apipb.Family_SAFI_UNICAST},
-    })
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-    var routes []string
-    for {
-        resp, err := stream.Recv()
-        if err == io.EOF {
-            break
-        }
-        if err != nil {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-            return
-        }
-        if resp.Destination == nil {
-            continue
-        }
-        for _, p := range resp.Destination.Paths {
-            prefix := &apipb.IPAddressPrefix{}
-            if err := p.GetNlri().UnmarshalTo(prefix); err == nil {
-                routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
-            }
-        }
-    }
-    c.JSON(http.StatusOK, gin.H{"routes": routes})
-}
-
 func getPeersHandler(c *gin.Context) {
     client := getBGPClient(c)
     if client == nil {
         return
     }
-    stream, err := client.ListPeer(context.Background(), &apipb.ListPeerRequest{})
+    stream, err := client.ListPeer(c, &apipb.ListPeerRequest{})
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
@@ -244,7 +218,7 @@ func getPeerInfoHandler(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'address' query param"})
         return
     }
-    stream, err := client.ListPeer(context.Background(), &apipb.ListPeerRequest{})
+    stream, err := client.ListPeer(c, &apipb.ListPeerRequest{})
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
@@ -253,6 +227,10 @@ func getPeerInfoHandler(c *gin.Context) {
         resp, err := stream.Recv()
         if err == io.EOF {
             break
+        }
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
         }
         if resp.Peer != nil && resp.Peer.Conf.NeighborAddress == addr {
             p := resp.Peer
@@ -268,12 +246,100 @@ func getPeerInfoHandler(c *gin.Context) {
     c.JSON(http.StatusNotFound, gin.H{"error": "Peer not found"})
 }
 
+func getRoutesHandler(c *gin.Context) {
+    client := getBGPClient(c)
+    if client == nil {
+        return
+    }
+    stream, err := client.ListPath(c, &apipb.ListPathRequest{
+        Family: &apipb.Family{Afi: apipb.Family_AFI_IP, Safi: apipb.Family_SAFI_UNICAST},
+        TableType: apipb.TableType_LOCAL,
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        if resp.Destination != nil {
+            routes = append(routes, resp.Destination.Prefix)
+        }
+    }
+    c.JSON(http.StatusOK, gin.H{"routes": routes})
+}
+
+func getRoutesOutHandler(c *gin.Context) {
+    client := getBGPClient(c)
+    if client == nil {
+        return
+    }
+    stream, err := client.ListPath(c, &apipb.ListPathRequest{
+        Family: &apipb.Family{Afi: apipb.Family_AFI_IP, Safi: apipb.Family_SAFI_UNICAST},
+        TableType: apipb.TableType_ADJ_OUT,
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        if resp.Destination != nil {
+            routes = append(routes, resp.Destination.Prefix)
+        }
+    }
+    c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
+}
+
+func routesInHandler(c *gin.Context) {
+    client := getBGPClient(c)
+    if client == nil {
+        return
+    }
+    stream, err := client.ListPath(c, &apipb.ListPathRequest{
+        Family: &apipb.Family{Afi: apipb.Family_AFI_IP, Safi: apipb.Family_SAFI_UNICAST},
+        TableType: apipb.TableType_ADJ_IN,
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        if resp.Destination != nil {
+            routes = append(routes, resp.Destination.Prefix)
+        }
+    }
+    c.JSON(http.StatusOK, gin.H{"received_routes": routes})
+}
 func getAdvertisedRoutesHandler(c *gin.Context) {
     client := getBGPClient(c)
     if client == nil {
         return
     }
-    // This just lists paths same as /routes, since Advertised isn't a filter.
     stream, err := client.ListPath(context.Background(), &apipb.ListPathRequest{
         Family: &apipb.Family{Afi: apipb.Family_AFI_IP, Safi: apipb.Family_SAFI_UNICAST},
     })
@@ -303,20 +369,26 @@ func getAdvertisedRoutesHandler(c *gin.Context) {
     }
     c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
 }
-
 func main() {
     connectBGPInstances()
-    router := gin.Default()
-    router.POST("/add-peer", addPeerHandler)
-    router.POST("/announce-route", addRouteHandler)
-    router.POST("/withdraw-route", withdrawRouteHandler)
-    router.GET("/routes", getRoutesHandler)
-    router.GET("/peers", getPeersHandler)
-    router.GET("/peer-info", getPeerInfoHandler)
-    router.GET("/advertised-routes", getAdvertisedRoutesHandler)
 
-    fmt.Println("🚀 GoBGP API listening on :2000")
-    if err := router.Run(":2000"); err != nil {
-        fmt.Printf("❌ Error starting server: %v\n", err)
+    r := gin.Default()
+
+    r.POST("/peers", addPeerHandler)
+    r.GET("/peers", getPeersHandler)
+    r.GET("/peer", getPeerInfoHandler)
+
+    r.POST("/routes", addRouteHandler)
+    r.DELETE("/routes", withdrawRouteHandler)
+
+    r.GET("/routes", getRoutesHandler)           // local routes
+    r.GET("/routes/out", getRoutesOutHandler)    // advertised (adj-out) routes
+    r.GET("/routes/in", routesInHandler)          // received (adj-in) routes
+ r.GET("/advertised-routes", getAdvertisedRoutesHandler)
+    fmt.Println("🚀 Starting server on :8080")
+    if err := r.Run(":8080"); err != nil {
+        fmt.Printf("Failed to run server: %v\n", err)
     }
+
+
 }
