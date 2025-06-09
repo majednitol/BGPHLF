@@ -385,8 +385,8 @@ func main() {
     r.GET("/routes/out", getRoutesOutHandler)    // advertised (adj-out) routes
     r.GET("/routes/in", routesInHandler)          // received (adj-in) routes
  r.GET("/advertised-routes", getAdvertisedRoutesHandler)
-    fmt.Println("🚀 Starting server on :8080")
-    if err := r.Run(":8080"); err != nil {
+    fmt.Println("🚀 Starting server on :2000")
+    if err := r.Run(":2000"); err != nil {
         fmt.Printf("Failed to run server: %v\n", err)
     }
 
