@@ -339,7 +339,7 @@ go to nfs_clientshare
 
 kubectl port-forward services/api 4000 
 
-
+kubectl port-forward service/gobgp-api 2000:2000
  
 
 
