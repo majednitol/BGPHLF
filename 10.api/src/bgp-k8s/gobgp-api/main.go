@@ -190,6 +190,12 @@ func withdrawRouteHandler(c *gin.Context) {
         return
     }
 
+    nextHopAttr, err := marshalAny(&apipb.NextHopAttribute{NextHop: req.NextHop})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
     path := &apipb.Path{
         Family: &apipb.Family{
             Afi:  apipb.Family_AFI_IP,
@@ -199,9 +205,13 @@ func withdrawRouteHandler(c *gin.Context) {
             Prefix:    req.Prefix,
             PrefixLen: req.PrefixLen,
         }),
+        Pattrs: []*anypb.Any{
+            mustMarshal(&apipb.OriginAttribute{Origin: 0}),
+            nextHopAttr,
+        },
     }
 
-    _, err := bgpClient.DeletePath(context.Background(), &apipb.DeletePathRequest{Path: path})
+    _, err = bgpClient.DeletePath(context.Background(), &apipb.DeletePathRequest{Path: path})
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
@@ -209,6 +219,7 @@ func withdrawRouteHandler(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"message": "Route withdrawn"})
 }
+
 
 func getRoutesHandler(c *gin.Context) {
     stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
