@@ -83,7 +83,7 @@ spec:
     spec:
       containers:
         - name: gobgp-api
-          image: majedur708/hlf-api:50.2  # Replace with your actual image
+          image: majedur708/hlf-api:50.6  # Replace with your actual image
           ports:
             - containerPort: 2000
           env:

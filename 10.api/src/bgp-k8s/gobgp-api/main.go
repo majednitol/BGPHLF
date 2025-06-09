@@ -370,7 +370,20 @@ func main() {
     r.GET("/routes/in", routesInHandler)
     r.GET("/advertised-routes", getAdvertisedRoutesHandler) // alias
 
+<<<<<<< HEAD
     r.Run(":2000")
+=======
+    r.GET("/routes", getRoutesHandler)           // local routes
+    r.GET("/routes/out", getRoutesOutHandler)    // advertised (adj-out) routes
+    r.GET("/routes/in", routesInHandler)          // received (adj-in) routes
+ r.GET("/advertised-routes", getAdvertisedRoutesHandler)
+    fmt.Println("🚀 Starting server on :2000")
+    if err := r.Run(":2000"); err != nil {
+        fmt.Printf("Failed to run server: %v\n", err)
+    }
+
+
+>>>>>>> 24b44d9a1614cda80b7b3fdc1c5c4f4888719d30
 }
 // package main
 
