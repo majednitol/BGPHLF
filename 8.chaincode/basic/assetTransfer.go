@@ -986,7 +986,7 @@ func isPrefixInRange(parent, sub string) bool {
 
 	return pNet.Contains(sNet.IP) && pNet.Contains(lastIP(sNet))
 }
- 
+  
 // rono can assign prefixes to RIR organizations
 // func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, assignedTo, timestamp string, prefix[] string) error {
 // 	mspID, err := getRIROrg(ctx)
