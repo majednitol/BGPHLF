@@ -15,9 +15,9 @@ import (
 	"strconv"
 	"strings"
 
+	
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"slices"
 )
 
 type serverConfig struct {
@@ -564,7 +564,15 @@ func (s *SmartContract) AssignResource(
 	if memberBytes == nil {
 		return fmt.Errorf("member %s not found", memberID)
 	}
-
+	for _, prefix := range subPrefix {
+		if !isPrefixInRange(parentPrefix, prefix) {
+			return fmt.Errorf("sub-prefix %s is not within parent prefix %s", prefix, parentPrefix)
+		}
+	subKey := "PREFIX_" + prefix
+	if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
+		return fmt.Errorf("prefix %s already assigned", subPrefix)
+	}
+	}
 	// ======== Get previous allocations for member ========
 	allocations, err := s.GetAllocationsByMember(ctx, memberID)
 	if err != nil {
@@ -572,7 +580,7 @@ func (s *SmartContract) AssignResource(
 	}
 
 	var newASN string
-	if len(allocations) > 0 {
+	if len(allocations) > 0 && allocations[0].ASN != "" {
 		newASN = allocations[0].ASN
 	} else {
 		asn, err := s.generateNextASN(ctx)
@@ -634,7 +642,15 @@ func (s *SmartContract) AssignResource(
 			if err := json.Unmarshal(existingBytes, &prefixAssignment); err != nil {
 				return fmt.Errorf("failed to parse existing prefix %s: %v", prefix, err)
 			}
-			found := slices.Contains(prefixAssignment.Prefix, prefix)
+
+			// Append prefix if not present
+			found := false
+			for _, p := range prefixAssignment.Prefix {
+				if p == prefix {
+					found = true
+					break
+				}
+			}
 			if !found {
 				prefixAssignment.Prefix = append(prefixAssignment.Prefix, prefix)
 			}
@@ -657,6 +673,7 @@ func (s *SmartContract) AssignResource(
 			return fmt.Errorf("failed to save prefix assignment for %s: %v", prefix, err)
 		}
 	}
+
 
 	updatedParentBytes, err := json.Marshal(parentAssignment)
 	if err != nil {
