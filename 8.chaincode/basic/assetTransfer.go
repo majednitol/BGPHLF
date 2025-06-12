@@ -579,7 +579,7 @@ func (s *SmartContract) AssignResource(
 	}
 
 	var newASN string
-	if len(allocations) > 0 && allocations[0].ASN != "" {
+	if len(allocations) > 0 {
 		newASN = allocations[0].ASN
 	} else {
 		asn, err := s.generateNextASN(ctx)
