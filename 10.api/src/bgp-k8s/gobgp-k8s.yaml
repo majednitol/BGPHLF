@@ -9,7 +9,7 @@ data:
     [global.config]
       as = 65001
       router-id = "192.0.2.1"
-      listen-port = -1  # Disable binding to port 179 to avoid permission issues
+      listen-port = -1  
 
     [[neighbors]]
       [neighbors.config]
