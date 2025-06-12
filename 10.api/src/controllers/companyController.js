@@ -64,7 +64,7 @@ export async function approveMember(req, res) {
       "chaincodeName": "basic",
       "memberID": req.body.memberID,
     };
-
+ 
     console.log("Payload:", payload);
     const result = await ApproveMember(payload);
     res.send(result);
