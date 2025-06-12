@@ -574,14 +574,15 @@ func (s *SmartContract) AssignResource(
 	}
 	}
 	// ======== Get previous allocations for member ========
-	allocations, err := s.GetAllocationsByMember(ctx, memberID)
-	if err != nil {
-		return fmt.Errorf("failed to get allocations by member: %v", err)
-	}
+	// allocations, err := s.GetAllocationsByMember(ctx, memberID)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to get allocations by member: %v", err)
+	// }
 
 	var newASN string
-	if len(allocations) > 0 && allocations[0].ASN != "" {
-		newASN = allocations[0].ASN
+	if true {
+		asn, _ := s.generateNextASN(ctx)
+		newASN = strconv.Itoa(asn)
 	} else {
 		asn, err := s.generateNextASN(ctx)
 		if err != nil {
@@ -691,9 +692,7 @@ func (s *SmartContract) AssignResource(
 		Prefix:           subPrefix,
 		AlreadyAllocated: []string{},
 	}
-if newASN == "" {
-			return fmt.Errorf("ASN cant be empty")
-		}
+
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
