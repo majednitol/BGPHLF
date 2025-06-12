@@ -5,16 +5,18 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"os"
 
-	"math/rand"
+	"math/big"
+	
 	"strconv"
 	"strings"
-	"time"
+	
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -583,9 +585,11 @@ func (s *SmartContract) AssignResource(
 	if len(allocations) > 0 && allocations[0].ASN != "" {
 		newASN = allocations[0].ASN
 	} else {
-		rand.Seed(time.Now().UnixNano()) 
-		randomNumber := rand.Intn(90000) + 10000
-		newASN = strconv.Itoa(randomNumber)
+		 hashInput := memberID + timestamp + allocationID
+        hash := sha256.Sum256([]byte(hashInput))
+        hashInt := new(big.Int).SetBytes(hash[:])
+        randomNumber := int(hashInt.Mod(hashInt, big.NewInt(90000)).Int64()) + 10000
+        newASN = strconv.Itoa(randomNumber)
 
 		// Save ASN info
 		as := AS{
