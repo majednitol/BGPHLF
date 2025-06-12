@@ -289,7 +289,7 @@ Validate an AS path against the stored route:
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"Args":["ListPendingRequests"]}'
+  -c '{"Args":["generateNextASN"]}'
 
 
 ---
