@@ -10,7 +10,7 @@ const AssignPrefixPage = () => {
   const { loading } = useAppSelector((state) => state.ipPrefix);
 
   // These values would typically come from decoded token/session
-  const org = 'Org1MSP';
+  const org = 'Org6MSP';
   const userID = '222';
 
   const [form, setForm] = useState({
@@ -26,12 +26,13 @@ const AssignPrefixPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      ...form,
-      org,
-      userID,
-      timestamp: new Date().toISOString(),
-    };
+const payload = {
+    prefix: [form.prefix],
+    assignedTo: form.assignedTo,
+    org,
+    userID,
+    timestamp: new Date().toISOString(),
+  };
 
     try {
       await dispatch(assignPrefix(payload)).unwrap();

@@ -172,8 +172,6 @@ export async function GetResourceRequestsByMember(request) {
 
 export async function AssignResource(request) {
   try {
-
-
     const memberID = request.memberID;
     const allocationID = request.allocationID;
     const parentPrefix = request.parentPrefix;
@@ -183,7 +181,7 @@ export async function AssignResource(request) {
     const org = request.org;
     const contract = await smartContract(request, memberID);
     let result = await contract.submitTransaction(
-      "AssignResource", org, allocationID, memberID, parentPrefix, subPrefixJSON, expiry, timestamp
+      "AssignResource", org, allocationID, memberID, parentPrefix, expiry, timestamp,subPrefixJSON
     );
     console.log("Transaction Result:", result);
 

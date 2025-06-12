@@ -51,7 +51,7 @@ const navItems = {
     '/dashboard/user/login-user'
   ]
 };
-const ConnectedAccountUser = 'rono'; // TODO: Replace with actual user type
+const ConnectedAccountUser = 'rir'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
 //   const { ConnectedAccountUser } = useContext(HealthContext);
 
