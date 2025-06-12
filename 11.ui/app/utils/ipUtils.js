@@ -88,7 +88,7 @@ export function calculateMultipleSubnets(parentPrefix, requiredIPs, maxLength = 
     maxLength = 24,
     alreadyAllocated = []
   } = payload;
-
+console.log("payload768",payload)
   const allocator = preferSingleBlock
     ? (parentPrefix, requiredIPs, alreadyAllocated = []) =>
         calculateSingleBlock(parentPrefix, requiredIPs, alreadyAllocated)

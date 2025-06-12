@@ -23,6 +23,8 @@ const ListApprovedRequests = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showAllSubnets, setShowAllSubnets] = useState(false);
+
   const [formData, setFormData] = useState({
     allocationID: '',
     memberID: '',
@@ -30,8 +32,9 @@ const ListApprovedRequests = () => {
     subPrefix: '',
     expiry: '',
     org: decodedUser.org,
+    maxLength:" "
   });
-
+const [preferSingleBlock, setPreferSingleBlock] = useState(false);
   useEffect(() => {
     dispatch(listApprovedRequests(decodedUser))
       .unwrap()
@@ -60,44 +63,109 @@ const ListApprovedRequests = () => {
       subPrefix: '',
       expiry: '',
       org: decodedUser.org,
+      maxLength: " "
     });
     setShowModal(true);
   };
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  // Always update form data
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
 
-    if (name === 'parentPrefix') {
+  // Only recalculate subnet when relevant fields change
+  if (name === 'parentPrefix' || name === 'maxLength') {
+    const parent = name === 'parentPrefix' ? value : formData.parentPrefix;
+    const maxLen = name === 'maxLength' ? Number(value) : Number(formData.maxLength);
+
+    if (selectedRequest && parent) {
       try {
         const requiredIPs = Number(selectedRequest?.value || 0);
-        const alreadyAllocated = prefix.find(p => p.prefix === value)?.alreadyAllocated || [];
-        console.log("alreadyAllocated", alreadyAllocated)
+        const alreadyAllocated = prefix.find(p => p.prefix === parent)?.alreadyAllocated || [];
+
         const payload = {
-  requestedIPs: requiredIPs,
-  preferSingleBlock: true,
-  poolCIDR: value,
-  maxLength: 24,
-  alreadyAllocated: alreadyAllocated
+          requestedIPs: requiredIPs,
+          preferSingleBlock,
+          poolCIDR: parent,
+          maxLength: maxLen || 24,
+          alreadyAllocated
         };
-        
+
         const subnets = calculateSubnets(payload);
-        const firstSubnet = subnets || '';
+        const firstSubnet = subnets || [];
 
         setFormData((prev) => ({
           ...prev,
-          parentPrefix: value,
+          parentPrefix: parent,
           subPrefix: firstSubnet,
         }));
       } catch (err) {
         toast.error(`Subnet calculation failed: ${err.message}`);
       }
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
     }
-  };
+  }
+}; 
+const formatInColumns = (items, columns = 3) => {
+  if (!Array.isArray(items)) return '';
+
+  const padded = [...items];
+  while (padded.length % columns !== 0) {
+    padded.push(''); // pad to full row
+  }
+
+  const rows = Math.ceil(padded.length / columns);
+  let output = '';
+
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < columns; c++) {
+      const index = r * columns + c; 
+      row.push(padded[index].padEnd(24));
+    }
+    output += row.join('') + '\n';
+  }
+
+  return output;
+};
+
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+
+//     if (name === 'parentPrefix') {
+//       try {
+//         const requiredIPs = Number(selectedRequest?.value || 0);
+//         const alreadyAllocated = prefix.find(p => p.prefix === value)?.alreadyAllocated || [];
+//         console.log("alreadyAllocated", alreadyAllocated)
+//         const payload = {
+//   requestedIPs: requiredIPs,
+//   preferSingleBlock: preferSingleBlock,
+//   poolCIDR: value,
+//  maxLength: Number(formData.maxLength) || 24,
+//   alreadyAllocated: alreadyAllocated
+//         };
+        
+//         const subnets = calculateSubnets(payload);
+//         const firstSubnet = subnets || '';
+
+//         setFormData((prev) => ({
+//           ...prev,
+//           parentPrefix: value,
+//           subPrefix: firstSubnet,
+//         }));
+//       } catch (err) {
+//         toast.error(`Subnet calculation failed: ${err.message}`);
+//       }
+//     } else {
+//       setFormData((prev) => ({
+//         ...prev,
+//         [name]: value,
+//       }));
+//     }
+//   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,13 +255,99 @@ console.log(payload)
                   </option>
                 ))}
               </select>
+
+<select
+  name="allocationMode"
+  value={preferSingleBlock ? "single" : "multiple"}
+  onChange={(e) => {
+    const selected = e.target.value;
+    const isSingle = selected === "single";
+    setPreferSingleBlock(isSingle);
+    const requiredIPs = Number(selectedRequest?.value || 0);
+    const parent = formData.parentPrefix;
+
+    if (parent) {
+      try {
+        const alreadyAllocated = prefix.find(p => p.prefix === parent)?.alreadyAllocated || [];
+        const payload = {
+          requestedIPs: requiredIPs,
+          preferSingleBlock: isSingle,
+          poolCIDR: parent,
+          axLength: Number(formData.maxLength) || 24,
+          alreadyAllocated,
+        };
+        const subnets = calculateSubnets(payload);
+        const firstSubnet = subnets || '';
+
+        setFormData(prev => ({
+          ...prev,
+          subPrefix: firstSubnet,
+        }));
+      } catch (err) {
+        toast.error(`Subnet calculation failed: ${err.message}`);
+      }
+    }
+  }}
+  style={styles.input}
+  required
+>
+  <option value="single">Single Block</option>
+  <option value="multiple">Multiple Blocks</option>
+              </select>
               <input
+  name="maxLength"
+  type="number"
+  min="1"
+  max="32"
+  value={formData.maxLength}
+  onChange={handleChange}
+  style={styles.input}
+  placeholder="Max Length (CIDR, e.g. 24)"
+  required={!preferSingleBlock}
+/>
+
+              {/* <input
                 name="subPrefix"
                 value={formData.subPrefix}
                 placeholder="Sub Prefix"
                 style={styles.input}
                 readOnly
-              />
+              /> */}
+              {Array.isArray(formData.subPrefix) ? (
+  <>
+    <textarea
+      name="subPrefix"            
+                    value={
+  formatInColumns(
+    showAllSubnets ? formData.subPrefix : formData.subPrefix.slice(0, 30),
+    3
+  )
+}
+      rows={10}
+      readOnly
+      style={styles.input}
+    />
+    {formData.subPrefix.length > 20 && (
+      <button
+        type="button"
+        onClick={() => setShowAllSubnets(prev => !prev)}
+        style={{ ...styles.button, marginTop: '10px' }}
+      >
+        {showAllSubnets ? 'See Less' : 'See More'}
+      </button>
+    )}
+  </>
+) : (
+  <textarea
+    name="subPrefix"
+  value={formData.subPrefix}
+              
+    rows={3}
+    readOnly
+    style={styles.input}
+  />
+)}
+
               <input
                 name="expiry"
                 type="date"
