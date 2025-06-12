@@ -31,13 +31,13 @@ export async function ValidatePath(request) {
 export async function AssignPrefix(request) {
     try {
         const userID = request.userID
-        const prefix = request.prefix
+        const prefixJSON = JSON.stringify(prefix);
         const assignedTo = request.assignedTo
         const timestamp = request.timestamp
         const contract = await smartContract(request, userID)
         let result = await contract.submitTransaction(
             "AssignPrefix",
-            prefix,
+            prefixJSON,
             assignedTo,
             timestamp
         );
@@ -91,13 +91,14 @@ export async function AnnounceRoute(request) {
             pathJSON,
         );
         console.log("Transaction Result:", result);
-        const payLoad = {
-            prefix: prefix,
-            prefix_len: prefix_len,
-            next_hop: next_hop
-        };
+    return result.toString()
+        // const payLoad = {
+        //     prefix: prefix,
+        //     prefix_len: prefix_len,
+        //     next_hop: next_hop
+        // };
 
-        const response = await BgpApiRepository.post('routes', payLoad, false);
+        // const response = await BgpApiRepository.post('routes', payLoad, false);
     } catch (error) {
         console.error("Error in createAsset:", error);
         throw error;
