@@ -9,7 +9,8 @@ import {
 } from '../../features/ipPrefix/ipPrefixSlice';
 import { assignResource } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
-import { calculateSubnets } from '../../utils/ipUtils';
+import calculateSubnets from '../../utils/ipUtils';
+
 
 const decodedUser = {
   org: 'Org1MSP',
@@ -70,8 +71,16 @@ const ListApprovedRequests = () => {
       try {
         const requiredIPs = Number(selectedRequest?.value || 0);
         const alreadyAllocated = prefix.find(p => p.prefix === value)?.alreadyAllocated || [];
-console.log("alreadyAllocated",alreadyAllocated)
-        const subnets = calculateSubnets(value, requiredIPs, alreadyAllocated);
+        console.log("alreadyAllocated", alreadyAllocated)
+        const payload = {
+  requestedIPs: requiredIPs,
+  preferSingleBlock: true,
+  poolCIDR: value,
+  maxLength: 24,
+  alreadyAllocated: alreadyAllocated
+        };
+        
+        const subnets = calculateSubnets(payload);
         const firstSubnet = subnets || '';
 
         setFormData((prev) => ({
