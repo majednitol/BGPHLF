@@ -84,7 +84,10 @@ const ListApprovedRequests = () => {
       if (selectedRequest && parent) {
         try {
           const requiredIPs = Number(selectedRequest?.value || 0);
-          const alreadyAllocated = prefix.find(p => p.prefix === parent)?.alreadyAllocated || [];
+          const alreadyAllocated = prefix.find(p => p.prefix.includes(parent))?.alreadyAllocated || [];
+
+          console.log("prefix", prefix)
+          console.log("alreadyAllocated",alreadyAllocated)
 
           const payload = {
             requestedIPs: requiredIPs,

@@ -171,7 +171,7 @@ peer chaincode invoke \
   peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"function":"GetCompany","Args":["com001"]}'
+  -c '{"function":"GetAllocationsByMember","Args":["brac0011"]}'
 
 
 ### 1. **AssignPrefix**

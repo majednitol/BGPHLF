@@ -634,8 +634,6 @@ func (s *SmartContract) AssignResource(
 			if err := json.Unmarshal(existingBytes, &prefixAssignment); err != nil {
 				return fmt.Errorf("failed to parse existing prefix %s: %v", prefix, err)
 			}
-
-			// Append prefix if not present
 			found := slices.Contains(prefixAssignment.Prefix, prefix)
 			if !found {
 				prefixAssignment.Prefix = append(prefixAssignment.Prefix, prefix)
@@ -657,13 +655,6 @@ func (s *SmartContract) AssignResource(
 		prefixBytes, _ := json.Marshal(prefixAssignment)
 		if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 			return fmt.Errorf("failed to save prefix assignment for %s: %v", prefix, err)
-		}
-	}
-
-	for _, sp := range subPrefix {
-		duplicate := slices.Contains(parentAssignment.AlreadyAllocated, sp)
-		if !duplicate {
-			parentAssignment.AlreadyAllocated = append(parentAssignment.AlreadyAllocated, sp)
 		}
 	}
 
