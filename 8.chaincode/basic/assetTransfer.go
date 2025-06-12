@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 
-	
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
@@ -83,7 +82,7 @@ type Route struct {
 }
 
 type PrefixAssignment struct {
-	Prefix []string `json:"prefix"`
+	Prefix           []string `json:"prefix"`
 	AlreadyAllocated []string `json:"alreadyAllocated"`
 	AssignedTo       string   `json:"assignedTo"`
 	AssignedBy       string   `json:"assignedBy"`
@@ -568,10 +567,10 @@ func (s *SmartContract) AssignResource(
 		if !isPrefixInRange(parentPrefix, prefix) {
 			return fmt.Errorf("sub-prefix %s is not within parent prefix %s", prefix, parentPrefix)
 		}
-	subKey := "PREFIX_" + prefix
-	if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
-		return fmt.Errorf("prefix %s already assigned", subPrefix)
-	}
+		subKey := "PREFIX_" + prefix
+		if exists, _ := ctx.GetStub().GetState(subKey); exists != nil {
+			return fmt.Errorf("prefix %s already assigned", subPrefix)
+		}
 	}
 	// ======== Get previous allocations for member ========
 	allocations, err := s.GetAllocationsByMember(ctx, memberID)
@@ -674,7 +673,6 @@ func (s *SmartContract) AssignResource(
 		}
 	}
 
-
 	updatedParentBytes, err := json.Marshal(parentAssignment)
 	if err != nil {
 		return fmt.Errorf("failed to marshal updated parent assignment: %v", err)
@@ -709,10 +707,6 @@ func (s *SmartContract) AssignResource(
 
 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
 }
-
-
-
-
 
 // func (s *SmartContract) AssignResource(
 // 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, expiry, timestamp string, subPrefixJSON string,
