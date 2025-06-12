@@ -31,15 +31,17 @@ export async function ValidatePath(request) {
 export async function AssignPrefix(request) {
     try {
         const userID = request.userID
+        const org = request.org
         const prefixJSON = JSON.stringify(request.prefix);
         const assignedTo = request.assignedTo
         const timestamp = request.timestamp
         const contract = await smartContract(request, userID)
         let result = await contract.submitTransaction(
             "AssignPrefix",
-            prefixJSON,
+            org,
             assignedTo,
-            timestamp
+            timestamp,
+            prefixJSON,
         );
         console.log("Transaction Result:", result);
 

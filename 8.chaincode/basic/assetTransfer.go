@@ -15,9 +15,10 @@ import (
 	"strconv"
 	"strings"
 
+	"slices"
+
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"slices"
 )
 
 type serverConfig struct {
@@ -64,11 +65,11 @@ type Allocation struct {
 	Timestamp string            `json:"timestamp"`
 }
 type AS struct {
-	ASN        string `json:"asn"`
+	ASN        string   `json:"asn"`
 	Prefix     []string `json:"prefix"`
-	AssignedTo string `json:"assignedTo"`
-	AssignedBy string `json:"assignedBy"`
-	Timestamp  string `json:"timestamp"`
+	AssignedTo string   `json:"assignedTo"`
+	AssignedBy string   `json:"assignedBy"`
+	Timestamp  string   `json:"timestamp"`
 }
 
 type SmartContract struct {
@@ -508,34 +509,33 @@ func (s *SmartContract) GetCompanyByMemberID(ctx contractapi.TransactionContextI
 // 	// }
 // 	// }
 
-
 // 	// // ======== Store Prefix Assignment ========
 // 	// prefixAssignment := PrefixAssignment{
-		
+
 // 	// 	AssignedTo: memberID,
 // 	// 	AssignedBy: org,
 // 	// 	Timestamp:  timestamp,
 // 	// }
-	
+
 // 	// prefixAssignment.Prefix = append(prefixAssignment.Prefix, subPrefix...)
 // 	// prefixBytes, _ := json.Marshal(prefixAssignment)
 // 	// if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
 // 	// 	return fmt.Errorf("failed to save prefix assignment: %v", err)
 // 	// }
 
-// 	// ======== Save Allocation ========
-// 	alloc := Allocation{
-// 		ID:        allocationID,
-// 		MemberID:  memberID,
-// 		Prefix:    &prefixAssignment,
-// 		ASN:       newASN,
-// 		Expiry:    expiry,
-// 		IssuedBy:  org,
-// 		Timestamp: timestamp,
-// 	}
-// 	allocBytes, _ := json.Marshal(alloc)
-// 	return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
-// }
+//		// ======== Save Allocation ========
+//		alloc := Allocation{
+//			ID:        allocationID,
+//			MemberID:  memberID,
+//			Prefix:    &prefixAssignment,
+//			ASN:       newASN,
+//			Expiry:    expiry,
+//			IssuedBy:  org,
+//			Timestamp: timestamp,
+//		}
+//		allocBytes, _ := json.Marshal(alloc)
+//		return ctx.GetStub().PutState("ALLOC_"+allocationID, allocBytes)
+//	}
 func (s *SmartContract) AssignResource(
 	ctx contractapi.TransactionContextInterface, org, allocationID, memberID, parentPrefix, expiry, timestamp string, subPrefixJSON string,
 ) error {
@@ -543,11 +543,11 @@ func (s *SmartContract) AssignResource(
 	if exists, _ := ctx.GetStub().GetState("ALLOC_" + allocationID); exists != nil {
 		return fmt.Errorf("allocation %s already exists", allocationID)
 	}
-  var subPrefix []string
-  err := json.Unmarshal([]byte(subPrefixJSON), &subPrefix)
-  if err != nil {
-    return fmt.Errorf("failed to parse subPrefix JSON: %v", err)
-  }
+	var subPrefix []string
+	err := json.Unmarshal([]byte(subPrefixJSON), &subPrefix)
+	if err != nil {
+		return fmt.Errorf("failed to parse subPrefix JSON: %v", err)
+	}
 	// ======== Check if member exists ========
 	memberKey := "MEMBER_" + memberID
 	memberBytes, err := ctx.GetStub().GetState(memberKey)
@@ -599,46 +599,45 @@ func (s *SmartContract) AssignResource(
 	}
 
 	// ======== Validate and Save Sub-Prefixes ========
-for _, prefix := range subPrefix {
-	subKey := "PREFIX_" + prefix
+	for _, prefix := range subPrefix {
+		subKey := "PREFIX_" + prefix
 
-	var prefixAssignment PrefixAssignment
-	existingBytes, err := ctx.GetStub().GetState(subKey)
-	if err != nil {
-		return fmt.Errorf("failed to read prefix %s: %v", prefix, err)
+		var prefixAssignment PrefixAssignment
+		existingBytes, err := ctx.GetStub().GetState(subKey)
+		if err != nil {
+			return fmt.Errorf("failed to read prefix %s: %v", prefix, err)
+		}
+
+		if existingBytes != nil {
+			if err := json.Unmarshal(existingBytes, &prefixAssignment); err != nil {
+				return fmt.Errorf("failed to parse existing prefix %s: %v", prefix, err)
+			}
+
+			// Optional: Prevent conflicting overwrite
+			if prefixAssignment.AssignedTo != memberID {
+				return fmt.Errorf("prefix %s already assigned to another member", prefix)
+			}
+
+			// Append if not duplicate
+			found := slices.Contains(prefixAssignment.Prefix, prefix)
+			if !found {
+				prefixAssignment.Prefix = append(prefixAssignment.Prefix, prefix)
+			}
+		} else {
+			// New prefix assignment
+			prefixAssignment = PrefixAssignment{
+				AssignedTo: memberID,
+				AssignedBy: org,
+				Timestamp:  timestamp,
+				Prefix:     []string{prefix},
+			}
+		}
+
+		prefixBytes, _ := json.Marshal(prefixAssignment)
+		if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
+			return fmt.Errorf("failed to save prefix assignment for %s: %v", prefix, err)
+		}
 	}
-
-	if existingBytes != nil {
-		if err := json.Unmarshal(existingBytes, &prefixAssignment); err != nil {
-			return fmt.Errorf("failed to parse existing prefix %s: %v", prefix, err)
-		}
-
-		// Optional: Prevent conflicting overwrite
-		if prefixAssignment.AssignedTo != memberID {
-			return fmt.Errorf("prefix %s already assigned to another member", prefix)
-		}
-
-		// Append if not duplicate
-		found := slices.Contains(prefixAssignment.Prefix, prefix)
-		if !found {
-			prefixAssignment.Prefix = append(prefixAssignment.Prefix, prefix)
-		}
-	} else {
-		// New prefix assignment
-		prefixAssignment = PrefixAssignment{
-			AssignedTo: memberID,
-			AssignedBy: org,
-			Timestamp:  timestamp,
-			Prefix:     []string{prefix},
-		}
-	}
-
-	prefixBytes, _ := json.Marshal(prefixAssignment)
-	if err := ctx.GetStub().PutState(subKey, prefixBytes); err != nil {
-		return fmt.Errorf("failed to save prefix assignment for %s: %v", prefix, err)
-	}
-}
-
 
 	parentAssignment.AlreadyAllocated = append(parentAssignment.AlreadyAllocated, subPrefix...)
 	updatedParentBytes, err := json.Marshal(parentAssignment)
@@ -847,14 +846,14 @@ func isPrefixInRange(parent, sub string) bool {
 // 		return err
 // 	}
 
-// 	return ctx.GetStub().SetEvent("PrefixAssigned", data)
-// }
-func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface,mspID, assignedTo, timestamp string,  prefixJSON string,) error {
-  var prefix []string
-    err := json.Unmarshal([]byte(prefixJSON), &prefix)
-    if err != nil {
-        return fmt.Errorf("failed to parse prefix JSON: %v", err)
-    }
+//		return ctx.GetStub().SetEvent("PrefixAssigned", data)
+//	}
+func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, mspID, assignedTo, timestamp string, prefixJSON string) error {
+	var prefix []string
+	err := json.Unmarshal([]byte(prefixJSON), &prefix)
+	if err != nil {
+		return fmt.Errorf("failed to parse prefix JSON: %v", err)
+	}
 	if mspID != "Org6MSP" {
 		return fmt.Errorf("unauthorized: only RONO can assign prefixes")
 	}
@@ -885,7 +884,7 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 		}
 	}
 
-		eventPayload := struct {
+	eventPayload := struct {
 		AssignedTo string   `json:"assignedTo"`
 		AssignedBy string   `json:"assignedBy"`
 		Timestamp  string   `json:"timestamp"`
