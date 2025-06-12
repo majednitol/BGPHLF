@@ -589,7 +589,7 @@ func (s *SmartContract) AssignResource(
 		}
 		newASN = strconv.Itoa(asn)
 
-		// Save ASN info
+		
 		as := AS{
 			ASN:        newASN,
 			Prefix:     subPrefix,
@@ -691,7 +691,9 @@ func (s *SmartContract) AssignResource(
 		Prefix:           subPrefix,
 		AlreadyAllocated: []string{},
 	}
-
+if newASN == "" {
+			return fmt.Errorf("ASN cant be empty")
+		}
 	alloc := Allocation{
 		ID:        allocationID,
 		MemberID:  memberID,
