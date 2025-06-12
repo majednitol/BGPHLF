@@ -216,7 +216,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
   --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"CreateSystemManager","Args":["sys001", "Alice Admin", "alice@example.com", "Org1MSP", "SYSTEM_MANAGER", "2025-06-01T12:00:00Z"]}' \
+  -c '{"function":"CreateSystemManager","Args":["222", "Alice Admin", "alice@example.com", "Org6MSP", "SYSTEM_MANAGER", "2025-06-01T12:00:00Z"]}' \
   --waitForEvent
 ### 2. **RegisterAS**
 
@@ -436,7 +436,7 @@ peer chaincode invoke \
   -c ''{
     "function": "RegisterCompanyWithMember",
     "Args": [
-      "com_gp_bd",
+      "brac0011",
       "Grameenphone Ltd",
       "Telecommunications",
       "GP House, Bashundhara",
@@ -448,7 +448,7 @@ peer chaincode invoke \
       "info@grameenphone.com",
       "abuse@grameenphone.com",
       "false",
-      "mem_gp001",
+      "brac0011",
       "GP Network Admin",
       "BD",
       "admin@grameenphone.com"
