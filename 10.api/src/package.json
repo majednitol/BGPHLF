@@ -7,6 +7,7 @@
     "dependencies": {
         "@grpc/grpc-js": "^1.12.5",
         "@hyperledger/fabric-gateway": "^1.7.1",
+        "axios": "^1.9.0",
         "body-parser": "^1.20.3",
         "cors": "^2.8.5",
         "crypto": "^1.0.1",

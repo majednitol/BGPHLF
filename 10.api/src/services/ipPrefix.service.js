@@ -1,3 +1,4 @@
+import BgpApiRepository from "../lib/apiRepository.js";
 import { smartContract } from "./smartContract.js";
 
 export async function GetPrefixAssignment(request) {
@@ -90,8 +91,13 @@ export async function AnnounceRoute(request) {
             pathJSON,
         );
         console.log("Transaction Result:", result);
+        const payLoad = {
+            prefix: prefix,
+            prefix_len: prefix_len,
+            next_hop: next_hop
+        };
 
-        return result;
+        const response = await BgpApiRepository.post('routes', payLoad, false);
     } catch (error) {
         console.error("Error in createAsset:", error);
         throw error;
@@ -99,23 +105,23 @@ export async function AnnounceRoute(request) {
 }
 
 export async function RevokeRoute(request) {
-  try {
-    const { memberID, asn, prefix } = request;
+    try {
+        const { memberID, asn, prefix } = request;
 
-    if (!memberID || !asn || !prefix) {
-      throw new Error("Missing required fields: memberID, asn, or prefix");
+        if (!memberID || !asn || !prefix) {
+            throw new Error("Missing required fields: memberID, asn, or prefix");
+        }
+
+        const contract = await smartContract(request, memberID);
+        const result = await contract.submitTransaction("RevokeRoute", memberID, asn, prefix);
+
+        console.log("Transaction Result:", result.toString());
+        return result.toString();
+
+    } catch (error) {
+        console.error("Error in RevokeRoute:", error?.message || error.toString());
+        throw new Error(`Fabric RevokeRoute failed: ${error?.message || error.toString()}`);
     }
-
-    const contract = await smartContract(request, memberID);
-    const result = await contract.submitTransaction("RevokeRoute", memberID, asn, prefix);
-
-    console.log("Transaction Result:", result.toString());
-    return result.toString();
-
-  } catch (error) {
-    console.error("Error in RevokeRoute:", error?.message || error.toString());
-    throw new Error(`Fabric RevokeRoute failed: ${error?.message || error.toString()}`);
-  }
 }
 
 

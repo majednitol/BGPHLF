@@ -420,14 +420,11 @@ func main() {
 
 
 // func connectBGPInstances() {
-//     // instanceStr := os.Getenv("GOBGP_INSTANCES")
-//     // if instanceStr == "" {
-//     //     instanceStr = "rono=localhost:50051"
-//     // }
-//     bgpAddr := os.Getenv("GOBGPD_ADDR")
-//     if bgpAddr == "" {
-//         bgpAddr = "localhost:50051" // fallback for local dev
+//     instanceStr := os.Getenv("GOBGP_INSTANCES")
+//     if instanceStr == "" {
+//         instanceStr = "rono=localhost:50051"
 //     }
+
 //     for _, inst := range strings.Split(bgpAddr, ",") {
 //         parts := strings.SplitN(strings.TrimSpace(inst), "=", 2)
 //         if len(parts) != 2 {
