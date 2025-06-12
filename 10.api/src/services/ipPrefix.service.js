@@ -33,6 +33,7 @@ export async function AssignPrefix(request) {
         const userID = request.userID
         const org = request.org
         const prefixJSON = JSON.stringify(request.prefix);
+        console.log("prefixJSON", prefixJSON)
         const assignedTo = request.assignedTo
         const timestamp = request.timestamp
         const contract = await smartContract(request, userID)
