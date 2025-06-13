@@ -1,7 +1,9 @@
 
 import apiRepository from '../../lib/apiRepository';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { v4 as uuidv4 } from 'uuid';
 
+const newUUID = uuidv4();
 // ✅ Get User
 export const getUser = createAsyncThunk('user/getUser', async ({ userId, org }, thunkAPI) => {
   try {
@@ -23,10 +25,10 @@ export const getAllPrefixesAssignedByOrg = createAsyncThunk('user/getAllPrefixes
   }
 });
 
-export const getOrgUser = createAsyncThunk('user/getOrgUser', async ({ userId, org }, thunkAPI) => {
+export const getOrgUser = createAsyncThunk('user/getOrgUser', async (_, thunkAPI) => {
   try {
-    const params = { userId, org };
-    const response = await apiRepository.get('/user/get-system-manager', params, true);
+    
+    const response = await apiRepository.get('/user/get-system-manager', {}, true);
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -34,9 +36,9 @@ export const getOrgUser = createAsyncThunk('user/getOrgUser', async ({ userId, o
 });
 
 // ✅ Register User (Enroll identity only)
-export const registerUser = createAsyncThunk('user/registerUser', async ({ userId, org, affiliation }, thunkAPI) => {
+export const registerUser = createAsyncThunk('user/registerUser', async ({ org, affiliation }, thunkAPI) => {
   try {
-    const data = { userId, org, affiliation };
+    const data = { userId:newUUID, org, affiliation };
     const response = await apiRepository.post('/user/register', data, false);
     return response.data;
   } catch (error) {
@@ -64,10 +66,14 @@ export const createOrgUser = createAsyncThunk('user/createOrgUser', async ({ use
   }
 });
 // ✅ Login User
-export const loginUser = createAsyncThunk('user/loginUser', async ({ userID, org }, thunkAPI) => {
+export const loginUser = createAsyncThunk('user/loginUser', async ({ org,email, name}, thunkAPI) => {
   try {
-    const data = { userID, org };
-    const response = await apiRepository.post('/user/login-user', data, false);
+    const data = { userId:"222", org, email, name };
+    const response = await apiRepository.post('/user/login-system-manager', data, false);
+    console.log("response.data token", response.data.token)
+    if (response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+    }
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

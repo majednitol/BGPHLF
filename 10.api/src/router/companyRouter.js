@@ -17,19 +17,19 @@ const companyRouter = express.Router();
 
 // Company registration and retrieval
 companyRouter.post("/register-company-by-member", registerCompanyWithMember);
-companyRouter.get("/get-company", getCompany);
+companyRouter.get("/get-company",authenticate, getCompany);
  
 // Member actions
-companyRouter.post("/approve-member", approveMember);
+companyRouter.post("/approve-member",authenticate, approveMember);
 
 // Resource management
-companyRouter.post("/assign-resource", assignResource);
-companyRouter.post("/request-resource", requestResource);
-companyRouter.post("/review-request", reviewRequest);
+companyRouter.post("/assign-resource",authenticate, assignResource);
+companyRouter.post("/request-resource",authenticate, requestResource);
+companyRouter.post("/review-request",authenticate, reviewRequest);
 
-getResourceRequestsByMember
-companyRouter.get("/get-resource-requests-by-member", getResourceRequestsByMember);
-companyRouter.get("/get-allocations-by-member", getAllocationsByMember);
-companyRouter.get("/get-company-by-member-id", getCompanyByMemberID);
+
+companyRouter.get("/get-resource-requests-by-member",authenticate, getResourceRequestsByMember);
+companyRouter.get("/get-allocations-by-member",authenticate, getAllocationsByMember);
+companyRouter.get("/get-company-by-member-id",authenticate, getCompanyByMemberID);
 
 export default companyRouter;

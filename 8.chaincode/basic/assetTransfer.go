@@ -13,10 +13,9 @@ import (
 	"os"
 
 	"math/big"
-	
+
 	"strconv"
 	"strings"
-	
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -47,14 +46,14 @@ type ResourceRequest struct {
 	MemberID  string `json:"memberId"`
 	Type      string `json:"type"` // ipv4, ipv6
 	// Start      string  `json:"start"`  // e.g., 192.0.2.0 or ASN start
-	Value      int    `json:"value"`  // number of IPs or ASNs
-	Date       string `json:"date"`   // e.g., 20250524
-	Status     string `json:"status"` // allocated, reserved, etc.
-	Country    string `json:"country"`
-	RIR        string `json:"rir"`
+	Value           int    `json:"value"`  // number of IPs or ASNs
+	Date            string `json:"date"`   // e.g., 20250524
+	Status          string `json:"status"` // allocated, reserved, etc.
+	Country         string `json:"country"`
+	RIR             string `json:"rir"`
 	PrefixMaxLength int    `json:"prefixMaxLength"`
-	ReviewedBy string `json:"reviewedBy"`
-	Timestamp  string `json:"timestamp"`
+	ReviewedBy      string `json:"reviewedBy"`
+	Timestamp       string `json:"timestamp"`
 }
 
 type Allocation struct {
@@ -151,6 +150,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	memberName string,
 	memberCountry string,
 	memberEmail string,
+	orgMSP string,
 ) error {
 	companyKey := "COM_" + companyID
 	companyBytes, err := ctx.GetStub().GetState(companyKey)
@@ -199,7 +199,22 @@ func (s *SmartContract) RegisterCompanyWithMember(
 		Approved: false,
 		Company:  company,
 	}
-
+	manager := SystemManager{
+		ID:        memberID,
+		Name:      memberName,
+		Email:     memberEmail,
+		OrgMSP:    orgMSP,
+		Role:      "admin",
+		CreatedAt: "",
+	}
+	key := "SYS_MGR_" + memberID
+	data, err := json.Marshal(manager)
+	if err != nil {
+		return fmt.Errorf("failed to marshal system manager data: %v", err)
+	}
+	if err := ctx.GetStub().PutState(key, data); err != nil {
+		return fmt.Errorf("failed to store system manager: %v", err)
+	}
 	memberJSON, err := json.Marshal(member)
 	if err != nil {
 		return fmt.Errorf("failed to marshal member: %v", err)
@@ -300,32 +315,6 @@ func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInt
 	}, nil
 }
 
-
-// func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManagerLoginResponse, error) {
-// 	if id == "" {
-// 		return nil, fmt.Errorf("system manager id cannot be empty")
-// 	}
-
-// 	key := "SYS_MGR_" + id
-// 	data, err := ctx.GetStub().GetState(key)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to read from ledger: %v", err)
-// 	}
-// 	if data == nil {
-// 		return nil, fmt.Errorf("system manager with id '%s' not found", id)
-// 	}
-
-// 	var manager SystemManager
-// 	if err := json.Unmarshal(data, &manager); err != nil {
-// 		return nil, fmt.Errorf("failed to parse system manager data: %v", err)
-// 	}
-
-// 	return &SystemManagerLoginResponse{
-// 		Name:   manager.Name,
-// 		OrgMSP: manager.OrgMSP,
-// 		Role:   manager.Role,
-// 	}, nil
-// }
 func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManager, error) {
 	if id == "" {
 		return nil, fmt.Errorf("system manager id cannot be empty")
@@ -391,7 +380,7 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir string,prefixMaxLength int, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir string, prefixMaxLength int, timestamp string) error {
 	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + memberID)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member not found")
@@ -414,14 +403,14 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 		MemberID:  memberID,
 		Type:      resType,
 		// Start:     start,
-		Value:      value,
-		Date:       date,
-		Status:     "pending",
-		Country:    country,
-		RIR:        rir,
+		Value:           value,
+		Date:            date,
+		Status:          "pending",
+		Country:         country,
+		RIR:             rir,
 		PrefixMaxLength: prefixMaxLength,
-		ReviewedBy: "not yet reviewed",
-		Timestamp:  timestamp,
+		ReviewedBy:      "not yet reviewed",
+		Timestamp:       timestamp,
 	}
 
 	data, err := json.Marshal(request)
@@ -451,7 +440,7 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	if err != nil || reqBytes == nil {
 		return fmt.Errorf("resource request %s not found", reqID)
 	}
- 
+
 	var request ResourceRequest
 	if err := json.Unmarshal(reqBytes, &request); err != nil {
 		return fmt.Errorf("failed to unmarshal request: %v", err)
@@ -639,11 +628,11 @@ func (s *SmartContract) AssignResource(
 	if len(allocations) > 0 && allocations[0].ASN != "" {
 		newASN = allocations[0].ASN
 	} else {
-		 hashInput := memberID + timestamp + allocationID
-        hash := sha256.Sum256([]byte(hashInput))
-        hashInt := new(big.Int).SetBytes(hash[:])
-        randomNumber := int(hashInt.Mod(hashInt, big.NewInt(90000)).Int64()) + 10000
-        newASN = strconv.Itoa(randomNumber)
+		hashInput := memberID + timestamp + allocationID
+		hash := sha256.Sum256([]byte(hashInput))
+		hashInt := new(big.Int).SetBytes(hash[:])
+		randomNumber := int(hashInt.Mod(hashInt, big.NewInt(90000)).Int64()) + 10000
+		newASN = strconv.Itoa(randomNumber)
 
 		// Save ASN info
 		as := AS{
@@ -950,9 +939,6 @@ func (s *SmartContract) GetLoggedInUser(ctx contractapi.TransactionContextInterf
 	return string(resultBytes), nil
 }
 
-
-
-
 func (s *SmartContract) RegisterUser(ctx contractapi.TransactionContextInterface, userID, dept, comapanyID, timestamp string) error {
 	if dept != "technical" && dept != "financial" && dept != "member" {
 		return fmt.Errorf("invalid role")
@@ -1011,7 +997,7 @@ func isPrefixInRange(parent, sub string) bool {
 
 	return pNet.Contains(sNet.IP) && pNet.Contains(lastIP(sNet))
 }
- 
+
 // rono can assign prefixes to RIR organizations
 // func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface, assignedTo, timestamp string, prefix[] string) error {
 // 	mspID, err := getRIROrg(ctx)

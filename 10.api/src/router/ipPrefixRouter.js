@@ -4,21 +4,21 @@ import { announceRoute, assignPrefix, getAllOwnedPrefixes, getPrefixAssignment, 
 
 
 const ipPrefixRouter = express.Router()
-ipPrefixRouter.post("/validate-path", validatePath)
+ipPrefixRouter.post("/validate-path",authenticate, validatePath)
 
-ipPrefixRouter.post("/assign-prefix", assignPrefix)
+ipPrefixRouter.post("/assign-prefix",authenticate, assignPrefix)
 ipPrefixRouter.post("/sub-assign-prefix", subAssignPrefix)
-ipPrefixRouter.post("/announce-route", announceRoute)
-ipPrefixRouter.post("/revoke-route", revokeRoute)
+ipPrefixRouter.post("/announce-route",authenticate, announceRoute)
+ipPrefixRouter.post("/revoke-route",authenticate, revokeRoute)
 
-ipPrefixRouter.get("/get-prefix-assignment", getPrefixAssignment)
+ipPrefixRouter.get("/get-prefix-assignment",authenticate, getPrefixAssignment)
 //TracePrefix
-ipPrefixRouter.get("/trace-prefix", tracePrefix)
+ipPrefixRouter.get("/trace-prefix",authenticate, tracePrefix)
 
-ipPrefixRouter.get("/list-pending-requests", listPendingRequests)
+ipPrefixRouter.get("/list-pending-requests",authenticate, listPendingRequests)
 
-ipPrefixRouter.get("/list-approved-requests", listApprovedRequests)
-ipPrefixRouter.get("/list-all-owned-prefixes", getAllOwnedPrefixes)
-ipPrefixRouter.get("/list-all-members",listAllMembers)
-   .get("/list-all-asn-values", listAllASNValues)
+ipPrefixRouter.get("/list-approved-requests",authenticate, listApprovedRequests)
+ipPrefixRouter.get("/list-all-owned-prefixes",authenticate, getAllOwnedPrefixes)
+ipPrefixRouter.get("/list-all-members",authenticate,listAllMembers)
+   .get("/list-all-asn-values",authenticate, listAllASNValues)
 export default ipPrefixRouter

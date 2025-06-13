@@ -1,87 +1,133 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loginUser } from '../../features/user/userSlice';
 import toast from 'react-hot-toast';
 
-export default function LoginUserPage() {
+const LoginUserPage = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.user);
 
-  const [userID, setUserID] = useState('');
-  const [org, setOrg] = useState('Org1');
-  const orgOptions = ['Org1', 'Org2', 'Org3', 'Org4', 'Org5', 'Org6'];
+  const [formData, setFormData] = useState({
+    email: '',
+    name: '',
+    org: 'Org1',
+  });
 
-  const handleLogin = async () => {
-    const res = await dispatch(loginUser({ userID, org }));
-    if (res.meta.requestStatus === 'fulfilled') {
+  const orgOptions = ['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'];
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await dispatch(loginUser(formData)).unwrap();
       toast.success('Login successful!');
-    } else {
-      toast.error(res.payload || 'Login failed!');
+      console.log(res); // You can store token or redirect here
+    } catch (error) {
+      toast.error(error || 'Login failed!');
     }
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.header}>Login User</h2>
-      <input
-        style={styles.input}
-        placeholder="User ID"
-        value={userID}
-        onChange={(e) => setUserID(e.target.value)}
-      />
-      <select style={styles.select} value={org} onChange={(e) => setOrg(e.target.value)}>
-        {orgOptions.map((o) => (
-          <option key={o} value={o}>{o}</option>
-        ))}
-      </select>
-      <button style={styles.button} onClick={handleLogin} disabled={loading}>
-        {loading ? 'Logging in...' : 'Login'}
-      </button>
+      <h2 style={styles.title}>🔐 Login User</h2>
+
+      <form onSubmit={handleLogin} style={styles.form}>
+        <input
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+        <input
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+        <select
+          name="org"
+          value={formData.org}
+          onChange={handleChange}
+          style={styles.select}
+          required
+        >
+          <option value="">Select Organization</option>
+          {orgOptions.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
     </div>
   );
-}
+};
 
 const styles = {
   container: {
-    maxWidth: '400px',
-    margin: '30px auto',
-    padding: '20px',
-    border: '2px solid #ddd',
+    maxWidth: '700px',
+    margin: '40px auto',
+    padding: '30px',
+    backgroundColor: '#f9f9fc',
     borderRadius: '12px',
-    boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'Segoe UI, sans-serif',
+    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   },
-  header: {
+  title: {
+    textAlign: 'center',
+    fontSize: '24px',
     color: '#2c3e50',
-    marginBottom: '15px',
+    marginBottom: '20px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
   },
   input: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    fontSize: '16px',
-    borderRadius: '6px',
+    padding: '10px 14px',
+    fontSize: '15px',
     border: '1px solid #ccc',
+    borderRadius: '8px',
+    outline: 'none',
+    transition: 'border 0.2s ease-in-out',
   },
   select: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    fontSize: '16px',
-    borderRadius: '6px',
+    padding: '10px 14px',
+    fontSize: '15px',
     border: '1px solid #ccc',
+    borderRadius: '8px',
+    outline: 'none',
+    backgroundColor: '#fff',
+    appearance: 'none',
+    MozAppearance: 'none',
+    cursor: 'pointer',
+    transition: 'border 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
   },
   button: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    backgroundColor: '#27ae60',
+    padding: '12px',
+    backgroundColor: '#007BFF',
     color: '#fff',
     border: 'none',
-    borderRadius: '6px',
+    fontSize: '16px',
+    borderRadius: '8px',
     cursor: 'pointer',
+    transition: 'background 0.2s ease-in-out',
   },
 };
+
+export default LoginUserPage;

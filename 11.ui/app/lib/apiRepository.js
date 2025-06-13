@@ -2,7 +2,7 @@ import apiClient from './apiClient';
 
 const getAccessToken = () => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
+  return localStorage.getItem('authToken');
 };
 
 const getAuthHeaders = (tokenRequired = true) => {
