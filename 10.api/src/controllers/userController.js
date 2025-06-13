@@ -41,11 +41,12 @@ export async function loginSystemManager(req, res, next) {
         if (!response || response.length === 0) {
       return next(createHttpError(401, "Invalid login credentials."));
     }
-    const manager = response[0]; 
+        const user = response.managers[0]
+        response.managers[0].id
     const tokenPayload = {
-      sub: manager.id,            
-      org: manager.orgMSP,
-      role: manager.role,
+      sub: user.id,            
+      org: user.orgMSP,
+      role: user.role,
     };
  
     const token = jwt.sign(tokenPayload, config.jwt_secret, {
