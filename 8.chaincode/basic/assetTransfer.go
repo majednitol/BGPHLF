@@ -151,6 +151,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 	memberCountry string,
 	memberEmail string,
 	orgMSP string,
+	CreatedAt string,
 ) error {
 	companyKey := "COM_" + companyID
 	companyBytes, err := ctx.GetStub().GetState(companyKey)
@@ -178,6 +179,7 @@ func (s *SmartContract) RegisterCompanyWithMember(
 		OrganizationEmail: orgEmail,
 		NetworkAbuseEmail: abuseEmail,
 		IsMemberOfNIR:     memberOfNIR,
+		
 	}
 
 	companyJSON, err := json.Marshal(company)

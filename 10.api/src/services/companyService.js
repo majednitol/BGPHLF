@@ -20,6 +20,7 @@ export async function RegisterCompanyWithMember(request) {
     const memberEmail = request.memberEmail
     const memberCountry = request.memberCountry
     const orgMSP = request.org
+    const createAt = new Date().toISOString();
     const contract = await smartContract(request, comapanyID)
     let result = await contract.submitTransaction(
       "RegisterCompanyWithMember",
@@ -38,7 +39,7 @@ export async function RegisterCompanyWithMember(request) {
       memberID,
       memberName,
       memberCountry,
-      memberEmail,orgMSP
+      memberEmail,orgMSP,createAt
     );
     console.log("Transaction Result:", result.toString());
 
