@@ -37,8 +37,8 @@ export async function loginSystemManager(req, res, next) {
         }
         console.log("payload", payload)
         let response = await LoginSystemManager(payload, next);
-        console.log("result app", result)
-        if (!result || result.length === 0) {
+        console.log("response", response)
+        if (!response || response.length === 0) {
       return next(createHttpError(401, "Invalid login credentials."));
     }
     const manager = response[0]; 
