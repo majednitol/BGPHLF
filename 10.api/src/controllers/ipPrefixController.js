@@ -54,7 +54,7 @@ export async function assignPrefix(req, res) {
 
         }
         console.log("payload", payload)
-        comsole.log("payload", req.userId)
+        console.log("payload", req.userId)
         let result = await AssignPrefix(payload);
         console.log(result)
         res.send(result)

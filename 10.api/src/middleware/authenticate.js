@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
 
     // Verify the token
     const decoded = verify(parsedToken, config.jwt_secret);
-    console.log("decoded", decoded.org)
+    console.log("decoded", decoded)
     req.userId = decoded.sub;
     req.org = decoded.org;
     req.role= decoded.role;
