@@ -9,15 +9,12 @@ const GetAllPrefixesAssignedPage = () => {
   const dispatch = useAppDispatch();
   const { loading, error, userData } = useAppSelector((state) => state.user);
 
-  const data = {
-    userId: '222',
-    org: 'Org6MSP',
-  };
+ 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch(getAllPrefixesAssignedByOrg(data)).unwrap();
+        await dispatch(getAllPrefixesAssignedByOrg()).unwrap();
         toast.success('Prefixes fetched successfully');
       } catch (err) {
         toast.error(`Error: ${err}`);

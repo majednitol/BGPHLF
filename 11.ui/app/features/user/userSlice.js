@@ -15,10 +15,10 @@ export const getUser = createAsyncThunk('user/getUser', async ({ userId, org }, 
   }
 });
 
-export const getAllPrefixesAssignedByOrg = createAsyncThunk('user/getAllPrefixesAssignedByOrg', async ({ userId, org }, thunkAPI) => {
+export const getAllPrefixesAssignedByOrg = createAsyncThunk('user/getAllPrefixesAssignedByOrg', async (_, thunkAPI) => {
   try {
-    const params = { userId, org };
-    const response = await apiRepository.get('/user/get-all-prefixes-assigned-by-org', params, true);
+    
+    const response = await apiRepository.get('/user/get-all-prefixes-assigned-by-org', {}, true);
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
