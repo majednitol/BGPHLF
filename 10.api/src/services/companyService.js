@@ -90,6 +90,7 @@ export async function RequestResource(request) {
     const date = request.date;
     const country = request.country
     const rir = request.rir;
+    const prefixMaxLength = request.prefixMaxLength;
     const timestamp = request.timestamp;
 
     const contract = await smartContract(request, memberID);
@@ -98,7 +99,7 @@ export async function RequestResource(request) {
       reqID,
       memberID,
       resType,
-      value, date, country, rir, timestamp
+      value, date, country, rir,prefixMaxLength, timestamp
     );
     console.log("Transaction Result:", result);
 

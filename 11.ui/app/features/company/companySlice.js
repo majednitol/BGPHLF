@@ -96,14 +96,14 @@ export const requestResource = createAsyncThunk(
   async ({ org, reqID,
     memberID,
     resType,
-    value, date, country, rir, timestamp }, thunkAPI) => {
+    value, date, country, rir,prefixMaxLength, timestamp }, thunkAPI) => {
     try {
       const data = {
         org,
         reqID,
         memberID,
         resType,
-        value, date, country, rir, timestamp
+        value, date, country, rir,prefixMaxLength, timestamp
       }
       console.log("data",data)
       const response = await apiRepository.post('company/request-resource', data, true);

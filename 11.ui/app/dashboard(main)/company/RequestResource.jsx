@@ -52,7 +52,7 @@ const RequestResource = () => {
         value: '',
         date: '',
         country: '',
-        rir: '',
+        rir: '', prefixMaxLength: '',
         timestamp: new Date().toISOString().slice(0, 16),
       });
     } catch (error) {
@@ -86,12 +86,22 @@ const RequestResource = () => {
         </select>
         <input
           name="value"
-          placeholder="Value (e.g., /24, /48)"
+          placeholder="number of preixs (e.g., 240, 4800)"
           value={formData.value}
           onChange={handleChange}
           style={styles.input}
           required
         />
+        <input
+  name="prefixMaxLength"
+  type="number"
+  placeholder="Prefix Max Length"
+  value={formData.prefixMaxLength}
+  onChange={handleChange}
+  style={styles.input}
+  required
+/>
+
         <input
           name="date"
           type="date"

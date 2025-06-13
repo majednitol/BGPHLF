@@ -22,7 +22,22 @@ export async function GetUser(request) {
         throw error;
     }
 }
+export async function LoginSystemManager(request) {
+    try {
+        const userId = request.userId;
+        const email = request.email;
+        const orgMSP = request.org;
+        const name = request.name;
 
+        const contract = await smartContract(request, userId);
+        let result = await contract.evaluateTransaction("LoginSystemManager", email, orgMSP, name);
+        console.log("result", result);
+        return JSON.parse(result);
+    } catch (error) {
+        console.error("Error in LoginSystemManager:", error);
+        throw error;
+    }
+}
 export async function GetSystemManager(request) {
     try {
         const userId = request.userId;

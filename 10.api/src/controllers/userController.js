@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
-import { CreateSystemManager, CreateUser, GetAllPrefixesAssignedByOrg, GetLoggedInUser, GetSystemManager, GetUser, LoginUser, registerAndEnrollUserOrCompany } from "../services/userService.js";
-
+import { CreateSystemManager, CreateUser, GetAllPrefixesAssignedByOrg, GetLoggedInUser, GetSystemManager, GetUser, LoginSystemManager, LoginUser, registerAndEnrollUserOrCompany } from "../services/userService.js";
+import jwt from 'jsonwebtoken';
+import config from "../config/config.js";
 const chaincodeName = "basic";
 const channelName = "mychannel"
 export async function getUser(req, res, next) {
@@ -24,7 +25,44 @@ export async function getUser(req, res, next) {
     }
 }
 
+export async function loginSystemManager(req, res, next) {
+    try {
+        let payload = {
+            "org": req.body.org,
+            "channelName": channelName,
+            "chaincodeName": chaincodeName,
+            "userId": req.body.userId ,
+            "email": req.body.email,
+            "name": req.body.name
+        }
+        console.log("payload", payload)
+        let result = await LoginSystemManager(payload, next);
+        console.log("result app", result)
+    //     if (!result || result.length === 0) {
+    //   return next(createHttpError(401, "Invalid login credentials."));
+    // }
 
+    // const manager = result[0]; // Assume first match
+    // const tokenPayload = {
+    //   sub: manager.ID,            // Unique identifier
+    //   org: manager.OrgMSP,
+    //   role: manager.Role,
+    // };
+
+    // const token = jwt.sign(tokenPayload, config.jwt_secret, {
+    //   expiresIn: '1h',
+    // });
+
+    // res.json({
+    //   token,
+    //   message: 'Login successful',
+    //   manager,
+    // });
+        res.json(result)
+    } catch (error) {
+        console.log(error)
+    }
+}
 export async function getSystemManager(req, res, next) {
     try {
         let payload = {

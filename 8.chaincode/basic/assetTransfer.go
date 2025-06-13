@@ -52,6 +52,7 @@ type ResourceRequest struct {
 	Status     string `json:"status"` // allocated, reserved, etc.
 	Country    string `json:"country"`
 	RIR        string `json:"rir"`
+	PrefixMaxLength int    `json:"prefixMaxLength"`
 	ReviewedBy string `json:"reviewedBy"`
 	Timestamp  string `json:"timestamp"`
 }
@@ -247,32 +248,84 @@ type SystemManagerLoginResponse struct {
 	OrgMSP string `json:"orgMSP"`
 	Role   string `json:"role"`
 }
+type SystemManagerLoginResult struct {
+	Managers []*SystemManager `json:"managers"`
+	Message  string           `json:"message"`
+}
 
-func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManagerLoginResponse, error) {
-	if id == "" {
-		return nil, fmt.Errorf("system manager id cannot be empty")
+func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInterface, email, orgMSP, name string) (*SystemManagerLoginResult, error) {
+	if email == "" || orgMSP == "" || name == "" {
+		return nil, fmt.Errorf("email, orgMSP, and name must all be provided")
 	}
 
-	key := "SYS_MGR_" + id
-	data, err := ctx.GetStub().GetState(key)
+	query := fmt.Sprintf(`{
+		"selector": {
+			"email": "%s",
+			"orgMSP": "%s",
+			"name": "%s"
+		}
+	}`, email, orgMSP, name)
+
+	iter, err := ctx.GetStub().GetQueryResult(query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from ledger: %v", err)
+		return nil, fmt.Errorf("failed to execute rich query: %v", err)
 	}
-	if data == nil {
-		return nil, fmt.Errorf("system manager with id '%s' not found", id)
+	defer iter.Close()
+
+	var managers []*SystemManager
+	for iter.HasNext() {
+		result, err := iter.Next()
+		if err != nil {
+			return nil, fmt.Errorf("error reading result: %v", err)
+		}
+		var manager SystemManager
+		if err := json.Unmarshal(result.Value, &manager); err != nil {
+			return nil, fmt.Errorf("error unmarshaling manager data: %v", err)
+		}
+		managers = append(managers, &manager)
 	}
 
-	var manager SystemManager
-	if err := json.Unmarshal(data, &manager); err != nil {
-		return nil, fmt.Errorf("failed to parse system manager data: %v", err)
+	// If no matching manager found
+	if len(managers) == 0 {
+		return &SystemManagerLoginResult{
+			Managers: nil,
+			Message:  "You are not registered",
+		}, nil
 	}
 
-	return &SystemManagerLoginResponse{
-		Name:   manager.Name,
-		OrgMSP: manager.OrgMSP,
-		Role:   manager.Role,
+	// Success
+	return &SystemManagerLoginResult{
+		Managers: managers,
+		Message:  "Login successful",
 	}, nil
 }
+
+
+// func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManagerLoginResponse, error) {
+// 	if id == "" {
+// 		return nil, fmt.Errorf("system manager id cannot be empty")
+// 	}
+
+// 	key := "SYS_MGR_" + id
+// 	data, err := ctx.GetStub().GetState(key)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to read from ledger: %v", err)
+// 	}
+// 	if data == nil {
+// 		return nil, fmt.Errorf("system manager with id '%s' not found", id)
+// 	}
+
+// 	var manager SystemManager
+// 	if err := json.Unmarshal(data, &manager); err != nil {
+// 		return nil, fmt.Errorf("failed to parse system manager data: %v", err)
+// 	}
+
+// 	return &SystemManagerLoginResponse{
+// 		Name:   manager.Name,
+// 		OrgMSP: manager.OrgMSP,
+// 		Role:   manager.Role,
+// 	}, nil
+// }
 func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManager, error) {
 	if id == "" {
 		return nil, fmt.Errorf("system manager id cannot be empty")
@@ -338,7 +391,7 @@ func (s *SmartContract) ApproveMember(ctx contractapi.TransactionContextInterfac
 
 // ========== Resource Request & Approval ==========
 
-func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir, timestamp string) error {
+func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterface, reqID, memberID, resType string, value int, date, country, rir string,prefixMaxLength int, timestamp string) error {
 	memberBytes, err := ctx.GetStub().GetState("MEMBER_" + memberID)
 	if err != nil || memberBytes == nil {
 		return fmt.Errorf("member not found")
@@ -366,6 +419,7 @@ func (s *SmartContract) RequestResource(ctx contractapi.TransactionContextInterf
 		Status:     "pending",
 		Country:    country,
 		RIR:        rir,
+		PrefixMaxLength: prefixMaxLength,
 		ReviewedBy: "not yet reviewed",
 		Timestamp:  timestamp,
 	}
@@ -397,7 +451,7 @@ func (s *SmartContract) ReviewRequest(ctx contractapi.TransactionContextInterfac
 	if err != nil || reqBytes == nil {
 		return fmt.Errorf("resource request %s not found", reqID)
 	}
-
+ 
 	var request ResourceRequest
 	if err := json.Unmarshal(reqBytes, &request); err != nil {
 		return fmt.Errorf("failed to unmarshal request: %v", err)

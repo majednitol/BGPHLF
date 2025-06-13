@@ -109,6 +109,7 @@ export async function requestResource(req, res) {
       "date": req.body.date,
       "country": req.body.country,
       "rir": req.body.rir,
+      "prefixMaxLength": req.body.prefixMaxLength,
       "timestamp": req.body.timestamp,
     };
 
