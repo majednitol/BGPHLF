@@ -570,4 +570,4 @@ peer chaincode invoke -n basic -C mychannel -c '{"Args":["RequestResource","req1
 peer chaincode query \
   -C mychannel \
   -n basic \
-  -c '{"function":"ListPendingRequests","Args":["Org6MSP"]}'
+  -c '{"function":"GetAllPrefixesAssignedByOrg","Args":["Org1MSP"]}'

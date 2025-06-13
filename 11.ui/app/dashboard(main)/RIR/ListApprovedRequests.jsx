@@ -12,10 +12,7 @@ import toast from 'react-hot-toast';
 import calculateSubnets from '../../utils/ipUtils';
 
 
-const decodedUser = {
-  org: 'Org1MSP',
-  userID: 'sys001',
-};
+
 
 const ListApprovedRequests = () => {
   const dispatch = useAppDispatch();
@@ -26,17 +23,15 @@ const ListApprovedRequests = () => {
   const [showAllSubnets, setShowAllSubnets] = useState(false);
 
   const [formData, setFormData] = useState({
-    allocationID: '',
     memberID: '',
     parentPrefix: '',
     subPrefix: '',
     expiry: '',
-    org: decodedUser.org,
     maxLength: " "
   });
   const [preferSingleBlock, setPreferSingleBlock] = useState(false);
   useEffect(() => {
-    dispatch(listApprovedRequests(decodedUser))
+    dispatch(listApprovedRequests())
       .unwrap()
       .catch(() => toast.error('Failed to fetch approved requests'));
 
@@ -47,7 +42,7 @@ const ListApprovedRequests = () => {
 
   const fetchOwnedPrefixes = async () => {
     try {
-      await dispatch(getAllOwnedPrefixes(decodedUser)).unwrap();
+      await dispatch(getAllOwnedPrefixes()).unwrap();
     } catch {
       toast.error('Failed to fetch owned prefixes');
     }
@@ -57,12 +52,10 @@ const ListApprovedRequests = () => {
     await fetchOwnedPrefixes();
     setSelectedRequest(request);
     setFormData({
-      allocationID: "",
       memberID: request.memberId || '',
       parentPrefix: '',
       subPrefix: '',
       expiry: '',
-      org: decodedUser.org,
       maxLength: " "
     });
     setShowModal(true);
@@ -230,13 +223,7 @@ const ListApprovedRequests = () => {
           <div style={styles.modal}>
             <h3 style={styles.modalTitle}>Assign Resource to Member</h3>
             <form onSubmit={handleSubmit} style={styles.form}>
-              <input
-                name="allocationID"
-                placeholder="Allocation ID"
-                style={styles.input}
-                onChange={handleChange}
-                required
-              />
+          
               <input
                 name="memberID"
                 placeholder="Member ID"

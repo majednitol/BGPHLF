@@ -9,7 +9,7 @@ const AssignResource = () => {
   const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState({
-    allocationID: '',
+   
     memberID: '',
     parentPrefix: '',
     subPrefix: '',
@@ -45,13 +45,7 @@ const AssignResource = () => {
     <div style={styles.formContainer}>
       <h2 style={styles.heading}>Assign Resource</h2>
       <form style={styles.form} onSubmit={handleSubmit}>
-        <input
-          style={styles.input}
-          name="allocationID"
-          placeholder="Allocation ID"
-          onChange={handleChange}
-          required
-        />
+       
         <input
           style={styles.input}
           name="memberID"

@@ -79,7 +79,7 @@ export async function assignResource(req, res) {
       "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
-      "memberID": req.userId,
+      "memberID": req.body.memberID,
       "allocationID": req.body.allocationID,
       "parentPrefix": req.body.parentPrefix,
       "subPrefix": req.body.subPrefix,

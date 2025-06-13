@@ -120,10 +120,10 @@ export const tracePrefix = createAsyncThunk(
 
 export const listPendingRequests = createAsyncThunk(
   'ipPrefix/listPendingRequests',
-  async ({org,userID}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const params = {org,userID}
-      const response = await apiRepository.get('ip/list-pending-requests', params, true);
+      
+      const response = await apiRepository.get('ip/list-pending-requests', {}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -132,11 +132,10 @@ export const listPendingRequests = createAsyncThunk(
 );
 export const getAllOwnedPrefixes = createAsyncThunk(
   'ipPrefix/getAllOwnedPrefixes',
-  async ({org,userID}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const params = { org, userID }
-      console.log("params",params)
-      const response = await apiRepository.get('ip/list-all-owned-prefixes', params, true);
+    
+      const response = await apiRepository.get('ip/list-all-owned-prefixes', {}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -145,11 +144,10 @@ export const getAllOwnedPrefixes = createAsyncThunk(
 );
 export const listAllASNValues = createAsyncThunk(
   'ipPrefix/listAllASNValues',
-  async ({org,memberID}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const params = { org, memberID }
-      console.log("params",params)
-      const response = await apiRepository.get('ip/list-all-asn-values', params, true);
+      
+      const response = await apiRepository.get('ip/list-all-asn-values', {}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -158,10 +156,9 @@ export const listAllASNValues = createAsyncThunk(
 );
 export const listApprovedRequests = createAsyncThunk(
   'ipPrefix/listApprovedRequests',
-  async ({org,userID}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const params = {org,userID}
-      const response = await apiRepository.get('ip/list-approved-requests', params, true);
+      const response = await apiRepository.get('ip/list-approved-requests', {}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -170,10 +167,10 @@ export const listApprovedRequests = createAsyncThunk(
 );
 export const listAllMembers = createAsyncThunk(
   'ipPrefix/listAllMembers',
-  async ({org,userID}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const params = {org,userID}
-      const response = await apiRepository.get('ip/list-all-members', params, true);
+      
+      const response = await apiRepository.get('ip/list-all-members', {}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

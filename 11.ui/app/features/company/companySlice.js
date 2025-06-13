@@ -80,9 +80,9 @@ export const approveMember = createAsyncThunk(
 // ✅ Assign Resource
 export const assignResource = createAsyncThunk(
   'company/assignResource',
-  async ({ org, allocationID, memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
+  async ({ memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
     try {
-      const data = { org, allocationID:newUUID, memberID, parentPrefix, subPrefix, expiry, timestamp }
+      const data = { allocationID:newUUID, memberID, parentPrefix, subPrefix, expiry, timestamp }
       const response = await apiRepository.post('company/assign-resource', data, true);
       return response.data;
     } catch (error) {
@@ -94,7 +94,7 @@ export const assignResource = createAsyncThunk(
 // ✅ Request Resource
 export const requestResource = createAsyncThunk(
   'company/requestResource',
-  async ({ org, reqID,
+  async ({ 
     memberID,
     resType,
     value, date, country, rir, prefixMaxLength, timestamp }, thunkAPI) => {
