@@ -47,7 +47,7 @@ export async function loginSystemManager(req, res, next) {
       org: manager.orgMSP,
       role: manager.role,
     };
-
+ 
     const token = jwt.sign(tokenPayload, config.jwt_secret, {
       expiresIn: '1h',
     }); 
