@@ -55,8 +55,7 @@ export async function loginSystemManager(req, res, next) {
 
     res.json({
       token,
-      message: 'Login successful',
-      manager,
+      message: 'Login successful'
     });
     
     } catch (error) {
