@@ -10,15 +10,12 @@ const GetOrgUser = () => {
   const { userData, loading, error } = useAppSelector((state) => state.user);
 
   // Simulated token-based values (replace with actual token logic)
-  const payload = {
-    userId: '222',
-    org: 'Org6MSP',
-  };
+  
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        await dispatch(getOrgUser(payload)).unwrap();
+        await dispatch(getOrgUser()).unwrap();
         toast.success('Org user fetched successfully');
       } catch (err) {
         toast.error(`Error: ${err}`);

@@ -21,12 +21,12 @@ export const validatePath = createAsyncThunk(
 // ✅ Assign Prefix
 export const assignPrefix = createAsyncThunk(
   'ipPrefix/assignPrefix',
-  async ({ org,userID, prefix,
+  async ({ prefix,
     assignedTo,
     timestamp }, thunkAPI) => {
     try {
       const data = {
-       org, userID, prefix,
+        prefix,
         assignedTo,
         timestamp
       }
