@@ -65,10 +65,10 @@ export async function loginSystemManager(req, res, next) {
 export async function getSystemManager(req, res, next) {
     try {
         let payload = {
-            "org": req.query.org ? req.query.org : req.org,
+            "org":req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userId": req.query.userId ? req.query.userId : req.userId
+            "userId": req.userId
         }
         console.log("payload", payload)
         let result = await GetSystemManager(payload, next);
@@ -183,10 +183,10 @@ export async function getLoggedInUser(req, res, next) {
 export async function getAllPrefixesAssignedByOrg(req, res, next) {
     try {
         let payload = {
-                "org": req.query.org ? req.query.org : req.org,
+                "org":  req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userId": req.query.userId ? req.query.userId : req.userId
+            "userId": req.userId
 
         }
         console.log("payload", payload)

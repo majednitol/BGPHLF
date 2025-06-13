@@ -25,6 +25,7 @@ const authenticate = async (req, res, next) => {
     console.log("decoded", decoded.org)
     req.userId = decoded.sub;
     req.org = decoded.org;
+    req.role= decoded.role;
     next();
   } catch (error) {
     // Handle specific token errors

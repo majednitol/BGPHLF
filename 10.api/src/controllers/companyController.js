@@ -41,7 +41,7 @@ export async function registerCompanyWithMember(req, res) {
 export async function getCompany(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "comapanyID": req.query.comapanyID ? req.query.comapanyID : req.comapanyID
@@ -59,7 +59,7 @@ export async function getCompany(req, res) {
 export async function approveMember(req, res) {
   try {
     const payload = {
-      "org": req.body.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
       "memberID": req.body.memberID,
@@ -76,10 +76,10 @@ export async function approveMember(req, res) {
 export async function assignResource(req, res) {
   try {
     const payload = {
-      "org": req.body.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
-      "memberID": req.body.memberID,
+      "memberID": req.userId,
       "allocationID": req.body.allocationID,
       "parentPrefix": req.body.parentPrefix,
       "subPrefix": req.body.subPrefix,
@@ -99,11 +99,11 @@ export async function assignResource(req, res) {
 export async function requestResource(req, res) {
   try {
     const payload = {
-      "org": req.body.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
       "reqID": req.body.reqID,
-      "memberID": req.body.memberID,
+      "memberID": req.userId,
       "resType": req.body.resType,
       "value": req.body.value,
       "date": req.body.date,
@@ -126,7 +126,7 @@ export async function requestResource(req, res) {
 export async function reviewRequest(req, res) {
   try {
     const payload = {
-      "org": req.body.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
       "reqID": req.body.reqID,
@@ -146,10 +146,10 @@ export async function reviewRequest(req, res) {
 export async function getCompanyByMemberID(req, res) {
   try {
     const payload = {
-      "org": req.query.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
-      "memberID": req.query.memberID || req.body.memberID,
+      "memberID": req.userId
     };
 
     console.log("Payload:", payload);
@@ -163,10 +163,10 @@ export async function getCompanyByMemberID(req, res) {
 export async function getAllocationsByMember(req, res) {
   try {
     const payload = {
-      "org": req.query.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
-      "memberID": req.query.memberID || req.body.memberID,
+      "memberID": req.userId
     };
 
     console.log("Payload:", payload);
@@ -181,10 +181,10 @@ export async function getAllocationsByMember(req, res) {
 export async function getResourceRequestsByMember(req, res) {
   try {
     const payload = {
-      "org": req.query.org,
+      "org": req.org,
       "channelName": "mychannel",
       "chaincodeName": "basic",
-      "memberID": req.query.memberID || req.body.memberID,
+      "memberID": req.userId
     };
 
     console.log("Payload:", payload);

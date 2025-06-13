@@ -5,10 +5,10 @@ const channelName = "mychannel"
 export async function validatePath(req, res) {
     try {
         let payload = {
-            org: req.body.org,
+            org: req.org,
             channelName: channelName,
             chaincodeName: chaincodeName,
-            memberID: req.body.memberID || req.memberID,
+            memberID: req.userId,
             prefix: req.body.prefix,
             pathJSON: req.body.pathJSON
         };
@@ -44,10 +44,10 @@ export async function validatePath(req, res) {
 export async function assignPrefix(req, res) {
     try {
         let payload = {
-            "org": req.body.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID": req.body.userID ? req.body.userID : req.userID,
+            "userID":req.userID,
             "prefix": req.body.prefix,
             "assignedTo": req.body.assignedTo,
             "timestamp": req.body.timestamp
@@ -89,10 +89,10 @@ export async function subAssignPrefix(req, res) {
 export async function announceRoute(req, res) {
     try {
         let payload = {
-            "org": req.body.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "memberID": req.body.memberID ? req.body.memberID : req.memberID,
+            "memberID": req.userId,
             "asn": req.body.asn,
             "prefix": req.body.prefix,
             "pathJSON": req.body.pathJSON
@@ -110,8 +110,9 @@ export async function announceRoute(req, res) {
 
 export async function revokeRoute(req, res) {
   try {
-    const { org, asn, prefix, memberID } = req.body;
-
+    const {  asn, prefix } = req.body;
+const org = req.org;
+const memberID = req.userId;
     if (!org || !asn || !prefix || !memberID) {
       return res.status(400).json({ error: "Missing required fields: org, asn, prefix, or memberID" });
     }
@@ -142,7 +143,7 @@ export async function revokeRoute(req, res) {
 export async function getPrefixAssignment(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "comapanyID": req.query.comapanyID ? req.query.comapanyID : req.comapanyID,
@@ -182,7 +183,7 @@ export async function getPrefixAssignment(req, res) {
 export async function tracePrefix(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "comapanyID": req.query.comapanyID ? req.query.comapanyID : req.comapanyID,
@@ -201,10 +202,10 @@ export async function tracePrefix(req, res) {
 export async function listPendingRequests(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID": req.query.userID ? req.query.userID : req.userID,
+            "userID": req.userId
         
         }
         console.log("payload", payload)
@@ -219,10 +220,10 @@ export async function listPendingRequests(req, res) {
 export async function listAllASNValues(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "memberID": req.query.memberID ? req.query.memberID : req.memberID,
+            "memberID": req.userId,
         
         }
         console.log("payload", payload)
@@ -237,10 +238,10 @@ export async function listAllASNValues(req, res) {
 export async function getAllOwnedPrefixes(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID": req.query.userID ? req.query.userID : req.userID,
+            "userID": req.userId
         
         }
         console.log("payload", payload)
@@ -255,10 +256,10 @@ export async function getAllOwnedPrefixes(req, res) {
 export async function listApprovedRequests(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID": req.query.userID ? req.query.userID : req.userID,
+            "userID": req.userId
         
         }
         console.log("payload", payload)
@@ -273,10 +274,10 @@ export async function listApprovedRequests(req, res) {
 export async function listAllMembers(req, res) {
     try {
         let payload = {
-            "org": req.query.org,
+            "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID": req.query.userID ? req.query.userID : req.userID,
+            "userID": req.userId
         
         }
         console.log("payload", payload)
