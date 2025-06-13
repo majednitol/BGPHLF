@@ -30,10 +30,10 @@ export async function ValidatePath(request) {
 }
 export async function AssignPrefix(request) {
     try {
-        const userID = request.userID
+        const userID = request.userId
         const org = request.org
         const prefixJSON = JSON.stringify(request.prefix);
-        console.log("prefixJSON", prefixJSON)
+        console.log("prefixJSON", userID)
         const assignedTo = request.assignedTo
         const timestamp = request.timestamp
         const contract = await smartContract(request, userID)

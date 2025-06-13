@@ -47,13 +47,14 @@ export async function assignPrefix(req, res) {
             "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userID":req.userId,
+            "userId": req.userId,
             "prefix": req.body.prefix,
             "assignedTo": req.body.assignedTo,
             "timestamp": req.body.timestamp
 
         }
         console.log("payload", payload)
+        comsole.log("payload", req.userId)
         let result = await AssignPrefix(payload);
         console.log(result)
         res.send(result)
@@ -109,35 +110,35 @@ export async function announceRoute(req, res) {
 }
 
 export async function revokeRoute(req, res) {
-  try {
-    const {  asn, prefix } = req.body;
-const org = req.org;
-const memberID = req.userId;
-    if (!org || !asn || !prefix || !memberID) {
-      return res.status(400).json({ error: "Missing required fields: org, asn, prefix, or memberID" });
+    try {
+        const { asn, prefix } = req.body;
+        const org = req.org;
+        const memberID = req.userId;
+        if (!org || !asn || !prefix || !memberID) {
+            return res.status(400).json({ error: "Missing required fields: org, asn, prefix, or memberID" });
+        }
+
+        const payload = {
+            org,
+            channelName,
+            chaincodeName,
+            memberID,
+            asn,
+            prefix
+        };
+
+        console.log("Revoking route with payload:", payload);
+        const result = await RevokeRoute(payload);
+
+        res.send({ message: "Route revoked successfully", result });
+
+    } catch (error) {
+        console.error("Error in revokeRoute handler:", error);
+        res.status(500).json({
+            error: "Failed to revoke route",
+            details: error?.message || error.toString()
+        });
     }
-
-    const payload = {
-      org,
-      channelName,
-      chaincodeName,
-      memberID,
-      asn,
-      prefix
-    };
-
-    console.log("Revoking route with payload:", payload);
-    const result = await RevokeRoute(payload);
-
-    res.send({ message: "Route revoked successfully", result });
-
-  } catch (error) {
-    console.error("Error in revokeRoute handler:", error);
-    res.status(500).json({
-      error: "Failed to revoke route",
-      details: error?.message || error.toString()
-    });
-  }
 }
 
 export async function getPrefixAssignment(req, res) {
@@ -206,7 +207,7 @@ export async function listPendingRequests(req, res) {
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "userID": req.userId
-        
+
         }
         console.log("payload", payload)
         let result = await ListPendingRequests(payload);
@@ -224,7 +225,7 @@ export async function listAllASNValues(req, res) {
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "memberID": req.userId,
-        
+
         }
         console.log("payload", payload)
         let result = await ListAllASNValues(payload);
@@ -242,7 +243,7 @@ export async function getAllOwnedPrefixes(req, res) {
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "userID": req.userId
-        
+
         }
         console.log("payload", payload)
         let result = await GetAllOwnedPrefixes(payload);
@@ -260,7 +261,7 @@ export async function listApprovedRequests(req, res) {
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "userID": req.userId
-        
+
         }
         console.log("payload", payload)
         let result = await ListApprovedRequests(payload);
@@ -278,7 +279,7 @@ export async function listAllMembers(req, res) {
             "channelName": channelName,
             "chaincodeName": chaincodeName,
             "userID": req.userId
-        
+
         }
         console.log("payload", payload)
         let result = await ListAllMembers(payload);
