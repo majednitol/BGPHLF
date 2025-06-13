@@ -2,28 +2,41 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {jwtDecode} from 'jwt-decode';  
+import { ClipLoader } from 'react-spinners';
 
 function IsAuth(Component) {
   return function AuthWrapper(props) {
     const router = useRouter();
-    const [isAllowed, setIsAllowed] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-      const user = localStorage.getItem("ConnectedAccountUser");
+      const token = localStorage.getItem("authToken");
 
-      if (!user || user === "no user") {
-        router.replace("/login");
-      } else {
-        setIsAllowed(true);
+      try {
+        if (!token) {
+          router.replace("/login-user");
+        } else {
+          const decoded = jwtDecode(token);
+          const role = decoded?.role;
+
+          if (!role) {
+            localStorage.removeItem("authToken");
+            router.replace("/login-user");
+          }
+          
+        }
+      } catch (error) {
+        localStorage.removeItem("authToken");
+        router.replace("/login-user");
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }, [router]);
 
-    if (loading || !isAllowed) {
-      return <div>Loading...</div>;
-    }
+    if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <ClipLoader size={50} color="#123abc" />
+        </div>
 
     return <Component {...props} />;
   };

@@ -5,17 +5,14 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { getAllocationsByMember, resetState } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac00',
-};
+
 
 const AllocationsList = () => {
   const dispatch = useAppDispatch();
   const { companyData, loading, error } = useAppSelector((state) => state.company);
 
   useEffect(() => {
-    dispatch(getAllocationsByMember({ org: decodedUser.org, memberID: decodedUser.memberID }));
+    dispatch(getAllocationsByMember());
     return () => dispatch(resetState());
   }, [dispatch]);
 console.log("companyData",companyData)
@@ -25,7 +22,7 @@ console.log("companyData",companyData)
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>📦 Allocations for Member ID: {decodedUser.memberID}</h2>
+      <h2 style={styles.heading}>📦 Allocations for Member ID: </h2>
 
       {loading && <p style={styles.loadingText}>Loading allocations...</p>}
       {error && <p style={styles.errorText}>Error: {error}</p>}

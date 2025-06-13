@@ -2,6 +2,10 @@
 
 import Link from 'next/link';
 import styles from './dashboard.module.css';
+import { useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { useRouter } from 'next/navigation';
+import { ClipLoader } from 'react-spinners';
 function generateLabel(href) {
   const parts = href.split('/');
   const lastPart = parts[parts.length - 1];
@@ -43,17 +47,48 @@ const navItems = {
     "/dashboard/company/revoke-route"
 
   ],
-  user: [
-    '/dashboard/user/get-user',
-    '/dashboard/user/register',
-    '/dashboard/user/create-user',
-    '/dashboard/user/login-user'
-  ]
+  // user: [
+  //   '/dashboard/user/get-user',
+  //   '/dashboard/user/register',
+  //   '/dashboard/user/create-user',
+  //   '/dashboard/user/login-user'
+  // ]
 };
-const ConnectedAccountUser = 'company'; // TODO: Replace with actual user type
 function DashboardLayout({ children }) {
-//   const { ConnectedAccountUser } = useContext(HealthContext);
+const [loading, setLoading] = useState(true);
+ const [userRole, setUserRole] = useState(null);
+const router = useRouter();
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        const decoded = jwtDecode(token);
+        setUserRole(decoded.role);
+      }
+    } catch (error) {
+      console.error('Invalid token or failed to decode', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+   const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    router.replace('/login-user');
 
+   };
+  
+  if (loading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <ClipLoader size={50} color="#123abc" />
+      </div>
+    );
+  }
   return (
     <div className="dashboard">
       <aside id="mySidenav" className={styles.mySidenav}>
@@ -65,7 +100,7 @@ function DashboardLayout({ children }) {
                   <p>Dashboard</p>
                 </Link>
 
-                {(navItems[ConnectedAccountUser] || []).map((href) => (
+                {(navItems[userRole] || []).map((href) => (
                   <Link
                     key={href}
                     href={href}
@@ -73,7 +108,15 @@ function DashboardLayout({ children }) {
                   >
                     <p>{generateLabel(href)}</p>
                   </Link>
+                  
                 ))}
+                <button
+                  onClick={handleLogout}
+                   className={`${styles.sidebarMenu__list__item__link} ${styles.logoutButton}`}
+                  
+                >
+                  <p> Logout</p>
+                </button>
               </li>
             </ul>
           </div>
