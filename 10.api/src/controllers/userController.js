@@ -36,29 +36,28 @@ export async function loginSystemManager(req, res, next) {
             "name": req.body.name
         }
         console.log("payload", payload)
-        let result = await LoginSystemManager(payload, next);
+        let response = await LoginSystemManager(payload, next);
         console.log("result app", result)
-    //     if (!result || result.length === 0) {
-    //   return next(createHttpError(401, "Invalid login credentials."));
-    // }
+        if (!result || result.length === 0) {
+      return next(createHttpError(401, "Invalid login credentials."));
+    }
+    const manager = response[0]; 
+    const tokenPayload = {
+      sub: manager.id,            
+      org: manager.orgMSP,
+      role: manager.role,
+    };
 
-    // const manager = result[0]; // Assume first match
-    // const tokenPayload = {
-    //   sub: manager.ID,            // Unique identifier
-    //   org: manager.OrgMSP,
-    //   role: manager.Role,
-    // };
+    const token = jwt.sign(tokenPayload, config.jwt_secret, {
+      expiresIn: '1h',
+    }); 
 
-    // const token = jwt.sign(tokenPayload, config.jwt_secret, {
-    //   expiresIn: '1h',
-    // });
-
-    // res.json({
-    //   token,
-    //   message: 'Login successful',
-    //   manager,
-    // });
-        res.json(result)
+    res.json({
+      token,
+      message: 'Login successful',
+      manager,
+    });
+    
     } catch (error) {
         console.log(error)
     }
