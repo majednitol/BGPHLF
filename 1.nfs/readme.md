@@ -34,6 +34,8 @@ minikube delete
 minikube stop
  minikube mount ../nfs_share:/mnt/data  
 
+
+doctl kubernetes cluster kubeconfig save 3901e894-7421-4e51-825d-a40c01285561
  
 ssh root@159.89.174.36
 vm mAjed2377a
