@@ -5,31 +5,32 @@ package identifier: basic:d91c9cccc7039cf189ed1ab866bde9908cc53566d75e3a6a669ac6
 peer0-org3
 package identifier: basic:0350fb30336aff894681530659cbad9d158eb7c3788162fb0da390b53a8fb092
 
-approve chaincode peer0-org1
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:d3455e83c94f4c8e719645169369ce9d6986e3ce5910b605e6ecdbc29a1866ed --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-org1
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:53574f7e641a4e9db24789f44a0160927b36cbcaaf3c422618a72009bcccfb62 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 
-approve chaincode peer0-org2
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:cc896c5c897c964b0121052ef27ce32f71235b420fff1cfd3966d8e3089c1d91 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-org2
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:2151d8670a036a71cbe72a9e6735f9d7bc827d5d7c8a59f718e3f02cf7bfc41b --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 
-approve chaincode peer0-org3
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:3fe7c2c80d2a6483a4277aa6700dc5e273b233b2bd6d8d6bea405e6657cfc5bd --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-org3
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:00dde6fa068fa498296832f783c97de2e25f0044c386f0127a36944ebf788ffc --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-approve chaincode peer0-org4
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:288dc200939566187264a87901b6d9f1ac09404ddf4ab30c1de85463f096edcb --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-org4
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:c2cf7627c66459bb375d97af4c389edb418b2bf3b0ea3f8846567e4bf89707b1 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-approve chaincode peer0-org5
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:e0a38f4b6ea5c54321e5763f5032afe2531b4c2cdf015cf3891e3c7af3060fa8 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-org5
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:7ea12207e54edbd6a2a0bda78c568535bc38b228e5fffb9c16f87a1eaa0c3a27 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-approve chaincode peer0-org6
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:3c513faac24248c7b6cec3bd542e63bd4034db3f3d6de22670a2630ff428d580 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+//approve chaincode peer0-org6
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:ec3687891ead85be76f34d66b6e0b53bd95b6fbc0bba9899602db85434f39bdd --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
 
-checkcommitreadiness
+//checkcommitreadiness
 peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name basic --version 1.0 --init-required --sequence 1 -o -orderer:7050 --tls --cafile $ORDERER_CA
 
 
-commit chaincode
+//commit chaincode
+
 peer lifecycle chaincode commit \
   -o orderer:7050 \
   --channelID mychannel \
@@ -216,7 +217,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
   --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"CreateSystemManager","Args":["666", "rono admin", "rono@example.com", "Org6MSP", "rono", "2025-06-01T12:00:00Z"]}' \
+  -c '{"function":"CreateSystemManager","Args":["222", "rono admin", "rono@example.com", "Org6MSP", "rono", "2025-06-01T12:00:00Z"]}' \
   --waitForEvent
 ### 2. **RegisterAS**
 "org1 admin", "org1@example.com"
@@ -330,7 +331,7 @@ peer chaincode query \
 
 // access couch db
 kubectl port-forward services/peer0-org1 5984:5984 [http://localhost:5984/_utils/]
-kubectl port-forward services/peer0-org2 5983:5984 
+kubectl port-forward services/api 5982:5982 
 kubectl port-forward services/api 4000 
 
 // create connection profile for client
