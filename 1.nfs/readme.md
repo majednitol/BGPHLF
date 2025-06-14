@@ -20,7 +20,7 @@
 ## NFS Client (MacOS)
 
 1. mkdir nfs_clientshare
-2. sudo mount -o nolocks -t nfs <IP>:/mnt/nfs_share ./nfs_clientshare
+2. sudo mount -o nolocks -t nfs 159.89.174.36:/mnt/nfs_share ./nfs_clientshare
 
 cd usr/share/nginx/html
 
