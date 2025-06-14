@@ -34,6 +34,6 @@ minikube delete
 minikube stop
  minikube mount ../nfs_share:/mnt/data  
 
-
+ 
 ssh root@159.89.174.36
 vm mAjed2377a
