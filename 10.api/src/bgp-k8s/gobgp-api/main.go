@@ -38,10 +38,6 @@ func connectBGP() {
 
     bgpClient = apipb.NewGobgpApiClient(conn)
 }
-
-// ----------------------------
-// Peer Management
-// ----------------------------
 type AddPeerRequest struct {
     NeighborAddress string `json:"neighbor_address"`
     PeerAS          uint32 `json:"peer_as"`
@@ -360,7 +356,10 @@ func getAdvertisedRoutesHandler(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
+
 }
+
+
 
 
 func main() {

@@ -346,10 +346,6 @@ kubectl port-forward service/gobgp-api 2000:2000
  
 
 
-
-
-Sure! Here are some example `curl` commands to interact with your GoBGP API server for the instance `rono` once your server is running on port 2000.
-
 ---
 
 ### 1. **Add a peer**
@@ -399,19 +395,7 @@ curl -X POST "http://localhost:2000/withdraw-route?instance=rono" \
 curl "http://localhost:2000/routes?instance=rono"
 ```
 
----
 
-If you want, I can also help you with **zsh escaping** (if you get errors like `no matches found` in zsh shell) — just wrap URLs in quotes like above, or escape `?` with `\?`.
-
----
-
-Let me know if you want me to explain or help with anything else!
-
-
-
-
-
-Based on your previous commands and pattern, here's the **full version of all `peer chaincode invoke` commands** including **TLS, all six orgs, and required peer and cert info** to work in your multi-org Hyperledger Fabric network:
 
 ---
 
