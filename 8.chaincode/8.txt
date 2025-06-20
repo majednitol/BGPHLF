@@ -1,6 +1,6 @@
 // packaging 
 1.go to nfs_clientshare/chaincode/basic/packaging
-2.tar cfz code.tar.gz connection.json && tar cfz basic-org1.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && vim connection.json
+2.tar cfz code.tar.gz connection.json && tar cfz basic-org1.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
 
 3.tar cfz code.tar.gz connection.json && tar cfz basic-org2.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
 

@@ -11,7 +11,7 @@ spec:
     - ReadWriteOnce
   nfs:
     path: /mnt/nfs_share/
-    server: 159.89.174.36
+    server: 167.71.238.9
 
 # local deployment
 

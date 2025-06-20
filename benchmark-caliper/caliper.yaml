@@ -110,7 +110,7 @@ spec:
           command: ["npx", "caliper", "launch", "manager"]
           args:
             - --caliper-bind-sut
-            - fabric:gateway
+            - fabric:2.2
             - --caliper-networkconfig
             - /caliper/config/caliper-network.yaml
             - --caliper-benchconfig
