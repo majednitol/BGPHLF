@@ -32,7 +32,7 @@ class CreateSystemManagerWorkload extends WorkloadModuleBase {
         const enrollPayload = {
             org: orgMSP,
             userId: userId,
-            affiliation: 'rono.technical'
+            affiliation: 'apnic.lir1.technical'
         };
 
         try {

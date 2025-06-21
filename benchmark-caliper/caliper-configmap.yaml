@@ -33,8 +33,8 @@ data:
     simpleArgs: &simple-args
       name: "System Manager"
       email: "sysmgr@example.com"
-      orgMSP: "Org6MSP"
-      role: "rono"
+      orgMSP: "Org1MSP"
+      role: "rir"
       createdAt: "2025-06-21T10:00:00Z"
 
     test:
