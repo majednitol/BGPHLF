@@ -45,7 +45,7 @@ spec:
                 mode: 0544
       containers:
         - name: peer
-          image: hyperledger/fabric-peer:2.3
+          image: hyperledger/fabric-peer:2.4.9
           command: ["sh", "-c", "peer node start"]
           env:
             - name: CORE_PEER_ADDRESSAUTODETECT
@@ -54,6 +54,8 @@ spec:
               value: peer0-org5
             - name: CORE_PEER_ADDRESS
               value: peer0-org5:13051
+            - name: CORE_PEER_GATEWAY_ENABLED
+              value: "true"
             - name: CORE_PEER_LISTENADDRESS
               value: 0.0.0.0:13051
             - name: CORE_PEER_EVENTS_ADDRESS

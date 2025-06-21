@@ -27,7 +27,7 @@ spec:
                         requests:
                           memory: "200Mi"
                           cpu: "90m"
-                  image: hyperledger/fabric-tools:2.3
+                  image: hyperledger/fabric-tools:2.4.9
                   workingDir: /
                   env:
                       - name: ORDERER_CA

@@ -28,7 +28,7 @@ spec:
                 path: config.yaml
       containers:
         - name: caliper
-          image: majedur708/hlf-api:500.17
+          image: majedur708/hlf-api:500.29
           imagePullPolicy: Always
           env:
             - name: CALIPER_NETWORKCONFIG
@@ -49,7 +49,11 @@ spec:
               mountPath: /caliper/config/config.yaml
               subPath: config.yaml
           command: ["npx"]
-          args: ["caliper", "launch", "manager"]
+          args:
+            - "caliper"
+            - "launch"
+            - "manager"
+            - "--caliper-fabric-gateway-enabled"
           resources:
             requests:
               memory: "400Mi"
