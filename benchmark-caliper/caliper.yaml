@@ -51,6 +51,9 @@ spec:
           command: ["npx"]
           args: ["caliper", "launch", "manager"]
           resources:
+            requests:
+              memory: "400Mi"
+              cpu: "300m"
             limits:
               memory: "512Mi"
               cpu: "400m"
