@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caliper-config
+  labels:
+    app: caliper
+data:
+  caliper-network.yaml: |
+    name: Caliper Benchmarks
+    version: "2.0.0"
+    caliper:
+      blockchain: fabric
+
+    channels:
+      - channelName: mychannel
+        contracts:
+          - id: basic
+
+    organizations:
+      - mspid: Org1MSP
+        identities:
+          certificates:
+            - name: 'Admin'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org1.yaml'
+          discover: true
+
+  config.yaml: |
+    simpleArgs: &simple-args
+      initialMoney: 10000
+      moneyToTransfer: 100
+      numberOfAccounts: &number-of-accounts 100
+
+    test:
+      name: basic-contract-benchmark
+      description: Performance benchmark for "basic" chaincode
+      workers:
+        number: 1
+      rounds:
+        - label: open
+          txNumber: *number-of-accounts
+          rateControl:
+            type: fixed-rate
+            opts:
+              tps: 10
+          workload:
+            module: benchmarks/scenario/basic/open.js
+            arguments: *simple-args
+
+        - label: query
+          txNumber: *number-of-accounts
+          rateControl:
+            type: fixed-rate
+            opts:
+              tps: 20
+          workload:
+            module: benchmarks/scenario/basic/query.js
+            arguments: *simple-args
+
+        - label: transfer
+          txNumber: 20
+          rateControl:
+            type: fixed-rate
+            opts:
+              tps: 5
+          workload:
+            module: benchmarks/scenario/basic/transfer.js
+            arguments:
+              <<: *simple-args
+              money: 100

@@ -1,80 +1,3 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: caliper-config
-  labels:
-    app: caliper
-data:
-  caliper-network.yaml: |
-    name: Caliper Benchmarks
-    version: "2.0.0"
-    caliper:
-      blockchain: fabric
-
-    channels:
-      - channelName: mychannel
-        contracts:
-          - id: basic
-
-    organizations:
-      - mspid: Org1MSP
-        identities:
-          certificates:
-            - name: 'Admin'
-              clientPrivateKey:
-                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk'
-              clientSignedCert:
-                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/cert.pem'
-        connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org1.yaml'
-          discover: true
-
-  config.yaml: |
-    simpleArgs: &simple-args
-      initialMoney: 10000
-      moneyToTransfer: 100
-      numberOfAccounts: &number-of-accounts 100
-
-    test:
-      name: basic-contract-benchmark
-      description: Performance benchmark for "basic" chaincode
-      workers:
-        number: 1
-      rounds:
-        - label: open
-          txNumber: *number-of-accounts
-          rateControl:
-            type: fixed-rate
-            opts:
-              tps: 10
-          workload:
-            module: benchmarks/scenario/basic/open.js
-            arguments: *simple-args
-
-        - label: query
-          txNumber: *number-of-accounts
-          rateControl:
-            type: fixed-rate
-            opts:
-              tps: 20
-          workload:
-            module: benchmarks/scenario/basic/query.js
-            arguments: *simple-args
-
-        - label: transfer
-          txNumber: 20
-          rateControl:
-            type: fixed-rate
-            opts:
-              tps: 5
-          workload:
-            module: benchmarks/scenario/basic/transfer.js
-            arguments:
-              <<: *simple-args
-              money: 100
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -105,16 +28,13 @@ spec:
                 path: config.yaml
       containers:
         - name: caliper
-          image: hyperledger/caliper:0.6.0
-          imagePullPolicy: IfNotPresent
-          command: ["npx", "caliper", "launch", "manager"]
-          args:
-            - --caliper-bind-sut
-            - fabric:2.2
-            - --caliper-networkconfig
-            - /caliper/config/caliper-network.yaml
-            - --caliper-benchconfig
-            - /caliper/config/config.yaml
+          image: majedur708/hlf-api:500.8
+          imagePullPolicy: Always
+          env:
+            - name: CALIPER_NETWORKCONFIG
+              value: /caliper/config/caliper-network.yaml
+            - name: CALIPER_BENCHCONFIG
+              value: /caliper/config/config.yaml
           volumeMounts:
             - name: data
               mountPath: /organizations
@@ -122,20 +42,18 @@ spec:
             - name: data
               mountPath: /usr/src/app/connection-profile
               subPath: connection-profile
-            - name: data
-              mountPath: /networks/fabric
-              subPath: networks/fabric
             - name: caliper-config
               mountPath: /caliper/config/caliper-network.yaml
               subPath: caliper-network.yaml
             - name: caliper-config
               mountPath: /caliper/config/config.yaml
               subPath: config.yaml
+          command: ["npx"]
+          args: ["caliper", "launch", "manager"]
           resources:
             limits:
               memory: "512Mi"
               cpu: "400m"
-
 ---
 apiVersion: v1
 kind: Service
