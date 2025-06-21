@@ -31,44 +31,26 @@ data:
 
   config.yaml: |
     simpleArgs: &simple-args
-      initialMoney: 10000
-      moneyToTransfer: 100
-      numberOfAccounts: &number-of-accounts 100
+      name: "System Manager"
+      email: "sysmgr@example.com"
+      orgMSP: "Org6MSP"
+      role: "rono"
+      createdAt: "2025-06-21T10:00:00Z"
 
     test:
-      name: basic-contract-benchmark
-      description: Performance benchmark for "basic" chaincode
+      name: system-manager-benchmark
+      description: Performance benchmark for SystemManager chaincode
       workers:
         number: 1
       rounds:
-        - label: open
-          txNumber: *number-of-accounts
+        - label: createSystemManager
+          txNumber: 100
           rateControl:
             type: fixed-rate
             opts:
               tps: 10
           workload:
-            module: benchmarks/scenario/basic/open.js
+            module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
 
-        - label: query
-          txNumber: *number-of-accounts
-          rateControl:
-            type: fixed-rate
-            opts:
-              tps: 20
-          workload:
-            module: benchmarks/scenario/basic/query.js
-            arguments: *simple-args
-
-        - label: transfer
-          txNumber: 20
-          rateControl:
-            type: fixed-rate
-            opts:
-              tps: 5
-          workload:
-            module: benchmarks/scenario/basic/transfer.js
-            arguments:
-              <<: *simple-args
-              money: 100
+ 

@@ -61,10 +61,11 @@ metadata:
     app: api
   name: api
 spec:
-  type: ClusterIP
+  type: NodePort  
   ports:
   - port: 4000
     protocol: TCP
     targetPort: 4000
+    nodePort: 30400
   selector:
     name: api
