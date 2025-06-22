@@ -506,7 +506,7 @@ data:
             # variable to override that choice.
             # NOTE: overriding this value might negatively influence the performance of
             # the peer so please change this value only if you know what you're doing
-            validatorPoolSize: 16
+            validatorPoolSize:
 
             # The discovery service is used by clients to query information about peers,
             # such as - which peers have joined a certain channel, what is the latest
@@ -530,12 +530,7 @@ data:
               # This option is only supported for qscc at this time.
               concurrency:
                 qscc: 5000
-                endorserService: 2500
-                deliverService: 2500
-                gatewayService: 2500                
-            grpc:
-              maxRecvMsgSize: 104857600
-              maxSendMsgSize: 104857600
+
         ###############################################################################
         #
         #    VM section
@@ -584,7 +579,7 @@ data:
                         Config:
                             max-size: "50m"
                             max-file: "5"
-                    Memory: 4294967296  
+                    Memory: 2147483648
 
         ###############################################################################
         #
