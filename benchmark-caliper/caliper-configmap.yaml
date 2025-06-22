@@ -110,7 +110,7 @@ data:
           rateControl:
             type: fixed-rate
             opts:
-              tps: 50
+              tps: 30
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
