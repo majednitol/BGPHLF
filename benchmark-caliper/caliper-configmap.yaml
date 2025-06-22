@@ -114,6 +114,9 @@ data:
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
+          timeout:
+            transaction: 180
+            endorsement: 180
         - label: getSystemManager
           txNumber: 10
           rateControl:
@@ -124,5 +127,8 @@ data:
             module: benchmarks/scenario/systemmanager/query.js
             arguments: 
               userId: "100"
+          timeout:
+            transaction: 180
+            endorsement: 180
 
  

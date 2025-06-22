@@ -1,4 +1,4 @@
-FROM hyperledger/caliper:0.5.0
+FROM hyperledger/caliper:0.6.0
 
 USER root
 RUN chown -R node:node /hyperledger/caliper/workspace
