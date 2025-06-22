@@ -110,12 +110,12 @@ data:
           rateControl:
             type: fixed-rate
             opts:
-              tps: 100
+              tps: 20
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
         - label: getSystemManager
-          txNumber: 1000
+          txNumber: 10
           rateControl:
             type: fixed-rate
             opts:

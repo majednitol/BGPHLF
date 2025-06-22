@@ -5,7 +5,7 @@ const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
 class CreateSystemManagerWorkload extends WorkloadModuleBase {
     // getRandom number 6 digit 
     getRandomNumber() {
-        return Math.floor(Math.random() * 1000000);
+        return Math.floor(Math.random() * 10000000000);
     }
     async submitTransaction() {
 

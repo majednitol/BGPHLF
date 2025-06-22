@@ -28,7 +28,7 @@ spec:
                 path: config.yaml
       containers:
         - name: caliper
-          image: majedur708/hlf-api:500.29
+          image: majedur708/hlf-api:500.32
           imagePullPolicy: Always
           env:
             - name: CALIPER_NETWORKCONFIG
