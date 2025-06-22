@@ -92,7 +92,7 @@ data:
        
   config.yaml: |
     simpleArgs: &simple-args
-      userId: "100"
+      userId: "2000"
       name: "System Manager"
       email: "sysmgr@example.com"
       orgMSP: "Org1MSP"
@@ -106,7 +106,7 @@ data:
         number: 1
       rounds:
         - label: createSystemManager
-          txNumber: 5
+          txNumber: 1
           rateControl:
             type: fixed-rate
             opts:
@@ -115,11 +115,11 @@ data:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
         - label: getSystemManager
-          txNumber: 5
+          txNumber: 100
           rateControl:
             type: fixed-rate
             opts:
-              tps: 10
+              tps: 20
           workload:
             module: benchmarks/scenario/systemmanager/query.js
             arguments: 
