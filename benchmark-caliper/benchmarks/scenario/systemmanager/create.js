@@ -1,6 +1,6 @@
 'use strict';
 
-const axios = require('axios');
+
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
 class CreateSystemManagerWorkload extends WorkloadModuleBase {
     // getRandom number 6 digit 
