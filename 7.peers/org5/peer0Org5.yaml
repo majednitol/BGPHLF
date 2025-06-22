@@ -137,11 +137,11 @@ spec:
           image: hyperledger/fabric-couchdb:0.4.15
           resources:
             limits:
-              memory: "2Gi"
-              cpu: "1000m"
+              memory: "600Mi"
+              cpu: "600m"
             requests:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "400Mi"
+              cpu: "400m"
           volumeMounts:
             - mountPath: /var/lib/couchdb`
               name: fabricfiles
