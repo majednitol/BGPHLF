@@ -407,8 +407,8 @@ Application: &ApplicationDefaults
             Type: ImplicitMeta
             Rule: "MAJORITY Endorsement"
         Endorsement:
-            Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"
+            Type: Signature
+            Rule: "OR('Org1MSP.peer', 'Org2MSP.peer', 'Org3MSP.peer', 'Org4MSP.peer', 'Org5MSP.peer', 'Org6MSP.peer')"
 
     Capabilities:
         <<: *ApplicationCapabilities
