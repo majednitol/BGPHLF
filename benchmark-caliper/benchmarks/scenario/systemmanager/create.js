@@ -11,7 +11,7 @@ class CreateSystemManagerWorkload extends WorkloadModuleBase {
 
         const { name, email, orgMSP, role, createdAt } = this.roundArguments;
         try {
-            let userId = this.getRandomNumber();
+            let userId = this.getRandomNumber().toString();
             const args = [userId, name, email, orgMSP, role, createdAt];
             await this.sutAdapter.sendRequests({
                 contractId: 'basic',
