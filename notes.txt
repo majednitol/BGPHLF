@@ -6,24 +6,24 @@ peer0-org3
 package identifier: basic:0350fb30336aff894681530659cbad9d158eb7c3788162fb0da390b53a8fb092
 
 //approve chaincode peer0-org1
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:a9f85750f2b33562e4bae631ad5c6efcb7dfbf768c8cbeef83f7a3f804f89e0c --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:e6fbe0a67359a6646d87e2950fa9690f559915a5cb368b85913a0097a6874730 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 
 //approve chaincode peer0-org2
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:163498fa6520eb39ddbf3d534c64ac6dad83c0cb20ba5169e82615aa024b4b6e --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:2516bd5962827a00382b2c9b8421bde095a85948f0e4e54285c0d49693c8eff4 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 
 //approve chaincode peer0-org3
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:d212cc362bbac2cefa45ae43b686b0e83f56910e28b81e2d947b51cd2ef36d5f --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:04377040761c84ad546cbbdc8f5038c7d27281709ab24ef3b6d60ae9086d1c8a --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-org4
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:ec7317c5cd57e39b6f6806e595ab73b3e9ba4b2f3dd415e5038100d946a8642c --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:3d128210eb0ae8cb5b316c8a7a7019717712a8db6801f5c064da2f9b792059a4 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-org5
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:491ce561c594749dc96a6aea43eb76ec2851ec0d37a39dc60b6250949653951d --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:0fdf6fb94ba3282b0ec7b2afdbe38b2cc4550e823288ea753712fb89c22db9af --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-org6
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:776d5ccc42eec1de73b494db881aaad248cd2ff074ac466a9524f34182b0d5d2 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:b5dde26f8c2088a1ea4ee4317e7d28be8a76dd38a61fb7315c92b45caa411b7d --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
 
 //checkcommitreadiness
 peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name basic --version 1.0 --init-required --sequence 1 -o -orderer:7050 --tls --cafile $ORDERER_CA
