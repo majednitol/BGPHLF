@@ -89,7 +89,6 @@ data:
           path: '/usr/src/app/connection-profile/connection-org6.json'
           discover: false
 
-       
   config.yaml: |
     simpleArgs: &simple-args
       userId: "20000"
@@ -105,8 +104,21 @@ data:
       workers:
         number: 10
       rounds:
-        - label: createSystemManager
-          txNumber: 1000
+        - label: createSystemManager (fixed-load)
+          txDuration: 30
+          rateControl:
+            type: fixed-load
+            opts:
+              transactionLoad: 2500
+          workload:
+            module: benchmarks/scenario/systemmanager/create.js
+            arguments: *simple-args
+          timeout:
+            transaction: 180
+            endorsement: 180
+
+        - label: createSystemManager (fixed-rate)
+          txDuration: 30
           rateControl:
             type: fixed-rate
             opts:
@@ -117,20 +129,31 @@ data:
           timeout:
             transaction: 180
             endorsement: 180
-        - label: getSystemManager
-          txNumber: 10
+
+        - label: getSystemManager (fixed-load)
+          txDuration: 30
+          rateControl:
+            type: fixed-load
+            opts:
+              transactionLoad: 2500
+          workload:
+            module: benchmarks/scenario/systemmanager/query.js
+            arguments:
+              userId: "100"
+          timeout:
+            transaction: 180
+            endorsement: 180
+
+        - label: getSystemManager (fixed-rate)
+          txDuration: 30
           rateControl:
             type: fixed-rate
             opts:
               tps: 2500
           workload:
             module: benchmarks/scenario/systemmanager/query.js
-            arguments: 
+            arguments:
               userId: "100"
           timeout:
             transaction: 180
             endorsement: 180
-
-    # clients:
-    #   type: local
-    #   number: 30
