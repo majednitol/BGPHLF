@@ -54,13 +54,16 @@ spec:
             - "launch"
             - "manager"
             - "--caliper-fabric-gateway-enabled"
+            - "--caliper-fabric-gateway-rpcoptions.grpc.keepalive_time_ms=300000"
+            - "--caliper-fabric-gateway-rpcoptions.grpc.http2.max_pings_without_data=0"
+
           resources:
             requests:
               memory: "800Mi"
               cpu: "600m"
             limits:
               memory: "2Gi"
-              cpu: "2"
+              cpu: "4"
 ---
 apiVersion: v1
 kind: Service
@@ -76,3 +79,10 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 3000
+# ---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+# | Name                | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+# |---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+# | createSystemManager | 20   | 0    | 11.4            | 3.02            | 1.26            | 1.91            | 6.5              |
+# |---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+# | getSystemManager    | 1000 | 0    | 63.1            | 1.50            | 0.01            | 0.14            | 63.0             |
+# +---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
