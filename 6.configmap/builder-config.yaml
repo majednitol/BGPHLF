@@ -530,9 +530,9 @@ data:
               # This option is only supported for qscc at this time.
               concurrency:
                 qscc: 5000
-                endorserService: 2500
-                deliverService: 2500
-                gatewayService: 2500                
+                endorserService: 5000
+                deliverService: 5000
+                gatewayService: 5000                
             grpc:
               maxRecvMsgSize: 104857600
               maxSendMsgSize: 104857600
