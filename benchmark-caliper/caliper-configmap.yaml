@@ -27,7 +27,7 @@ data:
                 path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org1.json'
-          discover: true
+          discover: false
 
       - mspid: Org2MSP
         identities:
@@ -39,7 +39,7 @@ data:
                 path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org2.json'
-          discover: true
+          discover: false
 
       - mspid: Org3MSP
         identities:
@@ -51,7 +51,7 @@ data:
                 path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org3.json'
-          discover: true
+          discover: false
 
       - mspid: Org4MSP
         identities:
@@ -63,7 +63,7 @@ data:
                 path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org4.json'
-          discover: true
+          discover: false
 
       - mspid: Org5MSP
         identities:
@@ -75,7 +75,7 @@ data:
                 path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org5.json'
-          discover: true
+          discover: false
 
       - mspid: Org6MSP
         identities:
@@ -87,7 +87,7 @@ data:
                 path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org6.json'
-          discover: true
+          discover: false
 
   config.yaml: |
     simpleArgs: &simple-args
@@ -102,9 +102,8 @@ data:
       name: system-manager-benchmark
       description: Performance benchmark for SystemManager chaincode
       workers:
-        number: 20
+        number: 10
       rounds:
-<<<<<<< HEAD
         - label: createSystemManager (fixed-load)
           txDuration: 30
           rateControl:
@@ -120,10 +119,6 @@ data:
 
         - label: createSystemManager (fixed-rate)
           txDuration: 30
-=======
-        - label: createSystemManager
-          txNumber: 1
->>>>>>> 2d8a3ebfce3679815ef444bbf5645f6940ebb4de
           rateControl:
             type: fixed-rate
             opts:
@@ -131,11 +126,9 @@ data:
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
-          userIdentity: round-robin
           timeout:
             transaction: 180
             endorsement: 180
-<<<<<<< HEAD
 
         - label: getSystemManager (fixed-load)
           txDuration: 30
@@ -153,29 +146,14 @@ data:
 
         - label: getSystemManager (fixed-rate)
           txDuration: 30
-=======
-        - label: getSystemManager
-          txNumber: 1000
->>>>>>> 2d8a3ebfce3679815ef444bbf5645f6940ebb4de
           rateControl:
-            type: fixed-load
+            type: fixed-rate
             opts:
-              tps: 500
+              tps: 2500
           workload:
             module: benchmarks/scenario/systemmanager/query.js
             arguments:
               userId: "100"
-          userIdentity: round-robin
           timeout:
             transaction: 180
             endorsement: 180
-<<<<<<< HEAD
-=======
-# throughput very low 
-#  +------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-# | Name             | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
-# |------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-# | getSystemManager | 1000 | 0    | 94.2            | 2.50            | 0.01            | 0.36            | 93.8             |
-# +------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-
->>>>>>> 2d8a3ebfce3679815ef444bbf5645f6940ebb4de
