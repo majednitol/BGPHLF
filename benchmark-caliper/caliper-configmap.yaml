@@ -20,74 +20,74 @@ data:
       - mspid: Org1MSP
         identities:
           certificates:
-            - name: 'Admin'
+            - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org1.json'
           discover: false
 
-      # - mspid: Org2MSP
-      #   identities:
-      #     certificates:
-      #       - name: 'Admin'
-      #         clientPrivateKey:
-      #           path: '/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/priv_sk'
-      #         clientSignedCert:
-      #           path: '/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/cert.pem'
-      #   connectionProfile:
-      #     path: '/usr/src/app/connection-profile/connection-org2.json'
-      #     discover: false
+      - mspid: Org2MSP
+        identities:
+          certificates:
+            - name: 'User1'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org2.json'
+          discover: false
 
-      # - mspid: Org3MSP
-      #   identities:
-      #     certificates:
-      #       - name: 'Admin'
-      #         clientPrivateKey:
-      #           path: '/organizations/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp/keystore/priv_sk'
-      #         clientSignedCert:
-      #           path: '/organizations/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp/signcerts/cert.pem'
-      #   connectionProfile:
-      #     path: '/usr/src/app/connection-profile/connection-org3.json'
-      #     discover: false
+      - mspid: Org3MSP
+        identities:
+          certificates:
+            - name: 'User1'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org3.json'
+          discover: false
 
-      # - mspid: Org4MSP
-      #   identities:
-      #     certificates:
-      #       - name: 'Admin'
-      #         clientPrivateKey:
-      #           path: '/organizations/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp/keystore/priv_sk'
-      #         clientSignedCert:
-      #           path: '/organizations/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp/signcerts/cert.pem'
-      #   connectionProfile:
-      #     path: '/usr/src/app/connection-profile/connection-org4.json'
-      #     discover: false
+      - mspid: Org4MSP
+        identities:
+          certificates:
+            - name: 'User1'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org4.json'
+          discover: false
 
-      # - mspid: Org5MSP
-      #   identities:
-      #     certificates:
-      #       - name: 'Admin'
-      #         clientPrivateKey:
-      #           path: '/organizations/peerOrganizations/org5.example.com/users/Admin@org5.example.com/msp/keystore/priv_sk'
-      #         clientSignedCert:
-      #           path: '/organizations/peerOrganizations/org5.example.com/users/Admin@org5.example.com/msp/signcerts/cert.pem'
-      #   connectionProfile:
-      #     path: '/usr/src/app/connection-profile/connection-org5.json'
-      #     discover: false
+      - mspid: Org5MSP
+        identities:
+          certificates:
+            - name: 'User1'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org5.json'
+          discover: false
 
-      # - mspid: Org6MSP
-      #   identities:
-      #     certificates:
-      #       - name: 'Admin'
-      #         clientPrivateKey:
-      #           path: '/organizations/peerOrganizations/org6.example.com/users/Admin@org6.example.com/msp/keystore/priv_sk'
-      #         clientSignedCert:
-      #           path: '/organizations/peerOrganizations/org6.example.com/users/Admin@org6.example.com/msp/signcerts/cert.pem'
-      #   connectionProfile:
-      #     path: '/usr/src/app/connection-profile/connection-org6.json'
-      #     discover: false
+      - mspid: Org6MSP
+        identities:
+          certificates:
+            - name: 'User1'
+              clientPrivateKey:
+                path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/keystore/priv_sk'
+              clientSignedCert:
+                path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/signcerts/cert.pem'
+        connectionProfile:
+          path: '/usr/src/app/connection-profile/connection-org6.json'
+          discover: false
 
        
   config.yaml: |
