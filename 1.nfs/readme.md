@@ -41,3 +41,5 @@ ssh root@167.71.238.9
 vm p@$$W0rd
 
 
+kubectl delete deployments --all
+kubectl delete services --all

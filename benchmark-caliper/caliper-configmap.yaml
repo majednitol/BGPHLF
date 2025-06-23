@@ -27,7 +27,7 @@ data:
                 path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org1.json'
-          discover: false
+          discover: true
 
       - mspid: Org2MSP
         identities:
@@ -39,7 +39,7 @@ data:
                 path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org2.json'
-          discover: false
+          discover: true
 
       - mspid: Org3MSP
         identities:
@@ -51,7 +51,7 @@ data:
                 path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org3.json'
-          discover: false
+          discover: true
 
       - mspid: Org4MSP
         identities:
@@ -63,7 +63,7 @@ data:
                 path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org4.json'
-          discover: false
+          discover: true
 
       - mspid: Org5MSP
         identities:
@@ -75,7 +75,7 @@ data:
                 path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org5.json'
-          discover: false
+          discover: true
 
       - mspid: Org6MSP
         identities:
@@ -87,9 +87,8 @@ data:
                 path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/signcerts/cert.pem'
         connectionProfile:
           path: '/usr/src/app/connection-profile/connection-org6.json'
-          discover: false
+          discover: true
 
-       
   config.yaml: |
     simpleArgs: &simple-args
       userId: "20000"
@@ -103,10 +102,10 @@ data:
       name: system-manager-benchmark
       description: Performance benchmark for SystemManager chaincode
       workers:
-        number: 10
+        number: 20
       rounds:
         - label: createSystemManager
-          txNumber: 1000
+          txNumber: 1
           rateControl:
             type: fixed-rate
             opts:
@@ -114,23 +113,28 @@ data:
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
+          userIdentity: round-robin
           timeout:
             transaction: 180
             endorsement: 180
         - label: getSystemManager
-          txNumber: 10
+          txNumber: 1000
           rateControl:
-            type: fixed-rate
+            type: fixed-load
             opts:
-              tps: 2500
+              tps: 500
           workload:
             module: benchmarks/scenario/systemmanager/query.js
             arguments: 
               userId: "100"
+          userIdentity: round-robin
           timeout:
             transaction: 180
             endorsement: 180
+# throughput very low 
+#  +------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+# | Name             | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+# |------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+# | getSystemManager | 1000 | 0    | 94.2            | 2.50            | 0.01            | 0.36            | 93.8             |
+# +------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 
-    # clients:
-    #   type: local
-    #   number: 30

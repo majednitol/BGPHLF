@@ -104,12 +104,12 @@ export const getPrefixAssignment = createAsyncThunk(
   }
 );
 
-// ✅ Trace Prefix
+
 export const tracePrefix = createAsyncThunk(
   'ipPrefix/tracePrefix',
-  async ({org,comapanyID,prefix}, thunkAPI) => {
+  async ({prefix}, thunkAPI) => {
     try {
-      const params = {comapanyID,prefix}
+      const params = {prefix}
       const response = await apiRepository.get('ip/trace-prefix', params, true);
       return response.data;
     } catch (error) {

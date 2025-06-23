@@ -87,9 +87,7 @@ spec:
             - name: CORE_PEER_TLS_ROOTCERT_FILE
               value: /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
             - name: CORE_LEDGER_STATE_STATEDATABASE
-              value: "CouchDB"
-            - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
-              value: "localhost:5984"
+              value: "goleveldb"
             - name: FABRIC_CFG_PATH
               value: /etc/hyperledger/fabric
             - name: CORE_OPERATIONS_LISTENADDRESS
@@ -131,18 +129,3 @@ spec:
               name: external-builder-release
               subPath: release
 
-
-
-        - name: couchdb
-          image: hyperledger/fabric-couchdb:0.4.15
-          resources:
-            limits:
-              memory: "300Mi"
-              cpu: "300m"
-            requests:
-              memory: "200Mi"
-              cpu: "200m"
-          volumeMounts:
-            - mountPath: /var/lib/couchdb
-              name: fabricfiles
-              subPath: state/org2/peer0-couchdb
