@@ -103,14 +103,14 @@ data:
       name: system-manager-benchmark
       description: Performance benchmark for SystemManager chaincode
       workers:
-        number: 5
+        number: 10
       rounds:
         - label: createSystemManager
-          txNumber: 1
+          txNumber: 1000
           rateControl:
             type: fixed-rate
             opts:
-              tps: 100
+              tps: 2500
           workload:
             module: benchmarks/scenario/systemmanager/create.js
             arguments: *simple-args
@@ -118,7 +118,7 @@ data:
             transaction: 180
             endorsement: 180
         - label: getSystemManager
-          txNumber: 10000
+          txNumber: 10
           rateControl:
             type: fixed-rate
             opts:
