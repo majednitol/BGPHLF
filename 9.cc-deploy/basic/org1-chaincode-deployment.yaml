@@ -23,7 +23,7 @@ spec:
           name: chaincode-basic-org1
           env:
             - name: CHAINCODE_ID
-              value: "basic:e6fbe0a67359a6646d87e2950fa9690f559915a5cb368b85913a0097a6874730"
+              value: "basic:e4dec9beb672668a5458e589e3587a0dd162f645ecdc90d43521391c8208d435"
             - name: CHAINCODE_SERVER_ADDRESS
               value: "0.0.0.0:7052"
           ports:
