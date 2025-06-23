@@ -106,7 +106,7 @@ data:
         number: 5
       rounds:
         - label: createSystemManager
-          txNumber: 1000
+          txNumber: 1
           rateControl:
             type: fixed-rate
             opts:
@@ -118,11 +118,11 @@ data:
             transaction: 180
             endorsement: 180
         - label: getSystemManager
-          txNumber: 10
+          txNumber: 10000
           rateControl:
             type: fixed-rate
             opts:
-              tps: 100
+              tps: 2500
           workload:
             module: benchmarks/scenario/systemmanager/query.js
             arguments: 

@@ -217,7 +217,7 @@ peer chaincode invoke \
   --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
   --peerAddresses peer0-org5:13051 \
   --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"CreateSystemManager","Args":["222", "rono admin", "rono@example.com", "Org6MSP", "rono", "2025-06-01T12:00:00Z"]}' \
+  -c '{"function":"CreateSystemManager","Args":["100", "rono admin", "rono@example.com", "Org1MSP", "rono", "2025-06-01T12:00:00Z"]}' \
   --waitForEvent
 ### 2. **RegisterAS**
 "org1 admin", "org1@example.com"
