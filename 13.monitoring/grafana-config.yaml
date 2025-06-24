@@ -1727,10 +1727,10 @@ data:
                 ]
               },
               "timezone": "",
-              "title": "Hyperledger Fabric Monitoring for 1.4",
+              "title": "Hyperledger Fabric Monitoring for 2.4.9",
               "uid": "pUnN6JgWz",
               "version": 2,
-              "description": "A beta version of the HLF 1.4 Monitoring Dashboard."
+              "description": "A beta version of the HLF 2.4.9 Monitoring Dashboard."
           }
   dashboard.yaml : |
     apiVersion: 1

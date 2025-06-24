@@ -1,19 +1,17 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: caliper
   labels:
     app: caliper
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: caliper
+  backoffLimit: 0
   template:
     metadata:
       labels:
         app: caliper
     spec:
+      restartPolicy: Never
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -54,8 +52,6 @@ spec:
             - "launch"
             - "manager"
             - "--caliper-fabric-gateway-enabled"
-            - "--caliper-fabric-gateway-rpcoptions.grpc.keepalive_time_ms=300000"
-            - "--caliper-fabric-gateway-rpcoptions.grpc.http2.max_pings_without_data=0"
 
           resources:
             requests:
@@ -64,25 +60,3 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "4"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: caliper
-  labels:
-    app: caliper
-spec:
-  selector:
-    app: caliper
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 3000
-# ---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-# | Name                | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
-# |---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-# | createSystemManager | 20   | 0    | 11.4            | 3.02            | 1.26            | 1.91            | 6.5              |
-# |---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-# | getSystemManager    | 1000 | 0    | 63.1            | 1.50            | 0.01            | 0.14            | 63.0             |
-# +---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
