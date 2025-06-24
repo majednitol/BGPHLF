@@ -275,17 +275,9 @@ func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInt
 		return nil, fmt.Errorf("email, orgMSP, and name must all be provided")
 	}
 
-	query := fmt.Sprintf(`{
-		"selector": {
-			"email": "%s",
-			"orgMSP": "%s",
-			"name": "%s"
-		}
-	}`, email, orgMSP, name)
-
-	iter, err := ctx.GetStub().GetQueryResult(query)
+	iter, err := ctx.GetStub().GetStateByRange("SYS_MGR_", "SYS_MGR_z")
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute rich query: %v", err)
+		return nil, fmt.Errorf("failed to scan manager records: %v", err)
 	}
 	defer iter.Close()
 
@@ -293,29 +285,31 @@ func (s *SmartContract) LoginSystemManager(ctx contractapi.TransactionContextInt
 	for iter.HasNext() {
 		result, err := iter.Next()
 		if err != nil {
-			return nil, fmt.Errorf("error reading result: %v", err)
+			continue
 		}
 		var manager SystemManager
 		if err := json.Unmarshal(result.Value, &manager); err != nil {
-			return nil, fmt.Errorf("error unmarshaling manager data: %v", err)
+			continue
 		}
-		managers = append(managers, &manager)
+
+		if manager.Email == email && manager.OrgMSP == orgMSP && manager.Name == name {
+			managers = append(managers, &manager)
+		}
 	}
 
-	// If no matching manager found
 	if len(managers) == 0 {
 		return &SystemManagerLoginResult{
 			Managers: nil,
-			Message:  "You are not registered",
+			Message:  "❌ You are not registered",
 		}, nil
 	}
 
-	// Success
 	return &SystemManagerLoginResult{
 		Managers: managers,
-		Message:  "Login successful",
+		Message:  "✅ Login successful",
 	}, nil
 }
+
 
 func (s *SmartContract) GetSystemManager(ctx contractapi.TransactionContextInterface, id string) (*SystemManager, error) {
 	if id == "" {
@@ -359,7 +353,9 @@ func (s *SmartContract) ListSystemManagers(ctx contractapi.TransactionContextInt
 		}
 		managers = append(managers, &manager)
 	}
-
+        if len(managers) == 0 {
+		return nil, fmt.Errorf("no system managers found")
+	}
 	return managers, nil
 }
 
@@ -983,6 +979,9 @@ func (s *SmartContract) GetAllPrefixesAssignedByOrg(ctx contractapi.TransactionC
 			assignments = append(assignments, &assign)
 		}
 	}
+	if len(assignments) == 0 {
+		return nil, fmt.Errorf("❌ No prefixes found for org: %s", org)
+	}
 	return assignments, nil
 }
 
@@ -1013,6 +1012,9 @@ func (s *SmartContract) GetAllAssignedPrefixes(ctx contractapi.TransactionContex
 			assignments = append(assignments, &pa)
 		}
 	}
+	if len(assignments) == 0 {
+		return nil, fmt.Errorf("❌ No prefixes found")
+	}
 	return assignments, nil
 }
 
@@ -1032,6 +1034,9 @@ func (s *SmartContract) GetAllOwnedPrefixes(ctx contractapi.TransactionContextIn
 			results = append(results, &pa)
 		}
 	}
+	if len(results) == 0 {
+		return nil, fmt.Errorf("❌ No prefixes found for org: %s", org)
+	}
 	return results, nil
 }
 
@@ -1039,7 +1044,7 @@ func (s *SmartContract) GetAllOwnedPrefixes(ctx contractapi.TransactionContextIn
 func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextInterface, rir string) ([]*ResourceRequest, error) {
 	iter, err := ctx.GetStub().GetStateByRange("REQ_", "REQ_z")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to scan pending requests: %v", err)
 	}
 	defer iter.Close()
 
@@ -1050,6 +1055,9 @@ func (s *SmartContract) ListPendingRequests(ctx contractapi.TransactionContextIn
 		if err := json.Unmarshal(result.Value, &req); err == nil && req.RIR == rir && req.Status == "pending" {
 			requests = append(requests, &req)
 		}
+	}
+	if len(requests) == 0 {
+		return nil, fmt.Errorf("❌ No pending requests found for RIR: %s", rir)
 	}
 	return requests, nil
 }
@@ -1067,6 +1075,9 @@ func (s *SmartContract) ListApprovedRequests(ctx contractapi.TransactionContextI
 		if err := json.Unmarshal(result.Value, &req); err == nil && req.RIR == org && req.Status == "approved" {
 			requests = append(requests, &req)
 		}
+	}
+	if len(requests) == 0 {
+		return nil, fmt.Errorf("❌ No approved requests found for org: %s", org)
 	}
 	return requests, nil
 }
@@ -1086,6 +1097,9 @@ func (s *SmartContract) ListAllMembers(ctx contractapi.TransactionContextInterfa
 		if err := json.Unmarshal(result.Value, &mem); err == nil {
 			members = append(members, &mem)
 		}
+	}
+	if len(members) == 0 {
+		return nil, fmt.Errorf("❌ No members found")
 	}
 	return members, nil
 }
@@ -1108,6 +1122,9 @@ func (s *SmartContract) ListAllASNValues(ctx contractapi.TransactionContextInter
 			asnList = append(asnList, asn.ASN)
 		}
 	}
+	if len(asnList) == 0 {
+		return nil, fmt.Errorf("❌ No ASNs found")
+	}
 	return asnList, nil
 }
 
@@ -1127,6 +1144,9 @@ func (s *SmartContract) GetAllocationsByMember(ctx contractapi.TransactionContex
 			allocations = append(allocations, &alloc)
 		}
 	}
+	if len(allocations) == 0 {
+		return nil, fmt.Errorf("❌ No allocations found for member: %s", memberID)
+	}
 	return allocations, nil
 }
 
@@ -1145,6 +1165,9 @@ func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionC
 		if err := json.Unmarshal(result.Value, &req); err == nil && req.MemberID == memberID {
 			requests = append(requests, &req)
 		}
+	}
+	if len(requests) == 0 {
+		return nil, fmt.Errorf("❌ No resource requests found for member: %s", memberID)
 	}
 	return requests, nil
 }
