@@ -25,11 +25,11 @@ peer lifecycle chaincode install basic-apnic.tgz
 # Install for Arin
 peer lifecycle chaincode install basic-arin.tgz
 
-# Install for Ripencc
-peer lifecycle chaincode install basic-ripencc.tgz
-
 # Install for Lacnic
 peer lifecycle chaincode install basic-lacnic.tgz
+
+# Install for Ripencc
+peer lifecycle chaincode install basic-ripencc.tgz
 
 # Install for Rono
 peer lifecycle chaincode install basic-rono.tgz

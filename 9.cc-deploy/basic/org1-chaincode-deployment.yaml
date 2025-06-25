@@ -23,7 +23,7 @@ spec:
           name: chaincode-basic-afrinic
           env:
             - name: CHAINCODE_ID
-              value: "basic:e4dec9beb672668a5458e589e3587a0dd162f645ecdc90d43521391c8208d435"
+              value: "basic:e5ac560bee5cad120ccc568bc2eefb902b5844a95d0ba2154ba11e266d58ac0e"
             - name: CHAINCODE_SERVER_ADDRESS
               value: "0.0.0.0:7052"
           ports:
