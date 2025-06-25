@@ -1,29 +1,21 @@
-peer0-org1
-basic:74c8d4bd2ae76e91d7160817ba7ae55323303c8cd95380f048e8fc96a45552d7
-peer0-org2
-package identifier: basic:d91c9cccc7039cf189ed1ab866bde9908cc53566d75e3a6a669ac656fa438735
-peer0-org3
-package identifier: basic:0350fb30336aff894681530659cbad9d158eb7c3788162fb0da390b53a8fb092
+//approve chaincode peer0-afrinic
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:e5ac560bee5cad120ccc568bc2eefb902b5844a95d0ba2154ba11e266d58ac0e --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-//approve chaincode peer0-org1
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:e4dec9beb672668a5458e589e3587a0dd162f645ecdc90d43521391c8208d435 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-apnic
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:0e092b909fd4865d80cee3734ba39f19c41c0a51bb657e7c09597bc485458924 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
+//approve chaincode peer0-arin
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:667cef53c9730b334213e45cb1d2b8bb8e549021bd7161ab722938168f9670b1 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-//approve chaincode peer0-org2
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:d66e21b22d1a39cfa81737a354ad76645501dc71bcd046fa14984d043eb86ea2 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-ripencc
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:236d1c8e89f0bacef7733f113cf696ebc308890536b78a51771fa3d5e4e2152f --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
+//approve chaincode peer0-lacnic
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:9dce5af2102e60255ab8b5366927369a81b4a64e44cb88612a4d3f40fab99563 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
-//approve chaincode peer0-org3
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:de52bc925d72cf14f8751bc1438566d9654c8da4a4b497e289b625425b76f506 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+//approve chaincode peer0-rono
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:9d38a1978886c93cba546d1a33c0e491fd0259db022341ee2e52f650980805a8 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
 
-//approve chaincode peer0-org4
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:32086ba458d5d1635f0097cd0c10d739c561e5790360a97b195f885c4cd58016 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
-
-//approve chaincode peer0-org5
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:b27867509f932c48c4732c122796b8a0a94154241ac2f7e1b99fd4abe17039be --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
-
-//approve chaincode peer0-org6
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:744e92a42ac797ca8676aa0ab5ade5a4f27915594abf7477363ea6de691effc4 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
 
 //checkcommitreadiness
 peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name basic --version 1.0 --init-required --sequence 1 -o -orderer:7050 --tls --cafile $ORDERER_CA
@@ -40,18 +32,19 @@ peer lifecycle chaincode commit \
   --init-required \
   --tls true \
   --cafile $ORDERER_CA \
-  --peerAddresses peer0-org1:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:9051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:11051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:12051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:13051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:14051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt
+  --peerAddresses peer0-afrinic:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-apnic:9051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-arin:11051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/arin.rono.com/peers/peer0.arin.rono.com/tls/ca.crt \
+  --peerAddresses peer0-ripencc:12051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/ripencc.rono.com/peers/peer0.ripencc.rono.com/tls/ca.crt \
+  --peerAddresses peer0-lacnic:13051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/lacnic.rono.com/peers/peer0.lacnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-rono:14051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/ca.crt
+
 
 
 
@@ -67,20 +60,21 @@ peer chaincode invoke \
   --cafile $ORDERER_CA \
   -C mychannel \
   -n basic \
-  --peerAddresses peer0-org1:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:9051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:11051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:12051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:13051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:14051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
+  --peerAddresses peer0-afrinic:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-apnic:9051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-arin:11051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/arin.rono.com/peers/peer0.arin.rono.com/tls/ca.crt \
+  --peerAddresses peer0-ripencc:12051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/ripencc.rono.com/peers/peer0.ripencc.rono.com/tls/ca.crt \
+  --peerAddresses peer0-lacnic:13051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/lacnic.rono.com/peers/peer0.lacnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-rono:14051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/ca.crt \
   -c '{"Args":["InitLedger"]}' \
   --waitForEvent
+
 
 
 invoke command (test cases)
