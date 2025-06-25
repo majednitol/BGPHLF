@@ -13,7 +13,7 @@ import { resolve } from 'path';
 export function buildCCPOrg(orgMSP) {
 
 	const org = orgMSP.replace('MSP', '').toLowerCase();
-	console.log("org".org)
+	console.log("org",org)
   const ccpPath = resolve(`connection-profile/connection-${org}.json`);
 	console.log("ccpPath", ccpPath)
 	const fileExists = existsSync(ccpPath);
