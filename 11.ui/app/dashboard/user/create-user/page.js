@@ -14,4 +14,4 @@ const CreateUser = () => {
     )
 }
 
-export default IsAuth(CreateUser) // Protected route for CreateUserPage
+export default IsAuth(CreateUser) 

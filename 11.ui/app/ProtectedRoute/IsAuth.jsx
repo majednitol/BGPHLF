@@ -15,20 +15,20 @@ function IsAuth(Component) {
 
       try {
         if (!token) {
-          router.replace("/login-user");
+          router.replace("/user/login-user");
         } else {
           const decoded = jwtDecode(token);
           const role = decoded?.role;
 
           if (!role) {
             localStorage.removeItem("authToken");
-            router.replace("/login-user");
+            router.replace("/user/login-user");
           }
           
         }
       } catch (error) {
         localStorage.removeItem("authToken");
-        router.replace("/login-user");
+        router.replace("/user/login-user");
       } finally {
         setLoading(false);
       }

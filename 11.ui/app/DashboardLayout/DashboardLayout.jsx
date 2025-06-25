@@ -47,12 +47,12 @@ const navItems = {
     "/dashboard/company/revoke-route"
 
   ],
-  // user: [
-  //   '/dashboard/user/get-user',
-  //   '/dashboard/user/register',
-  //   '/dashboard/user/create-user',
-  //   '/dashboard/user/login-user'
-  // ]
+  user: [
+    // '/dashboard/user/get-user',
+    // '/dashboard/user/register',
+    // '/dashboard/user/create-user',
+    '/user/login-user'
+  ]
 };
 function DashboardLayout({ children }) {
 const [loading, setLoading] = useState(true);
@@ -63,7 +63,9 @@ const router = useRouter();
       const token = localStorage.getItem('authToken');
       if (token) {
         const decoded = jwtDecode(token);
-        setUserRole(decoded.role);
+        // setUserRole(decoded.role);
+        setUserRole("company");
+
       }
     } catch (error) {
       console.error('Invalid token or failed to decode', error);
@@ -73,8 +75,8 @@ const router = useRouter();
   }, []);
    const handleLogout = () => {
     localStorage.removeItem('authToken');
-    router.replace('/login-user');
-
+    router.replace('/user/login-user');
+console.log("click")
    };
   
   if (loading) {

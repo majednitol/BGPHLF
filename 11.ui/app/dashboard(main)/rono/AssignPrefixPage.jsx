@@ -5,6 +5,15 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { assignPrefix, resetState } from '../../features/ipPrefix/ipPrefixSlice';
 import toast from 'react-hot-toast';
 
+const orgOptions = [
+  { label: 'AFRINIC', value: 'AfrinicMSP' },
+  { label: 'APNIC', value: 'ApnicMSP' },
+  { label: 'ARIN', value: 'ArinMSP' },
+  { label: 'RIPE NCC', value: 'RipenccMSP' },
+  { label: 'LACNIC', value: 'LacnicMSP' },
+  { label: 'RONO', value: 'RonoMSP' },
+];
+
 const AssignPrefixPage = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.ipPrefix);
@@ -22,20 +31,19 @@ const AssignPrefixPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-const payload = {
-    prefix: [form.prefix],
-    assignedTo: form.assignedTo,
-    timestamp: new Date().toISOString(),
-  };
+    const payload = {
+      prefix: [form.prefix],
+      assignedTo: form.assignedTo,
+      timestamp: new Date().toISOString(),
+    };
 
     try {
       await dispatch(assignPrefix(payload)).unwrap();
       toast.success('Prefix assigned successfully');
       setForm({ prefix: '', assignedTo: '' });
     } catch (err) {
-      console.log("msg",err)
-      toast.error(`Error: ${err
-}`);
+      console.log("msg", err);
+      toast.error(`Error: ${err}`);
     } finally {
       dispatch(resetState());
     }
@@ -56,14 +64,20 @@ const payload = {
       />
 
       <label style={styles.label}>Assigned To</label>
-      <input
+      <select
         name="assignedTo"
         value={form.assignedTo}
         onChange={handleChange}
-        placeholder="Assigned To"
         required
-        style={styles.input}
-      />
+        style={styles.select}
+      >
+        <option value="">Select Organization</option>
+        {orgOptions.map((org) => (
+          <option key={org.value} value={org.value}>
+            {org.label}
+          </option>
+        ))}
+      </select>
 
       <button type="submit" disabled={loading} style={styles.button}>
         {loading ? 'Assigning...' : 'Assign Prefix'}
@@ -92,6 +106,13 @@ const styles = {
     fontSize: 16,
     borderRadius: 5,
     border: '1px solid #ccc',
+  },
+  select: {
+    padding: 10,
+    fontSize: 16,
+    borderRadius: 5,
+    border: '1px solid #ccc',
+    backgroundColor: '#fff',
   },
   button: {
     padding: 12,

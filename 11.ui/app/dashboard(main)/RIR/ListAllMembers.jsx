@@ -10,10 +10,7 @@ import { approveMember } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 
 // Simulated token decode — replace with real logic
-const decodedUser = {
-  org: 'Org1MSP',
-  userID: '222',
-};
+
 
 const ListAllMembers = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +19,7 @@ const ListAllMembers = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        await dispatch(listAllMembers(decodedUser)).unwrap();
+        await dispatch(listAllMembers()).unwrap();
       } catch {
         toast.error('Failed to fetch company list');
       }
@@ -37,11 +34,11 @@ const ListAllMembers = () => {
 
   const handleApprove = async (memberID) => {
     try {
-      await dispatch(approveMember({ org: decodedUser.org, memberID })).unwrap();
+      await dispatch(approveMember()).unwrap();
       toast.success(`Member ${memberID} approved successfully!`);
 
       // Refresh member list
-      await dispatch(listAllMembers(decodedUser)).unwrap();
+      await dispatch(listAllMembers()).unwrap();
     } catch (err) {
       toast.error(`Approval failed: ${err}`);
     }

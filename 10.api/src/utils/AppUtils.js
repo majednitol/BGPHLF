@@ -10,9 +10,11 @@ import { existsSync, readFileSync } from 'fs';
 import nano from "nano";
 import { resolve } from 'path';
 
-export function buildCCPOrg1() {
+export function buildCCPOrg1(orgMSP) {
 
-	const ccpPath = resolve('connection-profile/connection-org1.json');
+	const org = orgMSP.replace('MSP', '').toLowerCase();
+	console.log("org".org)
+  const ccpPath = resolve(`connection-profile/connection-${org}.json`);
 	console.log("ccpPath", ccpPath)
 	const fileExists = existsSync(ccpPath);
 	if (!fileExists) {
@@ -20,89 +22,12 @@ export function buildCCPOrg1() {
 	}
 	const contents = readFileSync(ccpPath, 'utf8');
 
-	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
 
 	console.log(`Loaded the network configuration located at ${ccpPath}`);
 	return ccp;
 }
 
-export function buildCCPOrg2() {
-	// load the common connection configuration file
-	const ccpPath = resolve('connection-profile/connection-org2.json');
-	const fileExists = existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-}
-
-export function buildCCPOrg3() {
-	// load the common connection configuration file
-	const ccpPath = resolve('connection-profile/connection-org3.json');
-	const fileExists = existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-}
-export function buildCCPOrg4() {
-	// load the common connection configuration file
-	const ccpPath = resolve('connection-profile/connection-org4.json');
-	const fileExists = existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-}
-export function buildCCPOrg5() {
-	// load the common connection configuration file
-	const ccpPath = resolve('connection-profile/connection-org5.json');
-	const fileExists = existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-}
-export function buildCCPOrg6() {
-	// load the common connection configuration file
-	const ccpPath = resolve('connection-profile/connection-org6.json');
-	const fileExists = existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-}
 
 
 

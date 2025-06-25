@@ -12,7 +12,7 @@ let config = utils.getConfig()
 config.file(resolve('config.json'))
 let walletPath;
 export async function registerUser({ OrgMSP, userId,affiliation }) {
-    let org = Number(OrgMSP.match(/\d/g).join(""));
+    let org = OrgMSP
     
     let ccp = getCCP(org);
     const caClient = buildCAClient(FabricCAServices, ccp, `ca-org${org}`);

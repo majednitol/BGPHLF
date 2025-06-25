@@ -197,21 +197,24 @@ peer chaincode invoke \
 5️⃣ Sub-Assign Prefix (By RIR to Company)
 peer chaincode invoke \
   -o orderer:7050 \
+  --isInit \
   --tls true \
   --cafile $ORDERER_CA \
   -C mychannel \
   -n basic \
-  --peerAddresses peer0-org1:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:9051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:11051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:12051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:13051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  -c '{"function":"CreateSystemManager","Args":["100", "rono admin", "rono@example.com", "Org1MSP", "rono", "2025-06-01T12:00:00Z"]}' \
+  --peerAddresses peer0-afrinic:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-apnic:9051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-arin:11051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/arin.rono.com/peers/peer0.arin.rono.com/tls/ca.crt \
+  --peerAddresses peer0-ripencc:12051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/ripencc.rono.com/peers/peer0.ripencc.rono.com/tls/ca.crt \
+  --peerAddresses peer0-lacnic:13051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/lacnic.rono.com/peers/peer0.lacnic.rono.com/tls/ca.crt \
+  --peerAddresses peer0-rono:14051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/ca.crt \
+  -c ''{"function":"CreateSystemManager","Args":["100", "rono admin", "rono@example.com", "Org1MSP", "rono", "2025-06-01T12:00:00Z"]}'' \
   --waitForEvent
 ### 2. **RegisterAS**
 "org1 admin", "org1@example.com"

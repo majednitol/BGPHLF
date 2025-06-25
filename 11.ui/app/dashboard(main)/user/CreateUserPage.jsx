@@ -3,64 +3,104 @@
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import toast from 'react-hot-toast';
-import { createUser } from '../../features/user/userSlice';
+import { createOrgUser } from '../../features/user/userSlice';
+import { useRouter } from 'next/navigation';
 
-export default function CreateUserPage() {
+export default function CreateOrgUserPage() {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.user);
-
+const router = useRouter();
   const [form, setForm] = useState({
-    userID: '',
-    org: 'Org1',
-    dept: 'department1',
-    comapanyID: '',
-    timestamp: new Date().toISOString(),
+    name: '',
+    email: '',
+    orgMSP: '',
+    role: '',
+    createdAt: new Date().toISOString(),
   });
-
+const orgOptions = [
+  { label: 'AFRINIC', value: 'AfrinicMSP' },
+  { label: 'APNIC', value: 'ApnicMSP' },
+  { label: 'ARIN', value: 'ArinMSP' },
+  { label: 'RIPE NCC', value: 'RipenccMSP' },
+  { label: 'LACNIC', value: 'LacnicMSP' },
+  { label: 'RONO', value: 'RonoMSP' },
+];
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
-    const res = await dispatch(createUser(form));
+    const res = await dispatch(createOrgUser(form));
     if (res.meta.requestStatus === 'fulfilled') {
-      toast.success('User created successfully!');
+      toast.success('Org User created successfully!');
     } else {
-      toast.error(res.payload || 'Failed to create user.');
+      toast.error(res.payload || 'Failed to create org user.');
     }
   };
-
+ const handleLoginRedirect = () => {
+    router.push('/user/login-user');
+  };
   return (
     <div style={styles.container}>
-      <h2 style={styles.header}>Create User (Chaincode)</h2>
+      <h2 style={styles.header}>Create Org User</h2>
 
       <input
-        name="userID"
+        name="name"
         style={styles.input}
-        placeholder="User ID"
-        value={form.userID}
+        placeholder="Full Name"
+        value={form.name}
         onChange={handleChange}
       />
       <input
-        name="comapanyID"
+        name="email"
+        type="email"
         style={styles.input}
-        placeholder="Company ID"
-        value={form.comapanyID}
+        placeholder="Email"
+        value={form.email}
         onChange={handleChange}
       />
-      <select name="org" style={styles.select} value={form.org} onChange={handleChange}>
-        {['Org1', 'Org2', 'Org3', 'Org4', 'Org5', 'Org6'].map((o) => (
-          <option key={o} value={o}>{o}</option>
+
+       <select
+        name="orgMSP"
+        style={styles.select}
+        value={form.orgMSP}
+        onChange={handleChange}
+      >
+        {orgOptions.map((org) => (
+          <option key={org.value} value={org.value}>
+            {org.label}
+          </option>
         ))}
       </select>
-      <select name="dept" style={styles.select} value={form.dept} onChange={handleChange}>
-        <option value="department1">department1</option>
-        <option value="department2">department2</option>
+
+      
+
+      <select
+        name="role"
+        style={styles.select}
+        value={form.role}
+        onChange={handleChange}
+      >
+        <option value="">select type</option>
+        <option value="rono">rono</option>
+        <option value="rir">rir</option>
+        <option value="company">company</option>
       </select>
 
-      <button style={styles.button} onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Creating...' : 'Create User'}
+      <button
+        style={styles.button}
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? 'Creating...' : 'Create Org User'}
       </button>
+              <button
+          type="button"
+          onClick={handleLoginRedirect}
+          style={{ ...styles.button, backgroundColor: '#28a745', marginTop: '10px' }}
+        >
+          Login 
+        </button>
     </div>
   );
 }
@@ -100,11 +140,10 @@ const styles = {
     width: '100%',
     padding: '10px',
     fontSize: '16px',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#3498db',
     color: '#fff',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
   },
 };
-
