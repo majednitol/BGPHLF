@@ -63,7 +63,8 @@ export async function registerAndEnrollUser(caClient, wallet, orgMspId, userId, 
 }
 
 export function buildCAClient(FabricCAServices, ccp, caHostName) {
-   console.log('cppp',ccp)
+   console.log('caHostName',caHostName)
+   console.log('ccp from build ',ccp)
 	const caInfo = ccp.certificateAuthorities[caHostName];
 	const caTLSCACerts = caInfo.tlsCACerts.pem;
 	const caClient = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: true }, caInfo.caName);
