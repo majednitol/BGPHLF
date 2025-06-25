@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import BgpApiRepository from "../lib/apiRepository.js";
 import { smartContract } from "./smartContract.js";
 
@@ -149,23 +150,35 @@ export async function RevokeRoute(request) {
 //     }
 // }
 
+import createHttpError from 'http-errors';
+
 export async function TracePrefix(request) {
-    try {
-        const { prefix, asn, userId } = request;
-        const contract = await smartContract(request, userId);
+  try {
+    const { prefix, asn, userId } = request;
+    const contract = await smartContract(request, userId);
+    const result = await contract.evaluateTransaction("TracePrefix", prefix, asn);
+    console.log("✅ Transaction Result:", result.toString());
 
-        const result = await contract.evaluateTransaction(
-            "TracePrefix",
-            prefix, asn
-        );
+    return JSON.parse(result.toString());
 
-        console.log("Transaction Result:", result.toString());
-        return JSON.parse(result.toString());
-    } catch (error) {
-        console.error("Error in TracePrefix:", error);
-        throw error;
+  } catch (error) {
+    const message = error.message || "";
+
+    console.error("❌ Error in TracePrefix:", message);
+
+    if (message.includes("ASN") && message.includes("not found")) {
+      throw createHttpError(404, `ASN ${request.asn} is not registered.`);
     }
+    if (message.includes("prefix") && message.includes("not associated")) {
+      throw createHttpError(404, `Prefix ${request.prefix} is not associated with ASN ${request.asn}.`);
+    }
+    if (message.includes("assignment not found")) {
+      throw createHttpError(404, `Prefix ${request.prefix} has no assignment record.`);
+    }
+    throw createHttpError(500, message || "Internal Server Error");
+  }
 }
+
 
 export async function ListPendingRequests(request) {
     try {

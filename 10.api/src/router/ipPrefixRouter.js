@@ -1,8 +1,6 @@
 import express from 'express'
 import authenticate from '../middleware/authenticate.js';
 import { announceRoute, assignPrefix, getAllOwnedPrefixes, getPrefixAssignment, listAllASNValues, listAllMembers, listApprovedRequests, listPendingRequests, revokeRoute, subAssignPrefix, tracePrefix, validatePath } from '../controllers/ipPrefixController.js';
-
-
 const ipPrefixRouter = express.Router()
 ipPrefixRouter.post("/validate-path",authenticate, validatePath)
 
