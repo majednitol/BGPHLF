@@ -1,59 +1,59 @@
   set -x
-mkdir -p /organizations/peerOrganizations/org2.example.com/
-export FABRIC_CA_CLIENT_HOME=/organizations/peerOrganizations/org2.example.com/
+mkdir -p /organizations/peerOrganizations/apnic.rono.com/
+export FABRIC_CA_CLIENT_HOME=/organizations/peerOrganizations/apnic.rono.com/
 
-fabric-ca-client enroll -u https://admin:adminpw@ca-org2:8054 --caname ca-org2 --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+fabric-ca-client enroll -u https://admin:adminpw@ca-apnic:8054 --caname ca-apnic --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
 echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/ca-org2-8054-ca-org2.pem
+    Certificate: cacerts/ca-apnic-8054-ca-apnic.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/ca-org2-8054-ca-org2.pem
+    Certificate: cacerts/ca-apnic-8054-ca-apnic.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/ca-org2-8054-ca-org2.pem
+    Certificate: cacerts/ca-apnic-8054-ca-apnic.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/ca-org2-8054-ca-org2.pem
-    OrganizationalUnitIdentifier: orderer' > "/organizations/peerOrganizations/org2.example.com/msp/config.yaml"
+    Certificate: cacerts/ca-apnic-8054-ca-apnic.pem
+    OrganizationalUnitIdentifier: orderer' > "/organizations/peerOrganizations/apnic.rono.com/msp/config.yaml"
 
 
 
-fabric-ca-client register --caname ca-org2 --id.name peer0 --id.secret peer0pw --id.type peer --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+fabric-ca-client register --caname ca-apnic --id.name peer0 --id.secret peer0pw --id.type peer --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
-fabric-ca-client register --caname ca-org2 --id.name user1 --id.secret user1pw --id.type client --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+fabric-ca-client register --caname ca-apnic --id.name user1 --id.secret user1pw --id.type client --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
-fabric-ca-client register --caname ca-org2 --id.name org2admin --id.secret org2adminpw --id.type admin --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+fabric-ca-client register --caname ca-apnic --id.name apnicadmin --id.secret apnicadminpw --id.type admin --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
-fabric-ca-client enroll -u https://peer0:peer0pw@ca-org2:8054 --caname ca-org2 -M "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp" --csr.hosts peer0.org2.example.com --csr.hosts  peer0-org2 --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+fabric-ca-client enroll -u https://peer0:peer0pw@ca-apnic:8054 --caname ca-apnic -M "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/msp" --csr.hosts peer0.apnic.rono.com --csr.hosts  peer0-apnic --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
-cp "/organizations/peerOrganizations/org2.example.com/msp/config.yaml" "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp/config.yaml"
+cp "/organizations/peerOrganizations/apnic.rono.com/msp/config.yaml" "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/msp/config.yaml"
 
-fabric-ca-client enroll -u https://peer0:peer0pw@ca-org2:8054 --caname ca-org2 -M "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls" --enrollment.profile tls --csr.hosts peer0.org2.example.com --csr.hosts  peer0-org2 --csr.hosts ca-org2 --csr.hosts localhost --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
-
-
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/tlscacerts/"* "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/signcerts/"* "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.crt"
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/keystore/"* "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.key"
-
-mkdir -p "/organizations/peerOrganizations/org2.example.com/msp/tlscacerts"
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/tlscacerts/"* "/organizations/peerOrganizations/org2.example.com/msp/tlscacerts/ca.crt"
-
-mkdir -p "/organizations/peerOrganizations/org2.example.com/tlsca"
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/tlscacerts/"* "/organizations/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem"
-
-mkdir -p "/organizations/peerOrganizations/org2.example.com/ca"
-cp "/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp/cacerts/"* "/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem"
+fabric-ca-client enroll -u https://peer0:peer0pw@ca-apnic:8054 --caname ca-apnic -M "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls" --enrollment.profile tls --csr.hosts peer0.apnic.rono.com --csr.hosts  peer0-apnic --csr.hosts ca-apnic --csr.hosts localhost --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
 
 
-fabric-ca-client enroll -u https://user1:user1pw@ca-org2:8054 --caname ca-org2 -M "/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp" --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/tlscacerts/"* "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/ca.crt"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/signcerts/"* "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/server.crt"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/keystore/"* "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/server.key"
 
-cp "/organizations/peerOrganizations/org2.example.com/msp/config.yaml" "/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/config.yaml"
+mkdir -p "/organizations/peerOrganizations/apnic.rono.com/msp/tlscacerts"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/tlscacerts/"* "/organizations/peerOrganizations/apnic.rono.com/msp/tlscacerts/ca.crt"
 
-fabric-ca-client enroll -u https://org2admin:org2adminpw@ca-org2:8054 --caname ca-org2 -M "/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp" --tls.certfiles "/organizations/fabric-ca/org2/tls-cert.pem"
+mkdir -p "/organizations/peerOrganizations/apnic.rono.com/tlsca"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/tls/tlscacerts/"* "/organizations/peerOrganizations/apnic.rono.com/tlsca/tlsca.apnic.rono.com-cert.pem"
 
-cp "/organizations/peerOrganizations/org2.example.com/msp/config.yaml" "/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/config.yaml"
+mkdir -p "/organizations/peerOrganizations/apnic.rono.com/ca"
+cp "/organizations/peerOrganizations/apnic.rono.com/peers/peer0.apnic.rono.com/msp/cacerts/"* "/organizations/peerOrganizations/apnic.rono.com/ca/ca.apnic.rono.com-cert.pem"
+
+
+fabric-ca-client enroll -u https://user1:user1pw@ca-apnic:8054 --caname ca-apnic -M "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp" --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
+
+cp "/organizations/peerOrganizations/apnic.rono.com/msp/config.yaml" "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/config.yaml"
+
+fabric-ca-client enroll -u https://apnicadmin:apnicadminpw@ca-apnic:8054 --caname ca-apnic -M "/organizations/peerOrganizations/apnic.rono.com/users/Admin@apnic.rono.com/msp" --tls.certfiles "/organizations/fabric-ca/apnic/tls-cert.pem"
+
+cp "/organizations/peerOrganizations/apnic.rono.com/msp/config.yaml" "/organizations/peerOrganizations/apnic.rono.com/users/Admin@apnic.rono.com/msp/config.yaml"
 
   { set +x; } 2>/dev/null

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ca-org1
+  name: ca-afrinic
   labels:
-    app: ca-org1
+    app: ca-afrinic
 spec:
   type: ClusterIP
   selector:
-    app: ca-org1
+    app: ca-afrinic
   ports:
     - protocol: TCP
       targetPort: 7054

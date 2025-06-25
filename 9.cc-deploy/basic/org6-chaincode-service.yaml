@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: basic-org6
+  name: basic-rono
   labels:
-    app: basic-org6
+    app: basic-rono
 spec:
   ports:
     - name: grpc
       port: 7052
       targetPort: 7052
   selector:
-    app: chaincode-basic-org6
+    app: chaincode-basic-rono

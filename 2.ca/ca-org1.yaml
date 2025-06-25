@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ca-org1
+  name: ca-afrinic
 spec:
   selector:
     matchLabels:
-      app: ca-org1
+      app: ca-afrinic
   replicas: 1
   template:
     metadata:
       labels:
-        app: ca-org1
+        app: ca-afrinic
     spec:
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
       containers:
-        - name: ca-org1
+        - name: ca-afrinic
           image: hyperledger/fabric-ca:1.5.13
           imagePullPolicy: "Always"
           command:
@@ -34,14 +34,14 @@ spec:
               cpu: "350m"
           env:
            - name: FABRIC_CA_SERVER_CA_NAME
-             value: ca-org1
+             value: ca-afrinic
            - name: FABRIC_CA_SERVER_TLS_ENABLED
              value: "true"
            - name: FABRIC_CA_SERVER_CSR_CN
-             value: "ca-org1"
+             value: "ca-afrinic"
            - name: FABRIC_CA_SERVER_CSR_HOSTS
-             value: "ca-org1"
+             value: "ca-afrinic"
           volumeMounts:
             - name: data
               mountPath: /etc/hyperledger/fabric-ca-server
-              subPath: organizations/fabric-ca/org1
+              subPath: organizations/fabric-ca/afrinic

@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: basic-org5
+  name: basic-lacnic
   labels:
-    app: basic-org5
+    app: basic-lacnic
 spec:
   ports:
     - name: grpc
       port: 7052
       targetPort: 7052
   selector:
-    app: chaincode-basic-org5
+    app: chaincode-basic-lacnic

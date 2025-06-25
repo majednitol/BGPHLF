@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ca-org5
+  name: ca-lacnic
   
   labels:
-    app: ca-org5
+    app: ca-lacnic
 spec:
   type: ClusterIP
   selector:
-    app: ca-org5
+    app: ca-lacnic
   ports:
     - protocol: TCP
       targetPort: 12054

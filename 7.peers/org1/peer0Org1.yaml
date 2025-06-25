@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: peer0-org1
+  name: peer0-afrinic
 spec:
   selector:
     matchLabels:
-      name: peer0-org1
+      name: peer0-afrinic
   replicas: 1
   template:
     metadata:
       labels:
-        name: peer0-org1
+        name: peer0-afrinic
     spec:
       volumes:
         - name: fabricfiles
@@ -51,9 +51,9 @@ spec:
             - name: CORE_PEER_ADDRESSAUTODETECT
               value: "true"
             - name: CORE_PEER_ID
-              value: peer0-org1
+              value: peer0-afrinic
             - name: CORE_PEER_ADDRESS
-              value: peer0-org1:7051
+              value: peer0-afrinic:7051
             - name: CORE_PEER_LISTENADDRESS
               value: 0.0.0.0:7051
             - name: CORE_PEER_GATEWAY_ENABLED
@@ -61,11 +61,11 @@ spec:
             - name: CORE_PEER_EVENTS_ADDRESS
               value: 0.0.0.0:7061
             - name: CORE_PEER_GOSSIP_BOOTSTRAP
-              value: peer0-org1:7051
+              value: peer0-afrinic:7051
             - name: CORE_PEER_GOSSIP_ENDPOINT
-              value: peer0-org1:7051
+              value: peer0-afrinic:7051
             - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
-              value: peer0-org1:7051
+              value: peer0-afrinic:7051
             - name: CORE_PEER_GOSSIP_ORGLEADER
               value: "false"
             - name: CORE_PEER_GOSSIP_USELEADERELECTION
@@ -73,19 +73,19 @@ spec:
             - name: CORE_PEER_PROFILE_ENABLED
               value: "true"
             - name: CORE_PEER_LOCALMSPID
-              value: Org1MSP
+              value: AfrinicMSP
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/msp
             - name: FABRIC_LOGGING_SPEC
               value: debug
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.crt
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.crt
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.key
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt
             - name: CORE_LEDGER_STATE_STATEDATABASE
               value: "goleveldb"
             # Removed CouchDB config variables
@@ -116,7 +116,7 @@ spec:
               subPath: organizations
             - mountPath: /var/hyperledger/production
               name: fabricfiles
-              subPath: state/org1/peer0
+              subPath: state/afrinic/peer0
             - mountPath: /etc/hyperledger/fabric/core.yaml
               name: builders-config
               subPath: core.yaml
@@ -134,16 +134,16 @@ spec:
 # apiVersion: apps/v1
 # kind: Deployment
 # metadata:
-#   name: peer0-org1
+#   name: peer0-afrinic
 # spec:
 #   selector:
 #     matchLabels:
-#       name: peer0-org1
+#       name: peer0-afrinic
 #   replicas: 1
 #   template:
 #     metadata:
 #       labels:
-#         name: peer0-org1
+#         name: peer0-afrinic
 #     spec:
 #       volumes:
 #         - name: fabricfiles
@@ -184,9 +184,9 @@ spec:
 #             - name: CORE_PEER_ADDRESSAUTODETECT
 #               value: "true"
 #             - name: CORE_PEER_ID
-#               value: peer0-org1
+#               value: peer0-afrinic
 #             - name: CORE_PEER_ADDRESS
-#               value: peer0-org1:7051
+#               value: peer0-afrinic:7051
 #             - name: CORE_PEER_LISTENADDRESS
 #               value: 0.0.0.0:7051
 #             - name: CORE_PEER_GATEWAY_ENABLED
@@ -194,11 +194,11 @@ spec:
 #             - name: CORE_PEER_EVENTS_ADDRESS
 #               value: 0.0.0.0:7061
 #             - name: CORE_PEER_GOSSIP_BOOTSTRAP
-#               value: peer0-org1:7051
+#               value: peer0-afrinic:7051
 #             - name: CORE_PEER_GOSSIP_ENDPOINT
-#               value: peer0-org1:7051
+#               value: peer0-afrinic:7051
 #             - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
-#               value: peer0-org1:7051
+#               value: peer0-afrinic:7051
 #             - name: CORE_PEER_GOSSIP_ORGLEADER
 #               value: "false"
 #             - name: CORE_PEER_GOSSIP_USELEADERELECTION
@@ -206,19 +206,19 @@ spec:
 #             - name: CORE_PEER_PROFILE_ENABLED
 #               value: "true"
 #             - name: CORE_PEER_LOCALMSPID
-#               value: Org1MSP
+#               value: AfrinicMSP
 #             - name: CORE_PEER_MSPCONFIGPATH
-#               value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp
+#               value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/msp
 #             - name: FABRIC_LOGGING_SPEC
 #               value: debug
 #             - name: CORE_PEER_TLS_ENABLED
 #               value: "true"
 #             - name: CORE_PEER_TLS_CERT_FILE
-#               value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.crt
+#               value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.crt
 #             - name: CORE_PEER_TLS_KEY_FILE
-#               value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.key
+#               value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.key
 #             - name: CORE_PEER_TLS_ROOTCERT_FILE
-#               value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+#               value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt
 #             - name: CORE_LEDGER_STATE_STATEDATABASE
 #               value: "CouchDB"
 #             - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
@@ -250,7 +250,7 @@ spec:
 #               subPath: organizations
 #             - mountPath: /var/hyperledger/production
 #               name: fabricfiles
-#               subPath: state/org1/peer0
+#               subPath: state/afrinic/peer0
 #             - mountPath: /etc/hyperledger/fabric/core.yaml
 #               name: builders-config
 #               subPath: core.yaml
@@ -277,4 +277,4 @@ spec:
 #           volumeMounts:
 #             - mountPath: /var/couchdb/data
 #               name: fabricfiles
-#               subPath: state/org1/peer0-couchdb
+#               subPath: state/afrinic/peer0-couchdb

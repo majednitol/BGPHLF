@@ -30,7 +30,7 @@ spec:
                 - name: ORDERER_GENERAL_LOGLEVEL
                   value: debug
                 - name: ORDERER_GENERAL_LOCALMSPDIR
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp
                 - name: ORDERER_GENERAL_LOCALMSPID
                   value: OrdererMSP
                 - name: ORDERER_GENERAL_GENESISMETHOD
@@ -40,15 +40,15 @@ spec:
                 - name: ORDERER_GENERAL_TLS_ENABLED
                   value: "true"
                 - name: ORDERER_GENERAL_TLS_PRIVATEKEY
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.key
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.key
                 - name: ORDERER_GENERAL_TLS_CERTIFICATE
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.crt
                 - name: ORDERER_GENERAL_TLS_ROOTCAS
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/ca.crt
                 - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.key
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.key
                 - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
-                  value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+                  value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.crt
                
                resources:
                  limits:

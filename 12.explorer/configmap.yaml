@@ -14,7 +14,7 @@ data:
           "password": "exploreradminpw"
         },
         "enableAuthentication": false,
-        "organization": "Org1MSP",
+        "organization": "AfrinicMSP",
         "connection": {
           "timeout": {
             "peer": {
@@ -27,7 +27,7 @@ data:
       "channels": {
         "mychannel": {
           "peers": {
-            "peer0-org1": {}
+            "peer0-afrinic": {}
           },
           "connection": {
             "timeout": {
@@ -41,25 +41,25 @@ data:
         }
       },
       "organizations": {
-        "Org1MSP": {
-          "mspid": "Org1MSP",
+        "AfrinicMSP": {
+          "mspid": "AfrinicMSP",
           "adminPrivateKey": {
-            "path": "/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk"
+            "path": "/organizations/peerOrganizations/afrinic.rono.com/users/Admin@afrinic.rono.com/msp/keystore/priv_sk"
           },
           "peers": [
-            "peer0-org1"
+            "peer0-afrinic"
           ],
           "signedCert": {
-            "path": "/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/cert.pem"
+            "path": "/organizations/peerOrganizations/afrinic.rono.com/users/Admin@afrinic.rono.com/msp/signcerts/cert.pem"
           }
         }
       },
       "peers": {
-        "peer0-org1": {
+        "peer0-afrinic": {
           "tlsCACerts": {
-            "path": "/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+            "path": "/organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt"
           },
-          "url": "grpcs://peer0-org1:7051"
+          "url": "grpcs://peer0-afrinic:7051"
         }
       }
       }

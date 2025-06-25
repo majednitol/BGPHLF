@@ -3,23 +3,23 @@
 apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
 metadata:
-  name: chaincode-basic-org4
+  name: chaincode-basic-ripencc
   labels:
-    app: chaincode-basic-org4
+    app: chaincode-basic-ripencc
 spec:
   selector:
     matchLabels:
-      app: chaincode-basic-org4
+      app: chaincode-basic-ripencc
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: chaincode-basic-org4
+        app: chaincode-basic-ripencc
     spec:
       containers:
         - image: majedur708/hlf-api:18.100.48
-          name: chaincode-basic-org4
+          name: chaincode-basic-ripencc
           imagePullPolicy: Always
           env:
             - name: CHAINCODE_ID

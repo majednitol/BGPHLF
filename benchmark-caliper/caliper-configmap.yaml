@@ -17,84 +17,84 @@ data:
           - id: basic
 
     organizations:
-      - mspid: Org1MSP
+      - mspid: AfrinicMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/afrinic.rono.com/users/User1@afrinic.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/afrinic.rono.com/users/User1@afrinic.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org1.json'
+          path: '/usr/src/app/connection-profile/connection-afrinic.json'
           discover: false
 
-      - mspid: Org2MSP
+      - mspid: ApnicMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org2.json'
+          path: '/usr/src/app/connection-profile/connection-apnic.json'
           discover: false
 
-      - mspid: Org3MSP
+      - mspid: ArinMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/arin.rono.com/users/User1@arin.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org3.example.com/users/User1@org3.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/arin.rono.com/users/User1@arin.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org3.json'
+          path: '/usr/src/app/connection-profile/connection-arin.json'
           discover: false
 
-      - mspid: Org4MSP
+      - mspid: RipenccMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/ripencc.rono.com/users/User1@ripencc.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org4.example.com/users/User1@org4.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/ripencc.rono.com/users/User1@ripencc.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org4.json'
+          path: '/usr/src/app/connection-profile/connection-ripencc.json'
           discover: false
 
-      - mspid: Org5MSP
+      - mspid: LacnicMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/lacnic.rono.com/users/User1@lacnic.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org5.example.com/users/User1@org5.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/lacnic.rono.com/users/User1@lacnic.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org5.json'
+          path: '/usr/src/app/connection-profile/connection-lacnic.json'
           discover: false
 
-      - mspid: Org6MSP
+      - mspid: RonoMSP
         identities:
           certificates:
             - name: 'User1'
               clientPrivateKey:
-                path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/keystore/priv_sk'
+                path: '/organizations/peerOrganizations/rono.rono.com/users/User1@rono.rono.com/msp/keystore/priv_sk'
               clientSignedCert:
-                path: '/organizations/peerOrganizations/org6.example.com/users/User1@org6.example.com/msp/signcerts/cert.pem'
+                path: '/organizations/peerOrganizations/rono.rono.com/users/User1@rono.rono.com/msp/signcerts/cert.pem'
         connectionProfile:
-          path: '/usr/src/app/connection-profile/connection-org6.json'
+          path: '/usr/src/app/connection-profile/connection-rono.json'
           discover: false
 
   config.yaml: |
     simpleArgs: &simple-args
       userId: "20000"
       name: "System Manager"
-      email: "sysmgr@example.com"
-      orgMSP: "Org1MSP"
+      email: "sysmgr@rono.com"
+      orgMSP: "AfrinicMSP"
       role: "rir"
       createdAt: "2025-06-21T10:00:00Z"
 

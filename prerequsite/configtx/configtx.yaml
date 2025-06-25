@@ -25,7 +25,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: ../organizations/ordererOrganizations/example.com/msp
+        MSPDir: ../organizations/ordererOrganizations/rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -50,12 +50,12 @@ Organizations:
     - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org1MSP
+        Name: AfrinicMSP
 
         # ID to load the MSP definition as
-        ID: Org1MSP
+        ID: AfrinicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org1.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org1.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -63,16 +63,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org1MSP.member')"
+                Rule: "OR('AfrinicMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org1MSP.member')"
+                Rule: "OR('AfrinicMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin')"
+                Rule: "OR('AfrinicMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org1MSP.peer')"
+                Rule: "OR('AfrinicMSP.peer')"
 
         # leave this flag set to true.
         AnchorPeers:
@@ -85,12 +85,12 @@ Organizations:
     - &Org2
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org2MSP
+        Name: ApnicMSP
 
         # ID to load the MSP definition as
-        ID: Org2MSP
+        ID: ApnicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org2.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org2.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -98,16 +98,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org2MSP.member')"
+                Rule: "OR('ApnicMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org2MSP.member')"
+                Rule: "OR('ApnicMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin')"
+                Rule: "OR('ApnicMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org2MSP.peer')"
+                Rule: "OR('ApnicMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -119,12 +119,12 @@ Organizations:
     - &Org3
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org3MSP
+        Name: ArinMSP
 
         # ID to load the MSP definition as
-        ID: Org3MSP
+        ID: ArinMSP
 
-        MSPDir: ../organizations/peerOrganizations/org3.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org3.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -132,16 +132,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org3MSP.member')"
+                Rule: "OR('ArinMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org3MSP.member')"
+                Rule: "OR('ArinMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org3MSP.admin')"
+                Rule: "OR('ArinMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org3MSP.peer')"
+                Rule: "OR('ArinMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -152,12 +152,12 @@ Organizations:
     - &Org4
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org4MSP
+        Name: RipenccMSP
 
         # ID to load the MSP definition as
-        ID: Org4MSP
+        ID: RipenccMSP
 
-        MSPDir: ../organizations/peerOrganizations/org4.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org4.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -165,16 +165,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org4MSP.member')"
+                Rule: "OR('RipenccMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org4MSP.member')"
+                Rule: "OR('RipenccMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org4MSP.admin')"
+                Rule: "OR('RipenccMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org4MSP.peer')"
+                Rule: "OR('RipenccMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -185,12 +185,12 @@ Organizations:
     - &Org5
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org5MSP
+        Name: LacnicMSP
 
         # ID to load the MSP definition as
-        ID: Org5MSP
+        ID: LacnicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org5.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org5.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -198,16 +198,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org5MSP.member')"
+                Rule: "OR('LacnicMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org5MSP.member')"
+                Rule: "OR('LacnicMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org5MSP.admin')"
+                Rule: "OR('LacnicMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org5MSP.peer')"
+                Rule: "OR('LacnicMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -219,12 +219,12 @@ Organizations:
     - &Org6
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org6MSP
+        Name: RonoMSP
 
         # ID to load the MSP definition as
-        ID: Org6MSP
+        ID: RonoMSP
 
-        MSPDir: ../organizations/peerOrganizations/org6.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/org6.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -232,16 +232,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org6MSP.member')"
+                Rule: "OR('RonoMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org6MSP.member')"
+                Rule: "OR('RonoMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org6MSP.admin')"
+                Rule: "OR('RonoMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org6MSP.peer')"
+                Rule: "OR('RonoMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
@@ -408,7 +408,7 @@ Application: &ApplicationDefaults
             Rule: "MAJORITY Endorsement"
         Endorsement:
             Type: Signature
-            Rule: "OR('Org1MSP.peer', 'Org2MSP.peer', 'Org3MSP.peer', 'Org4MSP.peer', 'Org5MSP.peer', 'Org6MSP.peer')"
+            Rule: "OR('AfrinicMSP.peer', 'ApnicMSP.peer', 'ArinMSP.peer', 'RipenccMSP.peer', 'LacnicMSP.peer', 'RonoMSP.peer')"
 
     Capabilities:
         <<: *ApplicationCapabilities
@@ -441,24 +441,24 @@ Orderer: &OrdererDefaults
         Consenters:
         - Host: orderer
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.crt
         - Host: orderer2
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/server.crt
         - Host: orderer3
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/server.crt
         - Host: orderer4
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/server.crt
         - Host: orderer5
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/server.crt
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 5s
 

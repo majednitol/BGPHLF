@@ -43,3 +43,15 @@ vm p@$$W0rd
 
 kubectl delete deployments --all
 kubectl delete services --all
+
+
+
+
+| **Org Role** | **Old Org Name** | **Old Domain**   | **New Org Name** | **New Domain (Production)** | **Connection Profile Name** | **MSP ID**  |
+| ------------ | ---------------- | ---------------- | ---------------- | --------------------------- | --------------------------- | ---------- |
+| AFRINIC      | org1             | org1.example.com | afrinic          | afrinic.rono.com            | connection-afrinic.json     | AfrinicMSP |
+| APNIC        | org2             | org2.example.com | apnic            | apnic.rono.com              | connection-apnic.json       | ApnicMSP   |
+| ARIN         | org3             | org3.example.com | arin             | arin.rono.com               | connection-arin.json        | ArinMSP    |
+| RIPE NCC     | org4             | org4.example.com | ripencc          | ripencc.rono.com            | connection-ripencc.json     | RipenccMSP |
+| LACNIC       | org5             | org5.example.com | lacnic           | lacnic.rono.com             | connection-lacnic.json      | LacnicMSP  |
+| RONO         | org6             | org6.example.com | rono             | rono.rono.com               | connection-rono.json        | RonoMSP    |

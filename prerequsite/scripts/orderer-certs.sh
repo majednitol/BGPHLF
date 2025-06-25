@@ -1,8 +1,8 @@
 
   sleep 2
-  mkdir -p organizations/ordererOrganizations/example.com
+  mkdir -p organizations/ordererOrganizations/rono.com
 
-  export FABRIC_CA_CLIENT_HOME=/organizations/ordererOrganizations/example.com
+  export FABRIC_CA_CLIENT_HOME=/organizations/ordererOrganizations/rono.com
 echo $FABRIC_CA_CLIENT_HOME
 
   set -x
@@ -22,7 +22,7 @@ echo $FABRIC_CA_CLIENT_HOME
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
     Certificate: cacerts/ca-orderer-10054-ca-orderer.pem
-    OrganizationalUnitIdentifier: orderer' >/organizations/ordererOrganizations/example.com/msp/config.yaml
+    OrganizationalUnitIdentifier: orderer' >/organizations/ordererOrganizations/rono.com/msp/config.yaml
 
   echo "Register orderer"
   set -x
@@ -59,91 +59,91 @@ echo $FABRIC_CA_CLIENT_HOME
   fabric-ca-client register --caname ca-orderer --id.name ordererAdmin --id.secret ordererAdminpw --id.type admin --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers/orderer.example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com
 
   echo "Generate the orderer msp"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp --csr.hosts orderer.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp --csr.hosts orderer.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/config.yaml
 
   echo "Generate the orderer-tls certificates"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls --enrollment.profile tls --csr.hosts orderer.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls --enrollment.profile tls --csr.hosts orderer.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/signcerts/* /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/keystore/* /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.key
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/ca.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/signcerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/keystore/* /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/server.key
 
-  mkdir -p /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p /organizations/ordererOrganizations/example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p organizations/ordererOrganizations/example.com/users
-  mkdir -p organizations/ordererOrganizations/example.com/users/Admin@example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/users
+  mkdir -p organizations/ordererOrganizations/rono.com/users/Admin@rono.com
 
 
   # -----------------------------------------------------------------------
   #  Orderer 2
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers/orderer2.example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com
 
   echo "Generate the orderer2 msp"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/msp --csr.hosts orderer2.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer2 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/msp --csr.hosts orderer2.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer2 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/msp/config.yaml
 
   echo "Generate the orderer2-tls certificates"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls --enrollment.profile tls --csr.hosts orderer2.example.com --csr.hosts localhost --csr.hosts ca-orderer2 --csr.hosts orderer2 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls --enrollment.profile tls --csr.hosts orderer2.rono.com --csr.hosts localhost --csr.hosts ca-orderer2 --csr.hosts orderer2 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/ca.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/signcerts/* /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/keystore/* /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.key
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/ca.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/signcerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/server.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/keystore/* /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/server.key
 
-  mkdir -p /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p /organizations/ordererOrganizations/example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer2.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
 
 
   # -----------------------------------------------------------------------
   #  Orderer 3
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers/orderer3.example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com
 
   echo "Generate the orderer3 msp"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/msp --csr.hosts orderer3.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer3 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/msp --csr.hosts orderer3.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer3 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/msp/config.yaml
 
   echo "Generate the orderer3-tls certificates"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls --enrollment.profile tls --csr.hosts orderer3.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer3 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls --enrollment.profile tls --csr.hosts orderer3.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer3 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/ca.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/signcerts/* /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/keystore/* /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.key
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/ca.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/signcerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/server.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/keystore/* /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/server.key
 
-  mkdir -p /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p /organizations/ordererOrganizations/example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer3.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
 
 
@@ -151,29 +151,29 @@ echo $FABRIC_CA_CLIENT_HOME
   # -----------------------------------------------------------------------
   #  Orderer 4
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers/orderer4.example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com
 
   echo "Generate the orderer4 msp"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/msp --csr.hosts orderer4.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer4 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/msp --csr.hosts orderer4.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer4 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/msp/config.yaml
 
   echo "Generate the orderer4-tls certificates"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls --enrollment.profile tls --csr.hosts orderer4.example.com --csr.hosts localhost --csr.hosts ca-orderer4 --csr.hosts orderer4 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls --enrollment.profile tls --csr.hosts orderer4.rono.com --csr.hosts localhost --csr.hosts ca-orderer4 --csr.hosts orderer4 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/ca.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/signcerts/* /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/keystore/* /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.key
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/ca.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/signcerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/server.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/keystore/* /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/server.key
 
-  mkdir -p /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p /organizations/ordererOrganizations/example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer4.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
 
 
@@ -181,35 +181,35 @@ echo $FABRIC_CA_CLIENT_HOME
   # -----------------------------------------------------------------------
   #  Orderer 5
 
-  mkdir -p organizations/ordererOrganizations/example.com/orderers/orderer5.example.com
+  mkdir -p organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com
 
   echo "Generate the orderer5 msp"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/msp --csr.hosts orderer5.example.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer5 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/msp --csr.hosts orderer5.rono.com --csr.hosts localhost --csr.hosts ca-orderer --csr.hosts orderer5 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/msp/config.yaml
 
   echo "Generate the orderer5-tls certificates"
   set -x
-  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls --enrollment.profile tls --csr.hosts orderer5.example.com --csr.hosts localhost --csr.hosts ca-orderer5 --csr.hosts orderer5 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://orderer:ordererpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls --enrollment.profile tls --csr.hosts orderer5.rono.com --csr.hosts localhost --csr.hosts ca-orderer5 --csr.hosts orderer5 --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/ca.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/signcerts/* /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/keystore/* /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.key
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/ca.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/signcerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/server.crt
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/keystore/* /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/server.key
 
-  mkdir -p /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
-  mkdir -p /organizations/ordererOrganizations/example.com/msp/tlscacerts
-  cp /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/tlscacerts/* /organizations/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  mkdir -p /organizations/ordererOrganizations/rono.com/msp/tlscacerts
+  cp /organizations/ordererOrganizations/rono.com/orderers/orderer5.rono.com/tls/tlscacerts/* /organizations/ordererOrganizations/rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
 
 
   echo "Generate the admin msp"
   set -x
-  fabric-ca-client enroll -u https://ordererAdmin:ordererAdminpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/example.com/users/Admin@example.com/msp --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://ordererAdmin:ordererAdminpw@ca-orderer:10054 --caname ca-orderer -M /organizations/ordererOrganizations/rono.com/users/Admin@rono.com/msp --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  cp /organizations/ordererOrganizations/example.com/msp/config.yaml /organizations/ordererOrganizations/example.com/users/Admin@example.com/msp/config.yaml
+  cp /organizations/ordererOrganizations/rono.com/msp/config.yaml /organizations/ordererOrganizations/rono.com/users/Admin@rono.com/msp/config.yaml

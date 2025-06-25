@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: basic-org2
+  name: basic-apnic
   labels:
-    app: basic-org2
+    app: basic-apnic
 spec:
   ports:
     - name: grpc
       port: 7052
       targetPort: 7052
   selector:
-    app: chaincode-basic-org2
+    app: chaincode-basic-apnic

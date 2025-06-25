@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cli-peer0-org1
+  name: cli-peer0-afrinic
 spec:
   selector:
     matchLabels:
-      name: cli-peer0-org1
+      name: cli-peer0-afrinic
   template:
     metadata:
       labels:
-        name: cli-peer0-org1
+        name: cli-peer0-afrinic
     spec:
       volumes:
         - name: fabricfiles
@@ -17,7 +17,7 @@ spec:
             claimName: mypvc
 
       containers:
-        - name: cli-peer0-org1
+        - name: cli-peer0-afrinic
           stdin: true
           tty: true
           resources:
@@ -31,24 +31,24 @@ spec:
           workingDir: /
           env:
             - name: ORDERER_CA
-              value: /organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+              value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
             - name: CORE_PEER_ADDRESS
-              value: peer0-org1:7051
+              value: peer0-afrinic:7051
             - name: CORE_PEER_ID
-              value: cli.peer0.org1.example.com
+              value: cli.peer0.afrinic.rono.com
             - name: CORE_PEER_LOCALMSPID
-              value: Org1MSP
+              value: AfrinicMSP
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+              value: /organizations/peerOrganizations/afrinic.rono.com/users/Admin@afrinic.rono.com/msp
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.crt
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.crt
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.key
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt
             - name: FABRIC_LOGGING_SPEC
               value: ERROR
             - name: GOPATH

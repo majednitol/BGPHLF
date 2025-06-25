@@ -7,14 +7,14 @@
 #   arguments or environment variables.  The precedence for determining
 #   the value of each element is as follows:
 #   1) command line argument
-#      Examples:
+#      ronos:
 #      a) --port 443
 #         To set the listening port
 #      b) --ca.keyfile ../mykey.pem
 #         To set the "keyfile" element in the "ca" section below;
 #         note the '.' separator character.
 #   2) environment variable
-#      Examples:
+#      ronos:
 #      a) FABRIC_CA_SERVER_PORT=443
 #         To set the listening port
 #      b) FABRIC_CA_SERVER_CA_KEYFILE="../mykey.pem"
@@ -28,7 +28,7 @@
 #   ------------------
 #   The value of all fields whose name ends with "file" or "files" are
 #   name or names of other files.
-#   For example, see "tls.certfile" and "tls.clientauth.certfiles".
+#   For rono, see "tls.certfile" and "tls.clientauth.certfiles".
 #   The value of each of these fields can be a simple filename, a
 #   relative path, or an absolute path.  If the value is not an
 #   absolute path, it is interpretted as being relative to the location
@@ -80,7 +80,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: Org2CA
+  name: apnicCA
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -182,7 +182,7 @@ ldap:
       names: ['uid','member']
       # The 'converters' section is used to convert an LDAP entry to the value of
       # a fabric CA attribute.
-      # For example, the following converts an LDAP 'uid' attribute
+      # For rono, the following converts an LDAP 'uid' attribute
       # whose value begins with 'revoker' to a fabric CA attribute
       # named "hf.Revoker" with a value of "true" (because the boolean expression
       # evaluates to true).
@@ -194,7 +194,7 @@ ldap:
            value:
       # The 'maps' section contains named maps which may be referenced by the 'map'
       # function in the 'converters' section to map LDAP responses to arbitrary values.
-      # For example, assume a user has an LDAP attribute named 'member' which has multiple
+      # For rono, assume a user has an LDAP attribute named 'member' which has multiple
       # values which are each a distinguished name (i.e. a DN). For simplicity, assume the
       # values of the 'member' attribute are 'dn1', 'dn2', and 'dn3'.
       # Further assume the following configuration.
@@ -219,7 +219,7 @@ ldap:
 #############################################################################
 # Affiliations section. Fabric CA server can be bootstrapped with the
 # affiliations specified in this section. Affiliations are specified as maps.
-# For example:
+# For rono:
 #   businessunit1:
 #     department1:
 #       - team1
@@ -227,7 +227,7 @@ ldap:
 #     - department2
 #     - department3
 #
-# Affiliations are hierarchical in nature. In the above example,
+# Affiliations are hierarchical in nature. In the above rono,
 # department1 (used as businessunit1.department1) is the child of businessunit1.
 # team1 (used as businessunit1.department1.team1) is the child of department1.
 # department2 (used as businessunit2.department2) and department3 (businessunit2.department3)
@@ -295,7 +295,7 @@ signing:
 #  15 years in hours.
 #  The pathlength field is used to limit CA certificate hierarchy as described
 #  in section 4.2.1.9 of RFC 5280.
-#  Examples:
+#  ronos:
 #  1) No pathlength value means no limit is requested.
 #  2) pathlength == 1 means a limit of 1 is requested which is the default for
 #     a root CA.  This means the root CA can issue intermediate CA certificates,
@@ -306,17 +306,17 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: ca-org2
+   cn: ca-apnic
    names:
       - C: US
         ST: "New York"
         L: "New York"
-        O: ca-org2
-        OU: ca-org2
+        O: ca-apnic
+        OU: ca-apnic
    hosts:
      - localhost
-     - example.com
-     - ca-org2
+     - rono.com
+     - ca-apnic
    ca:
       expiry: 131400h
       pathlength: 1
@@ -353,7 +353,7 @@ bccsp:
 # config file in this list MAY contain all of the same elements as are found in
 # the server config file except port, debug, and tls sections.
 #
-# Examples:
+# ronos:
 # fabric-ca-server start -b admin:adminpw --cacount 2
 #
 # fabric-ca-server start -b admin:adminpw --cafiles ca/ca1/fabric-ca-server-config.yaml
