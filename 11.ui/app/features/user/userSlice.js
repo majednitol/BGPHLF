@@ -4,7 +4,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
 const newUUID = uuidv4();
-// ✅ Get User
 export const getUser = createAsyncThunk('user/getUser', async ({ userId, org }, thunkAPI) => {
   try {
     const params = { userId, org };
@@ -35,10 +34,9 @@ export const getOrgUser = createAsyncThunk('user/getOrgUser', async (_, thunkAPI
   }
 });
 
-// ✅ Register User (Enroll identity only)
-export const registerUser = createAsyncThunk('user/registerUser', async ({ org, affiliation }, thunkAPI) => {
+export const registerUser = createAsyncThunk('user/registerUser', async ({userId, org, affiliation }, thunkAPI) => {
   try {
-    const data = { userId:newUUID, org, affiliation };
+    const data = { userId, org, affiliation };
     const response = await apiRepository.post('/user/register', data, false);
     return response.data;
   } catch (error) {
@@ -58,7 +56,8 @@ export const createUser = createAsyncThunk('user/createUser', async ({ userID, o
 });
 export const createOrgUser = createAsyncThunk('user/createOrgUser', async ({ userID, name, email, orgMSP, role, createdAt }, thunkAPI) => {
   try {
-    const data = { userID, name, email, orgMSP, role, createdAt };
+    const data = { userID, name, email, org: orgMSP, role, createdAt };
+    console.log("data", data)
     const response = await apiRepository.post('/user/create-system-manager', data, false);
     return response.data;
   } catch (error) {

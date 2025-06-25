@@ -3,14 +3,18 @@
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import toast from 'react-hot-toast';
-import { createOrgUser } from '../../features/user/userSlice';
+import { createOrgUser, registerUser } from '../../features/user/userSlice';
 import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function CreateOrgUserPage() {
+
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.user);
 const router = useRouter();
   const [form, setForm] = useState({
+    userID: '',
     name: '',
     email: '',
     orgMSP: '',
@@ -18,6 +22,7 @@ const router = useRouter();
     createdAt: new Date().toISOString(),
   });
 const orgOptions = [
+  { label: 'Select an organization', value: '' },
   { label: 'AFRINIC', value: 'AfrinicMSP' },
   { label: 'APNIC', value: 'ApnicMSP' },
   { label: 'ARIN', value: 'ArinMSP' },
@@ -29,14 +34,36 @@ const orgOptions = [
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
-    const res = await dispatch(createOrgUser(form));
-    if (res.meta.requestStatus === 'fulfilled') {
-      toast.success('Org User created successfully!');
+const handleSubmit = async () => {
+  if (!form.orgMSP) {
+    toast.error('❌ Please select an organization.');
+    return;
+  }
+
+  const userID = uuidv4().slice(0, 8);
+  const updatedForm = { ...form, userID };
+  console.log("✅ Updated Form:", updatedForm);
+
+  const registerRes = await dispatch(registerUser({
+    userId: userID,
+    org: "AfrinicMSP",
+    affiliation: "apnic.lir1.technical"
+  }));
+
+  if (registerRes.meta.requestStatus === 'fulfilled') {
+    const createRes = await dispatch(createOrgUser(updatedForm));
+    if (createRes.meta.requestStatus === 'fulfilled') {
+      toast.success('✅ Org user successfully created!');
     } else {
-      toast.error(res.payload || 'Failed to create org user.');
+      toast.error('⚠️ Failed to create org user in DB.');
     }
-  };
+  } else {
+    toast.error('❌ Failed to register user on blockchain.');
+  }
+};
+
+
+
  const handleLoginRedirect = () => {
     router.push('/user/login-user');
   };

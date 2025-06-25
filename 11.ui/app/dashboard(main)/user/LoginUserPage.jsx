@@ -102,7 +102,14 @@ const LoginUserPage = () => {
           onClick={handleSignupRedirect}
           style={{ ...styles.button, backgroundColor: '#28a745', marginTop: '10px' }}
         >
-          Signup
+          Create Account For RIR Or RONO
+        </button>
+                <button
+          type="button"
+          onClick={()=>router.push('/user/register-company')}
+          style={{ ...styles.button, backgroundColor: '#28a745', marginTop: '10px' }}
+        >
+          Register Company
         </button>
       </form>
     </div>

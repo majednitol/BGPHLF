@@ -9,12 +9,11 @@ const AssignResource = () => {
   const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState({
-   
     memberID: '',
     parentPrefix: '',
     subPrefix: '',
     expiry: '',
-    org: 'Org1MSP',
+    org: 'AfrinicMSP',
   });
 
   const handleChange = (e) => {
@@ -30,7 +29,7 @@ const AssignResource = () => {
 
     const payload = {
       ...formData,
-      timestamp: new Date().toISOString(), // auto-generate timestamp
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -45,7 +44,6 @@ const AssignResource = () => {
     <div style={styles.formContainer}>
       <h2 style={styles.heading}>Assign Resource</h2>
       <form style={styles.form} onSubmit={handleSubmit}>
-       
         <input
           style={styles.input}
           name="memberID"
@@ -81,7 +79,14 @@ const AssignResource = () => {
           onChange={handleChange}
           style={styles.select}
         >
-          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((org) => (
+          {[
+            'AfrinicMSP',
+            'ApnicMSP',
+            'ArinMSP',
+            'RipenccMSP',
+            'LacnicMSP',
+            'RonoMSP',
+          ].map((org) => (
             <option key={org} value={org}>
               {org}
             </option>

@@ -5,17 +5,13 @@ import { useAppDispatch } from '../../redux/hooks';
 import { requestResource, resetState } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac00',
-};
 
 const RequestResource = () => {
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
-    reqID: '',
     resType: '',
     value: '',
+    prefixMaxLength: '',
     date: '',
     country: '',
     rir: '',
@@ -24,9 +20,7 @@ const RequestResource = () => {
 
   useEffect(() => {
     dispatch(resetState());
-    return () => {
-      dispatch(resetState());
-    };
+    return () => dispatch(resetState());
   }, [dispatch]);
 
   const handleChange = (e) => {
@@ -36,27 +30,23 @@ const RequestResource = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...formData,
-      memberID: decodedUser.memberID,
-      org: decodedUser.org,
-    };
+    const payload = { ...formData };
 
     try {
-      console.log("payload",payload)
+      console.log("🚀 Submitting payload:", payload);
       await dispatch(requestResource(payload)).unwrap();
-      toast.success('Resource request submitted successfully!');
+      toast.success('✅ Resource request submitted successfully!');
       setFormData({
-        reqID: '',
         resType: '',
         value: '',
+        prefixMaxLength: '',
         date: '',
         country: '',
-        rir: '', prefixMaxLength: '',
+        rir: '',
         timestamp: new Date().toISOString().slice(0, 16),
       });
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`❌ Error: ${error.message || error}`);
     }
   };
 
@@ -64,43 +54,39 @@ const RequestResource = () => {
     <div style={styles.container}>
       <h2 style={styles.title}>📩 Request Resource</h2>
 
-      <div style={styles.meta}>
-        <span><strong>Organization:</strong> {decodedUser.org}</span>
-        <span><strong>Member ID:</strong> {decodedUser.memberID}</span>
-      </div>
-
       <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          name="reqID"
-          placeholder="Request ID"
-          value={formData.reqID}
+
+        <select
+          name="resType"
+          value={formData.resType}
           onChange={handleChange}
-          style={styles.input}
+          style={styles.select}
           required
-        />
-        <select name="resType" value={formData.resType} onChange={handleChange} style={styles.input} required>
+        >
           <option value="">Select Resource Type</option>
           <option value="ipv4">IPv4</option>
           <option value="ipv6">IPv6</option>
           <option value="asn">ASN</option>
         </select>
+
         <input
           name="value"
-          placeholder="number of preixs (e.g., 240, 4800)"
+          placeholder="Number of Prefixes / ASN (e.g., 240, 4800)"
           value={formData.value}
           onChange={handleChange}
           style={styles.input}
           required
         />
+
         <input
-  name="prefixMaxLength"
-  type="number"
-  placeholder="Prefix Max Length"
-  value={formData.prefixMaxLength}
-  onChange={handleChange}
-  style={styles.input}
-  required
-/>
+          name="prefixMaxLength"
+          type="number"
+          placeholder="Prefix Max Length"
+          value={formData.prefixMaxLength}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
 
         <input
           name="date"
@@ -110,28 +96,29 @@ const RequestResource = () => {
           style={styles.input}
           required
         />
+
         <input
           name="country"
-          placeholder="Country"
+          placeholder="Country (e.g., BD, US)"
           value={formData.country}
           onChange={handleChange}
           style={styles.input}
           required
         />
-           <select
-  name="rir"
-  value={formData.rir}
-  onChange={handleChange}
-  style={styles.select}
-  required
->
-  <option value="">Select RIR</option> {/* <-- Add this */}
-  {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-    <option key={o} value={o}>
-      {o}
-    </option>
-  ))}
-</select> 
+
+        <select
+          name="rir"
+          value={formData.rir}
+          onChange={handleChange}
+          style={styles.select}
+          required
+        >
+          <option value="">Select RIR</option>
+          {['AfrinicMSP', 'ApnicMSP', 'ArinMSP', 'LacnicMSP', 'RipenccMSP'].map((rir) => (
+            <option key={rir} value={rir}>{rir}</option>
+          ))}
+        </select>
+
         <button type="submit" style={styles.button}>Submit Request</button>
       </form>
     </div>
@@ -153,28 +140,6 @@ const styles = {
     fontSize: '24px',
     color: '#2c3e50',
     marginBottom: '20px',
-  },  select: {
-    padding: '10px 14px',
-    fontSize: '15px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    outline: 'none',
-    backgroundColor: '#fff',
-    appearance: 'none',        
-    // WebkitAppearance: 'none',
-    MozAppearance: 'none',
-    cursor: 'pointer',
-    transition: 'border 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-  },
-  meta: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    backgroundColor: '#eef5ff',
-    padding: '10px 15px',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    fontSize: '15px',
-    color: '#333',
   },
   form: {
     display: 'flex',
@@ -188,6 +153,15 @@ const styles = {
     borderRadius: '8px',
     outline: 'none',
     transition: 'border 0.2s ease-in-out',
+  },
+  select: {
+    padding: '10px 14px',
+    fontSize: '15px',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    backgroundColor: '#fff',
+    outline: 'none',
+    cursor: 'pointer',
   },
   button: {
     padding: '12px',

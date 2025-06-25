@@ -4,11 +4,15 @@ import React, { useState } from 'react';
 import { useAppDispatch } from '../../redux/hooks';
 import { registerCompanyWithMember } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
+import { registerUser } from '../../features/user/userSlice';
 
 const RegisterCompanyWithMember = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
+
   const [formData, setFormData] = useState({
-    comapanyID: '',
     legalEntityName: '',
     industryType: '',
     addressLine1: '',
@@ -24,7 +28,9 @@ const RegisterCompanyWithMember = () => {
     memberName: '',
     memberCountry: '',
     memberEmail: '',
-    org: 'Org1MSP',
+    org: '',
+    companyID: '',
+    createdAt: new Date().toISOString(),
   });
 
   const handleChange = (e) => {
@@ -37,12 +43,38 @@ const RegisterCompanyWithMember = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await dispatch(registerCompanyWithMember(formData)).unwrap();
-      toast.success('✅ Company registered successfully!');
-    } catch (err) {
-      toast.error(`❌ Error: ${err}`);
+    const id = uuidv4().slice(0, 8);
+    const updatedForm = { ...formData, memberID: id, companyID: id };
+
+    if (!updatedForm.org || updatedForm.org === 'Select an organization') {
+      toast.error('❌ Please select a valid organization.');
+      return;
     }
+
+    
+    const registerRes = await dispatch(
+      registerUser({
+        userId: id,
+        org: "AfrinicMSP",
+        affiliation: 'apnic.lir1.technical',
+      })
+    );
+
+    if (registerRes.meta.requestStatus === 'fulfilled') {
+    
+      const createRes = await dispatch(registerCompanyWithMember(updatedForm));
+      if (createRes.meta.requestStatus === 'fulfilled') {
+        toast.success('✅ Company registered successfully');
+      } else {
+        toast.error('⚠️ Failed to create company in DB.');
+      }
+    } else {
+      toast.error('❌ Failed to register company on blockchain.');
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    router.push('/user/login-user');
   };
 
   return (
@@ -50,7 +82,6 @@ const RegisterCompanyWithMember = () => {
       <h2 style={styles.heading}>Register Company with Member</h2>
       <form onSubmit={handleSubmit} style={styles.form}>
         {[
-          ['comapanyID', 'Company ID'],
           ['legalEntityName', 'Legal Entity Name'],
           ['industryType', 'Industry Type'],
           ['addressLine1', 'Address Line 1'],
@@ -61,7 +92,6 @@ const RegisterCompanyWithMember = () => {
           ['phone', 'Phone'],
           ['orgEmail', 'Org Email'],
           ['abuseEmail', 'Abuse Email'],
-          ['memberID', 'Member ID'],
           ['memberName', 'Member Name'],
           ['memberCountry', 'Member Country'],
           ['memberEmail', 'Member Email'],
@@ -71,6 +101,7 @@ const RegisterCompanyWithMember = () => {
             name={name}
             placeholder={placeholder}
             type={name.includes('Email') ? 'email' : 'text'}
+            value={formData[name]}
             required
             onChange={handleChange}
             style={styles.input}
@@ -78,19 +109,42 @@ const RegisterCompanyWithMember = () => {
         ))}
 
         <label style={styles.checkboxLabel}>
-          <input type="checkbox" name="isMemberOfNIR" onChange={handleChange} />
+          <input
+            type="checkbox"
+            name="isMemberOfNIR"
+            checked={formData.isMemberOfNIR}
+            onChange={handleChange}
+          />
           Is Member of NIR
         </label>
 
         <select name="org" value={formData.org} onChange={handleChange} style={styles.select}>
-          {['Org1MSP', 'Org2MSP', 'Org3MSP', 'Org4MSP', 'Org5MSP', 'Org6MSP'].map((o) => (
-            <option key={o} value={o}>
+          {[
+            'Select an organization',
+            'AfrinicMSP',
+            'ApnicMSP',
+            'ArinMSP',
+            'RipenccMSP',
+            'LacnicMSP',
+            'RonoMSP',
+          ].map((o) => (
+            <option key={o} value={o === 'Select an organization' ? '' : o}>
               {o}
             </option>
           ))}
         </select>
 
-        <button type="submit" style={styles.button}>Register</button>
+        <button type="submit" style={styles.button}>
+          Register
+        </button>
+
+        <button
+          type="button"
+          onClick={handleLoginRedirect}
+          style={{ ...styles.button, backgroundColor: '#28a745', marginTop: '10px' }}
+        >
+          Login
+        </button>
       </form>
     </div>
   );

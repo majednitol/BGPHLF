@@ -5,17 +5,14 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { getResourceRequestsByMember, resetState } from '../../features/company/companySlice';
 import toast from 'react-hot-toast';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac00',
-};
+
 
 const ResourceRequestsList = () => {
   const dispatch = useAppDispatch();
   const { companyData, loading, error } = useAppSelector((state) => state.company);
 
   useEffect(() => {
-    dispatch(getResourceRequestsByMember({ org: decodedUser.org, memberID: decodedUser.memberID }));
+    dispatch(getResourceRequestsByMember());
 
     return () => {
       dispatch(resetState());
@@ -28,7 +25,7 @@ const ResourceRequestsList = () => {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>📨 Resource Requests for Member ID: {decodedUser.memberID}</h2>
+      <h2 style={styles.heading}>📨 Resource Request</h2>
 
       {loading && <p style={styles.loadingText}>Loading resource requests...</p>}
 

@@ -7,10 +7,7 @@ import { listPendingRequests, resetState } from '../../features/ipPrefix/ipPrefi
 import toast from 'react-hot-toast';
 import ReviewRequest from './ReviewRequest';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  userID: 'sys001',
-};
+
 
 const ListPendingRequests = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +19,7 @@ console.log("data",data)
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        await dispatch(listPendingRequests(decodedUser)).unwrap();
+        await dispatch(listPendingRequests()).unwrap();
       } catch {
         toast.error('Failed to fetch pending requests');
       }

@@ -4,10 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { getCompanyByMemberID, resetState } from '../../features/company/companySlice';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac00',
-};
+
 
 const GetCompanyByMemberID = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +15,7 @@ const GetCompanyByMemberID = () => {
     const fetchCompany = async () => {
       dispatch(resetState()); // reset previous state
       try {
-        await dispatch(getCompanyByMemberID({ org: decodedUser.org, memberID: decodedUser.memberID })).unwrap();
+        await dispatch(getCompanyByMemberID()).unwrap();
       } catch (err) {
         console.error(err);
       } finally {
@@ -38,8 +35,8 @@ const GetCompanyByMemberID = () => {
       <h2 style={styles.title}>🏢 Company By Member ID</h2>
 
       <div style={styles.meta}>
-        <span><strong>Organization:</strong> {decodedUser.org}</span>
-        <span><strong>Member ID:</strong> {decodedUser.memberID}</span>
+        <span><strong>Organization:</strong> </span>
+        <span><strong>Member ID:</strong> </span>
       </div>
 
       {loading || fetching ? (

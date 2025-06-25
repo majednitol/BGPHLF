@@ -12,25 +12,18 @@ import {
   resetState as resetCompanyState,
 } from '../../features/company/companySlice';
 
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac0011',
-};
-
 const RevokeRoute = () => {
   const dispatch = useAppDispatch();
   const { loading: ipLoading, error: ipError } = useAppSelector((state) => state.ipPrefix);
   const { companyData, loading: companyLoading, error: companyError } = useAppSelector((state) => state.company);
 
   const [form, setForm] = useState({
-    org: decodedUser.org,
-    memberID: decodedUser.memberID,
     asn: '',
     prefix: '',
   });
 
   useEffect(() => {
-    dispatch(getAllocationsByMember({ org: decodedUser.org, memberID: decodedUser.memberID }));
+    dispatch(getAllocationsByMember());
 
     return () => {
       dispatch(resetCompanyState());
@@ -67,8 +60,6 @@ const RevokeRoute = () => {
       await dispatch(revokeRoute(form)).unwrap();
       toast.success('Route revoked successfully');
       setForm({
-        org: decodedUser.org,
-        memberID: decodedUser.memberID,
         asn: '',
         prefix: '',
       });
@@ -81,9 +72,7 @@ const RevokeRoute = () => {
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
       <h2>🚫 Revoke Route</h2>
-
-      <label style={styles.label}>Member ID</label>
-      <input name="memberID" value={form.memberID} style={styles.input} disabled />
+  
 
       <label style={styles.label}>Select Allocation</label>
       <select onChange={handleAllocationChange} style={styles.input} required>

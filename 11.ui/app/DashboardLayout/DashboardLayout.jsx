@@ -64,7 +64,7 @@ const router = useRouter();
       if (token) {
         const decoded = jwtDecode(token);
         // setUserRole(decoded.role);
-        setUserRole("company");
+        setUserRole(decoded.role);
 
       }
     } catch (error) {

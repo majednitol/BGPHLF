@@ -4,17 +4,16 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { registerUser } from '../../features/user/userSlice';
 
-
 export default function EnrollUserPage() {
   const dispatch = useAppDispatch();
   const { loading, error, success } = useAppSelector((state) => state.user);
 
   const [userId, setUserId] = useState('');
-  const [org, setOrg] = useState('Org1');
-  const [affiliation, setAffiliation] = useState('Org1.department1');
+  const [org, setOrg] = useState('Afrinic');
+  const [affiliation, setAffiliation] = useState('Afrinic.department1');
   const [showDialog, setShowDialog] = useState(false);
 
-  const orgOptions = ['Org1', 'Org2', 'Org3', 'Org4', 'Org5', 'Org6'];
+  const orgOptions = ['Afrinic', 'Apnic', 'Arin', 'Ripencc', 'Lacnic', 'Rono'];
 
   const handleOrgChange = (e) => {
     const selectedOrg = e.target.value;
@@ -27,13 +26,14 @@ export default function EnrollUserPage() {
   };
 
   const handleSubmit = () => {
-    dispatch(registerUser({ userId, org, affiliation }));
+    const OrgMSP = `${org}MSP`;
+    dispatch(registerUser({ userId, org: OrgMSP, affiliation }));
   };
 
   useEffect(() => {
     if (success || error) {
       setShowDialog(true);
-      const timer = setTimeout(() => setShowDialog(false), 4000); // Auto-close
+      const timer = setTimeout(() => setShowDialog(false), 4000);
       return () => clearTimeout(timer);
     }
   }, [success, error]);
@@ -62,11 +62,11 @@ export default function EnrollUserPage() {
         <option value={`${org}.department2`}>{org}.department2</option>
       </select>
 
-      <button style={styles.button} onClick={handleSubmit} disabled={loading}>
+      <button style={styles.button} onClick={handleSubmit} disabled={loading || !userId}>
         {loading ? 'Enrolling...' : 'Enroll'}
       </button>
 
-      {showDialog && (success || error) && (
+      {showDialog && (
         <div
           style={{
             ...styles.dialog,

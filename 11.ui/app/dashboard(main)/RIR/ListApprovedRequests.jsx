@@ -128,41 +128,6 @@ const ListApprovedRequests = () => {
   };
 
 
-  //   const handleChange = (e) => {
-  //     const { name, value } = e.target;
-
-  //     if (name === 'parentPrefix') {
-  //       try {
-  //         const requiredIPs = Number(selectedRequest?.value || 0);
-  //         const alreadyAllocated = prefix.find(p => p.prefix === value)?.alreadyAllocated || [];
-  //         console.log("alreadyAllocated", alreadyAllocated)
-  //         const payload = {
-  //   requestedIPs: requiredIPs,
-  //   preferSingleBlock: preferSingleBlock,
-  //   poolCIDR: value,
-  //  maxLength: Number(formData.maxLength) || 24,
-  //   alreadyAllocated: alreadyAllocated
-  //         };
-
-  //         const subnets = calculateSubnets(payload);
-  //         const firstSubnet = subnets || '';
-
-  //         setFormData((prev) => ({
-  //           ...prev,
-  //           parentPrefix: value,
-  //           subPrefix: firstSubnet,
-  //         }));
-  //       } catch (err) {
-  //         toast.error(`Subnet calculation failed: ${err.message}`);
-  //       }
-  //     } else {
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         [name]: value,
-  //       }));
-  //     }
-  //   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 

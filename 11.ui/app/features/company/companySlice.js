@@ -2,11 +2,9 @@ import apiRepository from '../../lib/apiRepository';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
-const newUUID = uuidv4();
-// ✅ Register Company With Member
 export const registerCompanyWithMember = createAsyncThunk(
   'company/registerCompanyWithMember',
-  async ({ org, comapanyID,
+  async ({ org, companyID,
     legalEntityName,
     industryType,
     addressLine1,
@@ -25,7 +23,7 @@ export const registerCompanyWithMember = createAsyncThunk(
     try {
       const data = {
         org,
-        comapanyID: newUUID,
+        comapanyID:companyID,
         legalEntityName,
         industryType,
         addressLine1,
@@ -42,6 +40,7 @@ export const registerCompanyWithMember = createAsyncThunk(
         memberCountry,
         memberEmail
       }
+      console.log("data",data)
       const response = await apiRepository.post('company/register-company-by-member', data, false);
       return response.data;
     } catch (error) {
@@ -66,9 +65,9 @@ export const getCompany = createAsyncThunk(
 // ✅ Approve Member
 export const approveMember = createAsyncThunk(
   'company/approveMember',
-  async ({ org, memberID }, thunkAPI) => {
+  async ({  memberID }, thunkAPI) => {
     try {
-      const data = { org, memberID }
+      const data = { memberID }
       const response = await apiRepository.post('company/approve-member', data, true);
       return response.data;
     } catch (error) {
@@ -82,7 +81,8 @@ export const assignResource = createAsyncThunk(
   'company/assignResource',
   async ({ memberID, parentPrefix, subPrefix, expiry, timestamp }, thunkAPI) => {
     try {
-      const data = { allocationID:newUUID, memberID, parentPrefix, subPrefix, expiry, timestamp }
+      const id = uuidv4().slice(0, 8);
+      const data = { allocationID:id, memberID, parentPrefix, subPrefix, expiry, timestamp }
       const response = await apiRepository.post('company/assign-resource', data, true);
       return response.data;
     } catch (error) {
@@ -95,13 +95,13 @@ export const assignResource = createAsyncThunk(
 export const requestResource = createAsyncThunk(
   'company/requestResource',
   async ({ 
-    memberID,
     resType,
     value, date, country, rir, prefixMaxLength, timestamp }, thunkAPI) => {
     try {
+      const id = uuidv4().slice(0, 8);
       const data = {
         org,
-        reqID:newUUID,
+        reqID:id,
         memberID,
         resType,
         value, date, country, rir, prefixMaxLength, timestamp

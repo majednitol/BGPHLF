@@ -5,19 +5,15 @@ import toast from 'react-hot-toast';
 import { validatePath, listAllASNValues } from '../../features/ipPrefix/ipPrefixSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
-// Simulated decoded token values
-const decodedUser = {
-  org: 'Org1MSP',
-  memberID: 'brac0011',
-};
+
+
 
 const ValidatePath = () => {
   const dispatch = useAppDispatch();
   const { loading, data: asnData, error } = useAppSelector((state) => state.ipPrefix);
 
   const [form, setForm] = useState({
-    org: decodedUser.org,
-    memberID: decodedUser.memberID,
+
     prefix: '',
     pathJSON: '',
   });
@@ -25,7 +21,7 @@ const ValidatePath = () => {
   const [selectedASNs, setSelectedASNs] = useState([]);
 
   useEffect(() => {
-    dispatch(listAllASNValues({ org: decodedUser.org, memberID: decodedUser.memberID }));
+    dispatch(listAllASNValues());
   }, [dispatch]);
 
   useEffect(() => {
@@ -71,9 +67,6 @@ const ValidatePath = () => {
     <form onSubmit={handleSubmit} style={styles.form}>
       <h2>✅ Validate Path</h2>
 
-      <div style={styles.infoBox}>
-        <p><strong>Member ID:</strong> {form.memberID}</p>
-      </div>
 
       <label style={styles.label}>Prefix</label>
       <input
