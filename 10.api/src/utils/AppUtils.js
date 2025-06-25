@@ -10,9 +10,7 @@ import { existsSync, readFileSync } from 'fs';
 import nano from "nano";
 import { resolve } from 'path';
 
-export function buildCCPOrg(orgMSP) {
-
-	const org = orgMSP.replace('MSP', '').toLowerCase();
+export function buildCCPOrg(org) {
 	console.log("org",org)
   const ccpPath = resolve(`connection-profile/connection-${org}.json`);
 	console.log("ccpPath", ccpPath)
