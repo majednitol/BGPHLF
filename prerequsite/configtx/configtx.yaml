@@ -46,8 +46,8 @@ Organizations:
 
         OrdererEndpoints:
             - orderer:7050
-
-    - &Org1
+# l
+    - &Afrinic
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: AfrinicMSP
@@ -55,7 +55,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: AfrinicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org1.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/afrinic.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -79,10 +79,10 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org1
+            - Host: peer0-afrinic
               Port: 7051
 
-    - &Org2
+    - &Apnic
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: ApnicMSP
@@ -90,7 +90,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: ApnicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org2.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/apnic.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -113,10 +113,10 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org2
+            - Host: peer0-apnic
               Port: 9051
 
-    - &Org3
+    - &Arin
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: ArinMSP
@@ -124,7 +124,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: ArinMSP
 
-        MSPDir: ../organizations/peerOrganizations/org3.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/arin.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -147,9 +147,9 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org3
+            - Host: peer0-arin
               Port: 11051
-    - &Org4
+    - &Ripencc
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: RipenccMSP
@@ -157,7 +157,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: RipenccMSP
 
-        MSPDir: ../organizations/peerOrganizations/org4.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/ripencc.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -180,9 +180,9 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org4
+            - Host: peer0-ripencc
               Port: 12051
-    - &Org5
+    - &Lacnic
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: LacnicMSP
@@ -190,7 +190,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: LacnicMSP
 
-        MSPDir: ../organizations/peerOrganizations/org5.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/lacnic.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -213,10 +213,10 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org5
+            - Host: peer0-lacnic
               Port: 13051
 
-    - &Org6
+    - &Rono
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
         Name: RonoMSP
@@ -224,7 +224,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: RonoMSP
 
-        MSPDir: ../organizations/peerOrganizations/org6.rono.com/msp
+        MSPDir: ../organizations/peerOrganizations/rono.rono.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -247,7 +247,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0-org6
+            - Host: peer0-rono
               Port: 14051
 
 ################################################################################
@@ -553,24 +553,24 @@ Profiles:
         Consortiums:
             SampleConsortium:
                 Organizations:
-                    - *Org1
-                    - *Org2
-                    - *Org3
-                    - *Org4
-                    - *Org5
-                    - *Org6
+                    - *Afrinic
+                    - *Apnic
+                    - *Arin
+                    - *Ripencc
+                    - *Lacnic
+                    - *Rono
     TwoOrgsChannel:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Org1
-                - *Org2
-                - *Org3
-                - *Org4
-                - *Org5
-                - *Org6
+                - *Afrinic
+                - *Apnic
+                - *Arin
+                - *Ripencc
+                - *Lacnic
+                - *Rono
             Capabilities:
                 <<: *ApplicationCapabilities
 
