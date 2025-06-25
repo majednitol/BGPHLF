@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cli-peer0-org6
+  name: cli-peer0-rono
 spec:
   selector:
     matchLabels:
-      name: cli-peer0-org6
+      name: cli-peer0-rono
   template:
     metadata:
       labels:
-        name: cli-peer0-org6
+        name: cli-peer0-rono
     spec:
       volumes:
         - name: fabricfiles
@@ -17,7 +17,7 @@ spec:
             claimName: mypvc
 
       containers:
-        - name: cli-peer0-org6
+        - name: cli-peer0-rono
           stdin: true
           tty: true
           resources:
@@ -34,21 +34,21 @@ spec:
               value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
 
             - name: CORE_PEER_ADDRESS
-              value: peer0-org6:14051
+              value: peer0-rono:14051
             - name: CORE_PEER_ID
-              value: cli.peer0.org6.rono.com
+              value: cli.peer0.rono.rono.com
             - name: CORE_PEER_LOCALMSPID
-              value: Org6MSP
+              value: RonoMSP
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/org6.rono.com/users/Admin@org6.rono.com/msp
+              value: /organizations/peerOrganizations/rono.rono.com/users/Admin@rono.rono.com/msp
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/org6.rono.com/peers/peer0.org6.rono.com/tls/server.crt
+              value: /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/server.crt
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/org6.rono.com/peers/peer0.org6.rono.com/tls/server.key
+              value: /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/org6.rono.com/peers/peer0.org6.rono.com/tls/ca.crt
+              value: /organizations/peerOrganizations/rono.rono.com/peers/peer0.rono.rono.com/tls/ca.crt
             - name: FABRIC_LOGGING_SPEC
               value: ERROR
             - name: GOPATH

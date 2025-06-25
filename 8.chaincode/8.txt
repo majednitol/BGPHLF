@@ -1,25 +1,39 @@
-// packaging 
-1.go to nfs_clientshare/chaincode/basic/packaging
-2.tar cfz code.tar.gz connection.json && tar cfz basic-org1.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
+1. go to nfs_clientshare/chaincode/basic/packaging
 
-3.tar cfz code.tar.gz connection.json && tar cfz basic-org2.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
+2. tar cfz code.tar.gz connection.json && tar cfz basic-afrinic.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
 
-4.tar cfz code.tar.gz connection.json && tar cfz basic-org3.tgz code.tar.gz metadata.json && nano connection.json
+3. tar cfz code.tar.gz connection.json && tar cfz basic-apnic.tgz code.tar.gz metadata.json && rm -rf code.tar.gz && nano connection.json
 
-5. tar cfz code.tar.gz connection.json && tar cfz basic-org4.tgz code.tar.gz metadata.json && nano connection.json
+4. tar cfz code.tar.gz connection.json && tar cfz basic-arin.tgz code.tar.gz metadata.json && nano connection.json
 
-6. tar cfz code.tar.gz connection.json && tar cfz basic-org5.tgz code.tar.gz metadata.json && nano connection.json
+5. tar cfz code.tar.gz connection.json && tar cfz basic-ripencc.tgz code.tar.gz metadata.json && nano connection.json
 
-7. tar cfz code.tar.gz connection.json && tar cfz basic-org6.tgz code.tar.gz metadata.json && nano connection.json
+6. tar cfz code.tar.gz connection.json && tar cfz basic-lacnic.tgz code.tar.gz metadata.json && nano connection.json
 
-// install chaincode package [need to install for 6 org ]
+7. tar cfz code.tar.gz connection.json && tar cfz basic-rono.tgz code.tar.gz metadata.json && nano connection.json
+
+
+
 go to peer cli ;;;; cd opt/gopath/src/github.com/chaincode/basic/packaging
-peer lifecycle chaincode install basic-org1.tgz  [need to store package identifier for cc deploy]
-peer lifecycle chaincode install basic-org2.tgz
-peer lifecycle chaincode install basic-org3.tgz
-peer lifecycle chaincode install basic-org4.tgz
-peer lifecycle chaincode install basic-org5.tgz
-peer lifecycle chaincode install basic-org6.tgz
+
+# Install for Afrinic
+peer lifecycle chaincode install basic-afrinic.tgz
+
+# Install for Apnic
+peer lifecycle chaincode install basic-apnic.tgz
+
+# Install for Arin
+peer lifecycle chaincode install basic-arin.tgz
+
+# Install for Ripencc
+peer lifecycle chaincode install basic-ripencc.tgz
+
+# Install for Lacnic
+peer lifecycle chaincode install basic-lacnic.tgz
+
+# Install for Rono
+peer lifecycle chaincode install basic-rono.tgz
+
 
 
 
