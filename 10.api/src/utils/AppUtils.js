@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'fs';
 import nano from "nano";
 import { resolve } from 'path';
 
-export function buildCCPOrg1(orgMSP) {
+export function buildCCPOrg(orgMSP) {
 
 	const org = orgMSP.replace('MSP', '').toLowerCase();
 	console.log("org".org)
