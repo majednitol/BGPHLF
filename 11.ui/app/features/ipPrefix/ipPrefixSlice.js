@@ -4,15 +4,15 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ✅ Validate Path
 export const validatePath = createAsyncThunk(
   'ipPrefix/validatePath',
-  async ({ org ,memberID, prefix, pathJSON }, thunkAPI) => {
+  async ({ org, memberID, prefix, pathJSON }, thunkAPI) => {
     try {
       const data = { org, memberID, prefix, pathJSON }
-      console.log("daat",data)
+      console.log("daat", data)
       const response = await apiRepository.post('ip/validate-path', data, true);
-      console.log("response",response)
+      console.log("response", response)
       return response.data;
     } catch (error) {
-      console.log("error",error)
+      console.log("error", error)
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
     }
   }
@@ -55,11 +55,12 @@ export const assignPrefix = createAsyncThunk(
 // ✅ Announce Route
 export const announceRoute = createAsyncThunk(
   'ipPrefix/announceRoute',
-  async ({org, memberID, asn,
+  async ({ org, memberID, asn,
     prefix,
     pathJSON }, thunkAPI) => {
     try {
-      const data = {org,
+      const data = {
+        org,
         memberID, asn,
         prefix,
         pathJSON
@@ -75,13 +76,14 @@ export const announceRoute = createAsyncThunk(
 // ✅ Revoke Route
 export const revokeRoute = createAsyncThunk(
   'ipPrefix/revokeRoute',
-  async ({org, memberID, asn,
+  async ({ org, memberID, asn,
     prefix }, thunkAPI) => {
     try {
-      const data = {org,memberID, asn,
+      const data = {
+        org, memberID, asn,
         prefix
       }
-      console.log("payload",data)
+      console.log("payload", data)
       const response = await apiRepository.post('ip/revoke-route', data, true);
       return response.data;
     } catch (error) {
@@ -93,9 +95,9 @@ export const revokeRoute = createAsyncThunk(
 // ✅ Get Prefix Assignment
 export const getPrefixAssignment = createAsyncThunk(
   'ipPrefix/getPrefixAssignment',
-  async ({org,comapanyID,prefix}, thunkAPI) => {
+  async ({ org, comapanyID, prefix }, thunkAPI) => {
     try {
-      const params ={org,comapanyID,prefix}
+      const params = { org, comapanyID, prefix }
       const response = await apiRepository.get('ip/get-prefix-assignment', params, true);
       return response.data;
     } catch (error) {
@@ -107,9 +109,10 @@ export const getPrefixAssignment = createAsyncThunk(
 
 export const tracePrefix = createAsyncThunk(
   'ipPrefix/tracePrefix',
-  async ({prefix}, thunkAPI) => {
+  async ({ prefix, asn }, thunkAPI) => {
     try {
-      const params = {prefix}
+      const params = { prefix, asn }
+      console.log("params", params)
       const response = await apiRepository.get('ip/trace-prefix', params, true);
       return response.data;
     } catch (error) {
@@ -122,7 +125,7 @@ export const listPendingRequests = createAsyncThunk(
   'ipPrefix/listPendingRequests',
   async (_, thunkAPI) => {
     try {
-      
+
       const response = await apiRepository.get('ip/list-pending-requests', {}, true);
       return response.data;
     } catch (error) {
@@ -134,7 +137,7 @@ export const getAllOwnedPrefixes = createAsyncThunk(
   'ipPrefix/getAllOwnedPrefixes',
   async (_, thunkAPI) => {
     try {
-    
+
       const response = await apiRepository.get('ip/list-all-owned-prefixes', {}, true);
       return response.data;
     } catch (error) {
@@ -146,7 +149,7 @@ export const listAllASNValues = createAsyncThunk(
   'ipPrefix/listAllASNValues',
   async (_, thunkAPI) => {
     try {
-      
+
       const response = await apiRepository.get('ip/list-all-asn-values', {}, true);
       return response.data;
     } catch (error) {
@@ -169,7 +172,7 @@ export const listAllMembers = createAsyncThunk(
   'ipPrefix/listAllMembers',
   async (_, thunkAPI) => {
     try {
-      
+
       const response = await apiRepository.get('ip/list-all-members', {}, true);
       return response.data;
     } catch (error) {
@@ -300,7 +303,7 @@ const ipPrefixSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-    // List Pending Requests
+      // List Pending Requests
       .addCase(listPendingRequests.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -327,7 +330,7 @@ const ipPrefixSlice = createSlice({
         state.error = action.payload;
       })
       // List All Owned Prefixes
-       .addCase(getAllOwnedPrefixes.pending, (state) => {
+      .addCase(getAllOwnedPrefixes.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -339,7 +342,7 @@ const ipPrefixSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-    // List All Members
+      // List All Members
       .addCase(listAllMembers.pending, (state) => {
         state.loading = true;
         state.error = null;

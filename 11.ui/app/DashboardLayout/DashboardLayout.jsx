@@ -17,6 +17,7 @@ const navItems = {
     '/dashboard/rono/user-info',
      '/dashboard/rono/assign-ip-prefix',
     '/dashboard/rono/view-assigned-ip-prefix',
+    '/dashboard/ip/trace-prefix'
   
   ],
     rir: [
@@ -24,7 +25,8 @@ const navItems = {
     '/dashboard/rir/view-assigned-ip-prefix',
     '/dashboard/rir/assign-resource',
     '/dashboard/rir/list-pending-requests',
-    '/dashboard/rir/list-all-members',
+      '/dashboard/rir/list-all-members',
+    '/dashboard/ip/trace-prefix'
   
   
   ],
@@ -34,7 +36,7 @@ const navItems = {
     '/dashboard/ip/announce-route',
     '/dashboard/ip/revoke-route',
     '/dashboard/ip/get-prefix-assignment',
-    '/dashboard/ip/trace-prefix'
+    
   ],
   company: [
     
@@ -44,7 +46,8 @@ const navItems = {
     '/dashboard/company/get-company-by-member-id',
     '/dashboard/company/announce-route',
     '/dashboard/company/validate-path',
-    "/dashboard/company/revoke-route"
+    "/dashboard/company/revoke-route",
+    '/dashboard/ip/trace-prefix'
 
   ],
   user: [

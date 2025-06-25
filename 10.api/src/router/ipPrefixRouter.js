@@ -11,8 +11,7 @@ ipPrefixRouter.post("/sub-assign-prefix", subAssignPrefix)
 ipPrefixRouter.post("/announce-route",authenticate, announceRoute)
 ipPrefixRouter.post("/revoke-route",authenticate, revokeRoute)
 
-ipPrefixRouter.get("/get-prefix-assignment",authenticate, getPrefixAssignment)
-//TracePrefix
+ipPrefixRouter.get("/get-prefix-assignment", authenticate, getPrefixAssignment)
 ipPrefixRouter.get("/trace-prefix",authenticate, tracePrefix)
 
 ipPrefixRouter.get("/list-pending-requests",authenticate, listPendingRequests)

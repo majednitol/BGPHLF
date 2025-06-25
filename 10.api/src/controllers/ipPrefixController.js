@@ -187,8 +187,9 @@ export async function tracePrefix(req, res) {
             "org": req.org,
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "comapanyID": req.query.comapanyID ? req.query.comapanyID : req.comapanyID,
-            "prefix": req.query.prefix ? req.query.prefix : req.prefix
+            "userId": req.userId,
+            "prefix": req.query.prefix,
+            "asn": req.query.asn
         }
         console.log("payload", payload)
         let result = await TracePrefix(payload);

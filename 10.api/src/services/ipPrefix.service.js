@@ -94,7 +94,7 @@ export async function AnnounceRoute(request) {
             pathJSON,
         );
         console.log("Transaction Result:", result);
-    return result.toString()
+        return result.toString()
         // const payLoad = {
         //     prefix: prefix,
         //     prefix_len: prefix_len,
@@ -151,12 +151,12 @@ export async function RevokeRoute(request) {
 
 export async function TracePrefix(request) {
     try {
-        const { prefix, comapanyID } = request;
-        const contract = await smartContract(request, comapanyID);
+        const { prefix, asn, userId } = request;
+        const contract = await smartContract(request, userId);
 
         const result = await contract.evaluateTransaction(
             "TracePrefix",
-            prefix
+            prefix, asn
         );
 
         console.log("Transaction Result:", result.toString());
