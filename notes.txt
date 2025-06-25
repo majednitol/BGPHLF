@@ -228,10 +228,8 @@ peer chaincode invoke \
   --cafile $ORDERER_CA \
   -C mychannel \
   -n basic \
-  --peerAddresses peer0-org1:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  --peerAddresses peer0-afrinic:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
   -c '{
     "function": "RegisterCompanyWithMember",
     "Args": [
@@ -405,19 +403,9 @@ peer chaincode invoke \
   --cafile $ORDERER_CA \
   -C mychannel \
   -n basic \
-  --peerAddresses peer0-org1:7051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses peer0-org2:9051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-  --peerAddresses peer0-org3:11051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt \
-  --peerAddresses peer0-org4:12051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt \
-  --peerAddresses peer0-org5:13051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt \
-  --peerAddresses peer0-org6:14051 \
-  --tlsRootCertFiles /organizations/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt \
-  -c ''{
+  --peerAddresses peer0-afrinic:7051 \
+  --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
+  -c '{
     "function": "RegisterCompanyWithMember",
     "Args": [
       "brac0011",
@@ -435,10 +423,13 @@ peer chaincode invoke \
       "brac0011",
       "GP Network Admin",
       "BD",
-      "admin@grameenphone.com"
+      "admin@grameenphone.com",
+      "AfrinicMSP",
+      "2025-06-25T14:00:00Z"
     ]
   }' \
   --waitForEvent
+
 ```
 
 ---

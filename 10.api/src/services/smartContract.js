@@ -6,13 +6,13 @@ import { buildWallet } from '../utils/AppUtils.js';
 const walletPath = resolve("wallet");
 export const smartContract = async (request, userId) => {
     // console.log("request",request)
-    let org = request.org;
-    console.log("org",org)
-    if (!org) {
+    let OrgMSP = request.org;
+
+    if (!OrgMSP) {
         throw new Error("Organization not specified in the request");
     }
-    let num = Number(org.match(/\d/g).join(""));
-    const ccp = getCCP(num);
+     const org = OrgMSP.replace('MSP', '').toLowerCase();
+    const ccp = getCCP(org);
     const wallet = await buildWallet(Wallets, walletPath);
     console.log("wallet", wallet)
 
