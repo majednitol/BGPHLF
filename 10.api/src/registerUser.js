@@ -13,9 +13,8 @@ config.file(resolve('config.json'))
 let walletPath;
 export async function registerUser({ OrgMSP, userId,affiliation }) {
      
-    
-    let ccp = getCCP(org);
     const org = OrgMSP.replace('MSP', '').toLowerCase();
+    let ccp = getCCP(org);
     const caClient = buildCAClient(FabricCAServices, ccp, `ca-${org}`);
     const wallet = await buildWallet(); 
     await enrollAdmin(caClient, wallet, OrgMSP);
