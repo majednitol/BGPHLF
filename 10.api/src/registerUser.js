@@ -15,10 +15,9 @@ export async function registerUser({ OrgMSP, userId,affiliation }) {
     let org = OrgMSP
     
     let ccp = getCCP(org);
-    const caClient = buildCAClient(FabricCAServices, ccp, `ca-org${org}`);
+    const caClient = buildCAClient(FabricCAServices, ccp, `ca-${org}`);
     const wallet = await buildWallet(); 
     await enrollAdmin(caClient, wallet, OrgMSP);
-    const aff= "rono.technical";
     await registerAndEnrollUser(caClient, wallet, OrgMSP, userId, affiliation);
     return { wallet };
 }
