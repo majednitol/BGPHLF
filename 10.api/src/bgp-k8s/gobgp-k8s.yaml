@@ -26,7 +26,7 @@ spec:
             - containerPort: 179     # Router1 BGP port
             - containerPort: 180     # Router2 BGP port
             - containerPort: 181     # Router2 BGP port
-            - containerPort: 182     # Router2 BGP port
+            - containerPort: 186     # Router2 BGP port
             - containerPort: 183     # Router2 BGP port
             - containerPort: 184     # Router2 BGP port
             - containerPort: 185     # Router2 BGP port
