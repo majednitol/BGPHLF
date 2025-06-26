@@ -35,7 +35,7 @@ COPY gobgp-router/run_routers.sh .
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
 # Expose BGP API ports
-EXPOSE 50051 50052 50053 50054
+EXPOSE 50051 50052 50053 50054 50055 50056 50057
 
 # Use bash explicitly to avoid exec format issues
 CMD ["/bin/bash", "./run_routers.sh"]

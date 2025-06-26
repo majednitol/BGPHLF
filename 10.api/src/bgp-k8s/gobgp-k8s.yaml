@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gobgp-router
-          image: majedur708/hlf-api:300.20  # Your multi-router image here
+          image: majedur708/hlf-api:300.21  # Your multi-router image here
           ports:
             - containerPort: 50051   # Router1 API port
             - containerPort: 50052   # Router2 API port
@@ -26,6 +26,10 @@ spec:
             - containerPort: 179     # Router1 BGP port
             - containerPort: 180     # Router2 BGP port
             - containerPort: 181     # Router2 BGP port
+            - containerPort: 182     # Router2 BGP port
+            - containerPort: 183     # Router2 BGP port
+            - containerPort: 184     # Router2 BGP port
+            - containerPort: 185     # Router2 BGP port
           securityContext:
             runAsUser: 0
             capabilities:
