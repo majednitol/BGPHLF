@@ -26,6 +26,9 @@ COPY gobgp-router/router1.conf .
 COPY gobgp-router/router2.conf .
 COPY gobgp-router/router3.conf .
 COPY gobgp-router/router4.conf .
+COPY gobgp-router/router5.conf .
+COPY gobgp-router/router6.conf .
+COPY gobgp-router/router7.conf .
 COPY gobgp-router/run_routers.sh .
 
 # Ensure proper line endings and permissions
