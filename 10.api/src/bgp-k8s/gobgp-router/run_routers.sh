@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Starting router1..."
-gobgpd -f /gobgp/router1.conf \
-  --api-hosts 0.0.0.0:50051 \
-  --log-level debug > /dev/stdout 2>&1 &
+# echo "Starting router1..."
+# gobgpd -f /gobgp/router1.conf \
+#   --api-hosts 0.0.0.0:50051 \
+#   --log-level debug > /dev/stdout 2>&1 &
 
 echo "Starting router2..."
 gobgpd -f /gobgp/router2.conf \
