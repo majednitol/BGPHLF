@@ -25,13 +25,14 @@ WORKDIR /gobgp
 COPY gobgp-router/router1.conf .
 COPY gobgp-router/router2.conf .
 COPY gobgp-router/router3.conf .
+COPY gobgp-router/router4.conf .
 COPY gobgp-router/run_routers.sh .
 
 # Ensure proper line endings and permissions
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
 # Expose BGP API ports
-EXPOSE 50051 50052
+EXPOSE 50051 50052 50053 50054
 
 # Use bash explicitly to avoid exec format issues
 CMD ["/bin/bash", "./run_routers.sh"]
