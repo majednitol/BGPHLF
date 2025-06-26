@@ -18,8 +18,10 @@ spec:
           ports:
             - containerPort: 50051   # Router1 API port
             - containerPort: 50052   # Router2 API port
+            - containerPort: 50053   # Router2 API port
             - containerPort: 179     # Router1 BGP port
             - containerPort: 180     # Router2 BGP port
+            - containerPort: 181     # Router2 BGP port
           securityContext:
             runAsUser: 0
             capabilities:
