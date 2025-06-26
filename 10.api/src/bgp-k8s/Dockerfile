@@ -24,6 +24,7 @@ COPY --from=builder /go/bin/gobgp /usr/local/bin/
 WORKDIR /gobgp
 COPY gobgp-router/router1.conf .
 COPY gobgp-router/router2.conf .
+COPY gobgp-router/router3.conf .
 COPY gobgp-router/run_routers.sh .
 
 # Ensure proper line endings and permissions
