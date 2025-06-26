@@ -34,7 +34,16 @@ const TracePrefix = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>🔍 Trace IP Prefix</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+          <form onSubmit={handleSubmit} style={styles.form}>
+              <input
+          type="text"
+          name="asn"
+          placeholder="Enter ASN (e.g., 65001)"
+          value={formData.asn}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
         <input
           type="text"
           name="prefix"
@@ -44,15 +53,7 @@ const TracePrefix = () => {
           required
           style={styles.input}
         />
-        <input
-          type="text"
-          name="asn"
-          placeholder="Enter ASN (e.g., 65001)"
-          value={formData.asn}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
+        
         <button type="submit" style={styles.button} disabled={loading}>
           {loading ? 'Validating...' : 'Validate'}
         </button>
@@ -60,7 +61,6 @@ const TracePrefix = () => {
 
       {result && (
         <div style={styles.result}>
-          <h4>Trace Result:</h4>
           <pre style={styles.codeBlock}>{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
