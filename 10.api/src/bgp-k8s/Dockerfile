@@ -14,7 +14,7 @@ RUN git clone https://github.com/osrg/gobgp . && \
 FROM alpine:3.20
 
 # Install bash
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash iproute2
 
 # Copy GoBGP binaries from builder
 COPY --from=builder /go/bin/gobgpd /usr/local/bin/
