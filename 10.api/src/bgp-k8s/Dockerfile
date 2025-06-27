@@ -29,13 +29,23 @@ COPY gobgp-router/router4.conf .
 COPY gobgp-router/router5.conf .
 COPY gobgp-router/router6.conf .
 COPY gobgp-router/router7.conf .
+COPY gobgp-router/router8.conf .
+COPY gobgp-router/router9.conf .
+COPY gobgp-router/router10.conf .
+COPY gobgp-router/router11.conf .
+COPY gobgp-router/router12.conf .
+COPY gobgp-router/router13.conf .
+COPY gobgp-router/router14.conf .
+COPY gobgp-router/router15.conf .
+COPY gobgp-router/router16.conf .
+COPY gobgp-router/router17.conf .
 COPY gobgp-router/run_routers.sh .
 
 # Ensure proper line endings and permissions
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
 # Expose BGP API ports
-EXPOSE 50051 50052 50053 50054 50055 50056 50057
+EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067  
 
 # Use bash explicitly to avoid exec format issues
 CMD ["/bin/bash", "./run_routers.sh"]
