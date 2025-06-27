@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gobgp-router
-          image: majedur708/hlf-api:300.38  
+          image: majedur708/hlf-api:300.39  
           ports:
             - containerPort: 50051   # Router1 API port
             - containerPort: 50052   # Router2 API port
