@@ -20,23 +20,24 @@ import (
 )
 
 const (
-	mspID        = "Org1MSP"
-	cryptoPath   = "../../test-network/organizations/peerOrganizations/org1.example.com"
-	certPath     = cryptoPath + "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/signcerts"
-	keyPath      =  "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/keystore"
-	tlsCertPath  =  "organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt"
-	peerEndpoint = "localhost:7051"
-	gatewayPeer  = "peer0.org1.example.com"
+	mspID        = "AfrinicMSP"
+	cryptoPath   = "/organizations/peerOrganizations/afrinic.rono.com"
+	certPath     = cryptoPath + "/users/User1@afrinic.rono.com/msp/signcerts"
+	keyPath      = cryptoPath + "/users/User1@afrinic.rono.com/msp/keystore"
+	tlsCertPath  = cryptoPath + "/peers/peer0.afrinic.rono.com/tls/ca.crt"
+	peerEndpoint = "peer0-afrinic:7051"
+	gatewayPeer  = "peer0-afrinic"
 )
 
 var contract *client.Contract
 
 func main() {
-    fmt.Println("Cert Path:", certPath)
-fmt.Println("Key Path:", keyPath)
-fmt.Println("TLS Cert Path:", tlsCertPath)
-fmt.Println("Peer Endpoint:", peerEndpoint)
-fmt.Println("Gateway Peer:", gatewayPeer)
+	fmt.Println("Cert Path:", certPath)
+	fmt.Println("Key Path:", keyPath)
+	fmt.Println("TLS Cert Path:", tlsCertPath)
+	fmt.Println("Peer Endpoint:", peerEndpoint)
+	fmt.Println("Gateway Peer:", gatewayPeer)
+
 	conn := newGrpcConnection()
 	defer conn.Close()
 
@@ -85,6 +86,22 @@ fmt.Println("Gateway Peer:", gatewayPeer)
 		}
 		c.JSON(200, gin.H{"message": "success", "tx": status.TransactionID, "result": string(result)})
 	})
+// Test connection endpoint
+router.GET("/test", func(c *gin.Context) {
+    // Example: call chaincode function "queryAll" with no args (adjust to your chaincode)
+    result, err := contract.EvaluateTransaction("queryAll")
+    if err != nil {
+        c.JSON(500, gin.H{
+            "message": "Failed to connect or evaluate transaction",
+            "error":   parseError(err),
+        })
+        return
+    }
+    c.JSON(200, gin.H{
+        "message": "Connection successful",
+        "result":  string(result),
+    })
+})
 
 	// Read transaction (evaluate)
 	router.GET("/read", func(c *gin.Context) {
@@ -100,16 +117,22 @@ fmt.Println("Gateway Peer:", gatewayPeer)
 		c.JSON(200, gin.H{"result": pretty.String()})
 	})
 
-	fmt.Println("✅ REST API running on :8080")
-	router.Run(":8080")
+	fmt.Println("✅ REST API running on :2000")
+	router.Run(":2000")
 }
 
 // gRPC setup
 func newGrpcConnection() *grpc.ClientConn {
-	certPEM, _ := os.ReadFile(tlsCertPath)
-	cert, _ := identity.CertificateFromPEM(certPEM)
+	certPEM, err := os.ReadFile(tlsCertPath)
+	if err != nil {
+		panic(fmt.Errorf("failed to read TLS cert: %w", err))
+	}
+
 	certPool := x509.NewCertPool()
-	certPool.AddCert(cert)
+	if !certPool.AppendCertsFromPEM(certPEM) {
+		panic("failed to add TLS cert to cert pool")
+	}
+
 	creds := credentials.NewClientTLSFromCert(certPool, gatewayPeer)
 	conn, err := grpc.Dial(peerEndpoint, grpc.WithTransportCredentials(creds))
 	if err != nil {
@@ -120,25 +143,46 @@ func newGrpcConnection() *grpc.ClientConn {
 
 // identity setup
 func newIdentity() *identity.X509Identity {
-	certPEM, _ := readFirstFile(certPath)
-	cert, _ := identity.CertificateFromPEM(certPEM)
-	id, _ := identity.NewX509Identity(mspID, cert)
+	certPEM, err := readFirstFile(certPath)
+	if err != nil {
+		panic(fmt.Errorf("failed to read signcert: %w", err))
+	}
+	cert, err := identity.CertificateFromPEM(certPEM)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse signcert: %w", err))
+	}
+	id, err := identity.NewX509Identity(mspID, cert)
+	if err != nil {
+		panic(fmt.Errorf("failed to create identity: %w", err))
+	}
 	return id
 }
 
 // signer setup
 func newSign() identity.Sign {
-	keyPEM, _ := readFirstFile(keyPath)
-	privateKey, _ := identity.PrivateKeyFromPEM(keyPEM)
-	sign, _ := identity.NewPrivateKeySign(privateKey)
+	keyPEM, err := readFirstFile(keyPath)
+	if err != nil {
+		panic(fmt.Errorf("failed to read keystore: %w", err))
+	}
+	privateKey, err := identity.PrivateKeyFromPEM(keyPEM)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse private key: %w", err))
+	}
+	sign, err := identity.NewPrivateKeySign(privateKey)
+	if err != nil {
+		panic(fmt.Errorf("failed to create signer: %w", err))
+	}
 	return sign
 }
 
-// read helper
+// read helper: reads first file in a directory
 func readFirstFile(dir string) ([]byte, error) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
+	}
+	if len(files) == 0 {
+		return nil, fmt.Errorf("no files found in directory: %s", dir)
 	}
 	return os.ReadFile(path.Join(dir, files[0].Name()))
 }
@@ -153,6 +197,177 @@ func parseError(err error) string {
 	}
 	return statusErr.Message()
 }
+
+
+
+
+// package main
+
+// import (
+// 	"bytes"
+// 	"crypto/x509"
+// 	"encoding/json"
+// 	"fmt"
+// 	"os"
+// 	"path"
+// 	"time"
+
+// 	"github.com/gin-gonic/gin"
+// 	"github.com/hyperledger/fabric-gateway/pkg/client"
+// 	"github.com/hyperledger/fabric-gateway/pkg/hash"
+// 	"github.com/hyperledger/fabric-gateway/pkg/identity"
+// 	"github.com/hyperledger/fabric-protos-go-apiv2/gateway"
+// 	"google.golang.org/grpc"
+// 	"google.golang.org/grpc/credentials"
+// 	"google.golang.org/grpc/status"
+// )
+
+
+// const (
+// 	mspID        = "AfrinicMSP" // Change to your actual MSP ID
+// 	// Do NOT include org1.example.com twice!
+// 	certPath     = "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/signcerts"
+// 	keyPath      = "/organizations/peerOrganizations/apnic.rono.com/users/User1@apnic.rono.com/msp/keystore"
+// 	tlsCertPath  = "/organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt"
+// 	peerEndpoint = "peer0-afrinic-rono:7051" // Replace localhost with actual Kubernetes service
+// 	gatewayPeer  = "peer0.afrinic.rono.com"
+// )
+
+
+// var contract *client.Contract
+
+// func main() {
+//     fmt.Println("Cert Path:", certPath)
+// fmt.Println("Key Path:", keyPath)
+// fmt.Println("TLS Cert Path:", tlsCertPath)
+// fmt.Println("Peer Endpoint:", peerEndpoint)
+// fmt.Println("Gateway Peer:", gatewayPeer)
+// 	conn := newGrpcConnection()
+// 	defer conn.Close()
+
+// 	id := newIdentity()
+// 	sign := newSign()
+
+// 	gw, err := client.Connect(
+// 		id,
+// 		client.WithSign(sign),
+// 		client.WithHash(hash.SHA256),
+// 		client.WithClientConnection(conn),
+// 		client.WithEvaluateTimeout(5*time.Second),
+// 		client.WithEndorseTimeout(15*time.Second),
+// 		client.WithSubmitTimeout(5*time.Second),
+// 		client.WithCommitStatusTimeout(1*time.Minute),
+// 	)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer gw.Close()
+
+// 	network := gw.GetNetwork("mychannel")
+// 	contract = network.GetContract("basic")
+
+// 	router := gin.Default()
+
+// 	// Write transaction (submit)
+// 	router.POST("/write", func(c *gin.Context) {
+// 		var body struct {
+// 			Function string   `json:"function"`
+// 			Args     []string `json:"args"`
+// 		}
+// 		if err := c.ShouldBindJSON(&body); err != nil {
+// 			c.JSON(400, gin.H{"error": err.Error()})
+// 			return
+// 		}
+// 		result, commit, err := contract.SubmitAsync(body.Function, client.WithArguments(body.Args...))
+// 		if err != nil {
+// 			c.JSON(500, gin.H{"error": parseError(err)})
+// 			return
+// 		}
+// 		status, err := commit.Status()
+// 		if err != nil || !status.Successful {
+// 			c.JSON(500, gin.H{"error": "commit failed", "tx": status.TransactionID})
+// 			return
+// 		}
+// 		c.JSON(200, gin.H{"message": "success", "tx": status.TransactionID, "result": string(result)})
+// 	})
+
+// 	// Read transaction (evaluate)
+// 	router.GET("/read", func(c *gin.Context) {
+// 		function := c.Query("function")
+// 		args := c.QueryArray("args")
+// 		result, err := contract.EvaluateTransaction(function, args...)
+// 		if err != nil {
+// 			c.JSON(500, gin.H{"error": parseError(err)})
+// 			return
+// 		}
+// 		var pretty bytes.Buffer
+// 		_ = json.Indent(&pretty, result, "", "  ")
+// 		c.JSON(200, gin.H{"result": pretty.String()})
+// 	})
+
+// 	fmt.Println("✅ REST API running on :2000")
+// 	router.Run(":2000")
+// }
+
+// // gRPC setup
+// func newGrpcConnection() *grpc.ClientConn {
+// 	certPEM, _ := os.ReadFile(tlsCertPath)
+// 	cert, _ := identity.CertificateFromPEM(certPEM)
+// 	certPool := x509.NewCertPool()
+// 	certPool.AddCert(cert)
+// 	creds := credentials.NewClientTLSFromCert(certPool, gatewayPeer)
+// 	conn, err := grpc.Dial(peerEndpoint, grpc.WithTransportCredentials(creds))
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return conn
+// }
+
+// // identity setup
+// func newIdentity() *identity.X509Identity {
+// 	certPEM, err := readFirstFile(certPath)
+// 	if err != nil {
+// 		panic(fmt.Errorf("❌ failed to read cert file: %w", err))
+// 	}
+// 	cert, err := identity.CertificateFromPEM(certPEM)
+// 	if err != nil {
+// 		panic(fmt.Errorf("❌ failed to parse cert PEM: %w", err))
+// 	}
+// 	id, err := identity.NewX509Identity(mspID, cert)
+// 	if err != nil {
+// 		panic(fmt.Errorf("❌ failed to create identity: %w", err))
+// 	}
+// 	return id
+// }
+
+
+// // signer setup
+// func newSign() identity.Sign {
+// 	keyPEM, _ := readFirstFile(keyPath)
+// 	privateKey, _ := identity.PrivateKeyFromPEM(keyPEM)
+// 	sign, _ := identity.NewPrivateKeySign(privateKey)
+// 	return sign
+// }
+
+// // read helper
+// func readFirstFile(dir string) ([]byte, error) {
+// 	files, err := os.ReadDir(dir)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return os.ReadFile(path.Join(dir, files[0].Name()))
+// }
+
+// // parse chaincode/fabric error
+// func parseError(err error) string {
+// 	statusErr := status.Convert(err)
+// 	for _, detail := range statusErr.Details() {
+// 		if d, ok := detail.(*gateway.ErrorDetail); ok {
+// 			return fmt.Sprintf("%s: %s", d.MspId, d.Message)
+// 		}
+// 	}
+// 	return statusErr.Message()
+// }
 // package main
 
 // import (

@@ -67,7 +67,7 @@ spec:
             claimName: mypvc
       containers:
         - name: gobgp-api
-          image: majedur708/hlf-api:50.6
+          image: majedur708/hlf-api:50.18
           ports:
             - containerPort: 2000
           env:
