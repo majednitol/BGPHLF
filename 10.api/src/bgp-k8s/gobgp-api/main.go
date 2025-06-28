@@ -110,15 +110,14 @@ router.POST("/validatePath", WriteHandleWithFunction(contract, "ValidatePath"))
 }
 func ReadHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var params struct {
-			Args []string `json:"args"`
-		}
-		if err := c.ShouldBindJSON(&params); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		args := c.QueryArray("args") // handles ?args=100&args=200
+
+		if len(args) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'args' query parameter(s)"})
 			return
 		}
 
-		result, err := contract.EvaluateTransaction(function, params.Args...)
+		result, err := contract.EvaluateTransaction(function, args...)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
 			return
@@ -132,6 +131,7 @@ func ReadHandleWithFunction(contract *client.Contract, function string) gin.Hand
 		})
 	}
 }
+
 
 
 func WriteHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
