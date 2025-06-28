@@ -37,7 +37,7 @@ minikube stop
 
 doctl kubernetes cluster kubeconfig save 2168d0a3-8ea3-4fbd-b557-c2cb00840eb2
  
-ssh root@167.71.238.9
+ssh root@139.59.74.85
 vm p@$$W0rd
 
 
