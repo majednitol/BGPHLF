@@ -23,7 +23,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: CHAINCODE_ID
-              value: " basic:0dc5d26ff4f81275bc04eaae539011bd81275bf53cc75dc4c7c675ddacdb409c"
+              value: "basic:13d6a9462c5ff8c28f30a2661afe1dac71b150ccab5314be6085c8243bf53c81"
             - name: CHAINCODE_SERVER_ADDRESS
               value: "0.0.0.0:7052"
           ports:
