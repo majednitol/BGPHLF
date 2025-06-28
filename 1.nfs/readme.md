@@ -14,7 +14,7 @@
 1. sudo apt update
 2. sudo apt install nfs-common
 3. sudo mkdir -p /mnt/nfs_clientshare
-4. sudo mount -t nfs 167.71.238.9:/mnt/nfs_share ./nfs_clientshare
+4. sudo mount -t nfs 139.59.74.85:/mnt/nfs_share ./nfs_clientshare
 5. ls -l /mnt/nfs_clientshare/
 
 ## NFS Client (MacOS)
