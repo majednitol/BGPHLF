@@ -35,7 +35,7 @@ minikube stop
  minikube mount ../nfs_share:/mnt/data  
 
 
-doctl kubernetes cluster kubeconfig save 2168d0a3-8ea3-4fbd-b557-c2cb00840eb2
+doctl kubernetes cluster kubeconfig save 994d2367-c91f-49e0-98ec-f56d2d3887d2
  
 ssh root@139.59.74.85
 vm p@$$W0rd
