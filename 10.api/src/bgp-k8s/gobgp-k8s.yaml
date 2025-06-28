@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gobgp-router
-          image: majedur708/hlf-api:300.39  
+          image: majedur708/hlf-api:300.40  
           ports:
             - containerPort: 50051   # Router1 API port
             - containerPort: 50052   # Router2 API port
@@ -22,40 +22,18 @@ spec:
             - containerPort: 50054   # Router2 API port
             - containerPort: 50055   # Router2 API port
             - containerPort: 50056   # Router2 API port
-            - containerPort: 50057   # Router2 API port
-            - containerPort: 179     # Router1 BGP port
-            - containerPort: 180     # Router2 BGP port
-            - containerPort: 181     # Router2 BGP port
-            - containerPort: 183     # Router2 BGP port
-            - containerPort: 184     # Router2 BGP port
-            - containerPort: 185     # Router2 BGP port
+            - containerPort: 50057   # Router2 API 
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "200m"
+            limits:
+              memory: "350Mi"
+              cpu: "300m"          
           securityContext:
             runAsUser: 0
             capabilities:
               add: ["NET_BIND_SERVICE"]
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gobgp-service
-spec:
-  selector:
-    app: gobgp-router
-  ports:
-    - name: router1-api
-      port: 50051
-      targetPort: 50051
-    - name: router2-api
-      port: 50052
-      targetPort: 50052
-    - name: router1-bgp
-      port: 179
-      targetPort: 179
-    - name: router2-bgp
-      port: 180
-      targetPort: 180
-  type: ClusterIP
 
 ---
 apiVersion: apps/v1
@@ -72,6 +50,10 @@ spec:
       labels:
         app: gobgp-api
     spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
       containers:
         - name: gobgp-api
           image: majedur708/hlf-api:50.6
@@ -79,7 +61,7 @@ spec:
             - containerPort: 2000
           env:
             - name: GOBGPD_ADDR
-              value: "gobgp-service:50051"  # Connects to router1 API via service
+              value: "gobgp-service:50051"
           resources:
             requests:
               memory: "250Mi"
@@ -87,6 +69,13 @@ spec:
             limits:
               memory: "350Mi"
               cpu: "300m"
+          volumeMounts:
+            - name: data
+              mountPath: /usr/src/app/connection-profile
+              subPath: connection-profile
+            - name: data
+              mountPath: /organizations
+              subPath: organizations
 
 ---
 apiVersion: v1
@@ -97,10 +86,12 @@ spec:
   selector:
     app: gobgp-api
   ports:
-    - port: 2000
+    - name: http
+      port: 2000
       targetPort: 2000
       protocol: TCP
   type: ClusterIP
+
 
 # apiVersion: v1
 # kind: ConfigMap
