@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"time"
@@ -65,63 +66,112 @@ func main() {
 	router := gin.Default()
 
 	// Write transaction (submit)
-	router.POST("/write", func(c *gin.Context) {
-		var body struct {
-			Function string   `json:"function"`
-			Args     []string `json:"args"`
-		}
-		if err := c.ShouldBindJSON(&body); err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return
-		}
-		result, commit, err := contract.SubmitAsync(body.Function, client.WithArguments(body.Args...))
-		if err != nil {
-			c.JSON(500, gin.H{"error": parseError(err)})
-			return
-		}
-		status, err := commit.Status()
-		if err != nil || !status.Successful {
-			c.JSON(500, gin.H{"error": "commit failed", "tx": status.TransactionID})
-			return
-		}
-		c.JSON(200, gin.H{"message": "success", "tx": status.TransactionID, "result": string(result)})
-	})
-// Test connection endpoint
-router.GET("/test", func(c *gin.Context) {
-    // Example: call chaincode function "queryAll" with no args (adjust to your chaincode)
-    result, err := contract.EvaluateTransaction("queryAll")
-    if err != nil {
-        c.JSON(500, gin.H{
-            "message": "Failed to connect or evaluate transaction",
-            "error":   parseError(err),
-        })
-        return
-    }
-    c.JSON(200, gin.H{
-        "message": "Connection successful",
-        "result":  string(result),
-    })
-})
+	// router.POST("/write", func(c *gin.Context) {
+	// 	var body struct {
+	// 		Function string   `json:"function"`
+	// 		Args     []string `json:"args"`
+	// 	}
+	// 	if err := c.ShouldBindJSON(&body); err != nil {
+	// 		c.JSON(400, gin.H{"error": err.Error()})
+	// 		return
+	// 	}
+	// 	result, commit, err := contract.SubmitAsync(body.Function, client.WithArguments(body.Args...))
+	// 	if err != nil {
+	// 		c.JSON(500, gin.H{"error": parseError(err)})
+	// 		return
+	// 	}
+	// 	status, err := commit.Status()
+	// 	if err != nil || !status.Successful {
+	// 		c.JSON(500, gin.H{"error": "commit failed", "tx": status.TransactionID})
+	// 		return
+	// 	}
+	// 	c.JSON(200, gin.H{"message": "success", "tx": status.TransactionID, "result": string(result)})
+	// })
 
-	// Read transaction (evaluate)
-	router.GET("/read", func(c *gin.Context) {
-		function := c.Query("function")
-		args := c.QueryArray("args")
-		result, err := contract.EvaluateTransaction(function, args...)
-		if err != nil {
-			c.JSON(500, gin.H{"error": parseError(err)})
-			return
-		}
-		var pretty bytes.Buffer
-		_ = json.Indent(&pretty, result, "", "  ")
-		c.JSON(200, gin.H{"result": pretty.String()})
-	})
+
+	// // Read transaction (evaluate)
+	// router.GET("/read", func(c *gin.Context) {
+	// 	function := c.Query("function")
+	// 	args := c.QueryArray("args")
+	// 	result, err := contract.EvaluateTransaction(function, args...)
+	// 	if err != nil {
+	// 		c.JSON(500, gin.H{"error": parseError(err)})
+	// 		return
+	// 	}
+	// 	var pretty bytes.Buffer
+	// 	_ = json.Indent(&pretty, result, "", "  ")
+	// 	c.JSON(200, gin.H{"result": pretty.String()})
+	// })
+router.GET("/getSystemManager", ReadHandleWithFunction(contract, "GetSystemManager"))
+router.POST("/validatePath", WriteHandleWithFunction(contract, "ValidatePath"))
 
 	fmt.Println("✅ REST API running on :2000")
 	router.Run(":2000")
 }
+func ReadHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var params struct {
+			Args []string `json:"args"`
+		}
+		if err := c.ShouldBindJSON(&params); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
-// gRPC setup
+		result, err := contract.EvaluateTransaction(function, params.Args...)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
+			return
+		}
+
+		var pretty bytes.Buffer
+		_ = json.Indent(&pretty, result, "", "  ")
+
+		c.JSON(http.StatusOK, gin.H{
+			"result": pretty.String(),
+		})
+	}
+}
+
+
+func WriteHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var body struct {
+			Args []string `json:"args"`
+		}
+		if err := c.ShouldBindJSON(&body); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		result, commit, err := contract.SubmitAsync(function, client.WithArguments(body.Args...))
+		if err != nil {
+			// Use parseError here to get detailed error message
+			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
+			return
+		}
+
+		status, err := commit.Status()
+		if err != nil || !status.Successful {
+			errMsg := "Commit failed"
+			if err != nil {
+				errMsg = parseError(err)
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": errMsg,
+				"tx":    status.TransactionID,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "success",
+			"tx":      status.TransactionID,
+			"result":  string(result),
+		})
+	}
+}
+
 func newGrpcConnection() *grpc.ClientConn {
 	certPEM, err := os.ReadFile(tlsCertPath)
 	if err != nil {

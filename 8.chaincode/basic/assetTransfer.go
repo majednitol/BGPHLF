@@ -865,46 +865,81 @@ func (s *SmartContract) AnnounceRoute(ctx contractapi.TransactionContextInterfac
 	return ctx.GetStub().PutState("ROUTE_"+prefix, routeBytes)
 }
 
+// func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
+// 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to retrieve route for prefix %s: %v", prefix, err)
+// 	}
+// 	if routeBytes == nil {
+// 		return "", fmt.Errorf("Invalid")
+// 	}
+
+// 	var onChainRoute Route
+// 	if err := json.Unmarshal(routeBytes, &onChainRoute); err != nil {
+// 		return "", fmt.Errorf("failed to unmarshal stored route data: %v", err)
+// 	}
+
+// 	var incomingPath []string
+// 	if err := json.Unmarshal([]byte(pathJSON), &incomingPath); err != nil {
+// 		return "", fmt.Errorf("INVALID")
+// 	}
+// 	if len(incomingPath) == 0 {
+// 		return "", fmt.Errorf("AS path cannot be empty")
+// 	}
+
+// 	// Validate each ASN in the path by checking if it exists on ledger
+// 	for _, asn := range incomingPath {
+// 		asnKey := "AS_" + asn
+// 		asBytes, err := ctx.GetStub().GetState(asnKey)
+// 		if err != nil || asBytes == nil {
+// 			return "", fmt.Errorf("INVALID")
+// 		}
+// 	}
+
+// 	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
+// 		return "INVALID", nil
+// 	}
+
+// 	return "VALID", nil
+// }
+
+
 func (s *SmartContract) ValidatePath(ctx contractapi.TransactionContextInterface, prefix string, pathJSON string) (string, error) {
-	// Retrieve the on-chain route for the given prefix
 	routeBytes, err := ctx.GetStub().GetState("ROUTE_" + prefix)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve route for prefix %s: %v", prefix, err)
 	}
 	if routeBytes == nil {
-		return "", fmt.Errorf("no route found for prefix %s", prefix)
+		return "INVALID", nil
 	}
 
 	var onChainRoute Route
 	if err := json.Unmarshal(routeBytes, &onChainRoute); err != nil {
 		return "", fmt.Errorf("failed to unmarshal stored route data: %v", err)
 	}
-
-	// Parse the input AS path JSON
 	var incomingPath []string
 	if err := json.Unmarshal([]byte(pathJSON), &incomingPath); err != nil {
-		return "", fmt.Errorf("invalid path JSON format: %v", err)
+		return "INVALID", nil
 	}
 	if len(incomingPath) == 0 {
-		return "", fmt.Errorf("AS path cannot be empty")
+		return "INVALID", nil
 	}
 
-	// Validate each ASN in the path by checking if it exists on ledger
 	for _, asn := range incomingPath {
 		asnKey := "AS_" + asn
 		asBytes, err := ctx.GetStub().GetState(asnKey)
 		if err != nil || asBytes == nil {
-			return "", fmt.Errorf("ASN %s in the path is not registered", asn)
+			return "INVALID", nil
 		}
 	}
 
-	// Compare the path with the announced route's path
 	if strings.Join(onChainRoute.Path, ",") != strings.Join(incomingPath, ",") {
-		return "INVALID: AS path mismatch with announced route", nil
+		return "INVALID", nil
 	}
 
-	return "VALID: AS path verified", nil
+	return "VALID", nil
 }
+
 
 func (s *SmartContract) RevokeRoute(ctx contractapi.TransactionContextInterface, owner, asn, prefix string) error {
 	if owner == "" || asn == "" || prefix == "" {
