@@ -41,6 +41,7 @@ COPY gobgp-router/router16.conf .
 COPY gobgp-router/router17.conf .
 COPY gobgp-router/run_routers.sh .
 
+
 # Ensure proper line endings and permissions
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
