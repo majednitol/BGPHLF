@@ -13,39 +13,28 @@ RUN git clone https://github.com/osrg/gobgp . && \
 # -------- STAGE 2: Runtime --------
 FROM alpine:3.20
 
-# Install bash
-RUN apk add --no-cache bash iproute2
+# Install bash, iproute2, git, curl, unzip (needed for grpcurl and git clone)
+RUN apk add --no-cache bash iproute2 git curl unzip
+
+# Clone GoBGP source for proto files (adjust if needed)
+RUN git clone https://github.com/osrg/gobgp.git /gobgp-src
+
+# Download and install grpcurl
+RUN curl -L https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz -o /tmp/grpcurl.tar.gz && \
+    tar -xzf /tmp/grpcurl.tar.gz -C /usr/local/bin grpcurl && \
+    chmod +x /usr/local/bin/grpcurl && \
+    rm /tmp/grpcurl.tar.gz
 
 # Copy GoBGP binaries from builder
 COPY --from=builder /go/bin/gobgpd /usr/local/bin/
 COPY --from=builder /go/bin/gobgp /usr/local/bin/
 
-# Set workdir and copy config and script
 WORKDIR /gobgp
-COPY gobgp-router/router1.conf .
-COPY gobgp-router/router2.conf .
-COPY gobgp-router/router3.conf .
-COPY gobgp-router/router4.conf .
-COPY gobgp-router/router5.conf .
-COPY gobgp-router/router6.conf .
-COPY gobgp-router/router7.conf .
-COPY gobgp-router/router8.conf .
-COPY gobgp-router/router9.conf .
-COPY gobgp-router/router10.conf .
-COPY gobgp-router/router11.conf .
-COPY gobgp-router/router12.conf .
-COPY gobgp-router/router13.conf .
-COPY gobgp-router/router14.conf .
-COPY gobgp-router/router15.conf .
-COPY gobgp-router/router16.conf .
-COPY gobgp-router/router17.conf .
+COPY gobgp-router/router*.conf .
 COPY gobgp-router/run_routers.sh .
 
-# Ensure proper line endings and permissions
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
-# Expose BGP API ports
-EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067  
+EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067
 
-# Use bash explicitly to avoid exec format issues
 CMD ["/bin/bash", "./run_routers.sh"]
