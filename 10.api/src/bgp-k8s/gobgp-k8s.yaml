@@ -47,6 +47,21 @@ spec:
               add: ["NET_BIND_SERVICE"]
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gobgp-service
+spec:
+  selector:
+    app: gobgp-router
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+  type: ClusterIP
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -67,7 +82,7 @@ spec:
             claimName: mypvc
       containers:
         - name: gobgp-api
-          image: majedur708/hlf-api:50.20
+          image: majedur708/hlf-api:50.26
           ports:
             - containerPort: 2000
           env:

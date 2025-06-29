@@ -1,93 +1,104 @@
-package main
+// package main
 
-import (
-	"context"
-	"log"
-	"net/http"
+// import (
+// 	"context"
+// 	"log"
+// 	"net/http"
+// 	"os"
 
-	api "github.com/osrg/gobgp/v3/api"
-	anypb "google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/grpc"
+// 	api "github.com/osrg/gobgp/v3/api"
+// 	anypb "google.golang.org/protobuf/types/known/anypb"
+// 	"google.golang.org/grpc"
+// 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/gin-gonic/gin"
-)
+// 	"github.com/gin-gonic/gin"
+// )
+// type AnnounceRequest struct {
+// 	Prefix    string   `json:"prefix"`     // e.g., "192.168.100.0"
+// 	PrefixLen uint32   `json:"prefixLen"`  // e.g., 24
+// 	NextHop   string   `json:"nextHop"`    // e.g., "127.0.0.11"
+// 	ASPath    []uint32 `json:"asPath"`     // e.g., [100, 200, 300]
+// }
 
-type AnnounceRequest struct {
-	Prefix    string   `json:"prefix"`     // e.g., "192.168.100.0"
-	PrefixLen uint32   `json:"prefixLen"`  // e.g., 24
-	NextHop   string   `json:"nextHop"`    // e.g., "127.0.0.11"
-	ASPath    []uint32 `json:"asPath"`     // e.g., [100, 200, 300]
-}
+// func main() {
+// 	router := gin.Default()
+// 	router.POST("/announce", announceHandler)
+// 	log.Println("✅ BGP announce API running at :2000")
+// 	router.Run(":2000")
+// }
 
-func main() {
-	router := gin.Default()
-	router.POST("/announce", announceHandler)
-	log.Println("✅ BGP announce API running at :8080")
-	router.Run(":2000")
-}
+// // connectBGP establishes a reusable gRPC client connection to GoBGP
+// func connectBGP() (api.GobgpApiClient, *grpc.ClientConn, error) {
+// 	addr := os.Getenv("GOBGPD_ADDR")
+// 	if addr == "" {
+// 		addr = "127.0.0.1:50051"
+// 		log.Println("⚠️  GOBGPD_ADDR not set. Defaulting to", addr)
+// 	}
 
-func announceHandler(c *gin.Context) {
-	var req AnnounceRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+// 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
 
-	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithInsecure())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to connect to GoBGP"})
-		return
-	}
-	defer conn.Close()
+// 	client := api.NewGobgpApiClient(conn)
+// 	return client, conn, nil
+// }
 
-	client := api.NewGobgpApiClient(conn)
+// func announceHandler(c *gin.Context) {
+// 	var req AnnounceRequest
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
 
-	// NLRI (Prefix)
-	nlri, _ := anypb.New(&api.IPAddressPrefix{
-		Prefix:    req.Prefix,
-		PrefixLen: req.PrefixLen,
-	})
+// 	client, conn, err := connectBGP()
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to connect to GoBGP", "details": err.Error()})
+// 		return
+// 	}
+// 	defer conn.Close()
 
-	// Path Attributes
+// 	// NLRI (Prefix)
+// 	nlri, _ := anypb.New(&api.IPAddressPrefix{
+// 		Prefix:    req.Prefix,
+// 		PrefixLen: req.PrefixLen,
+// 	})
 
-	// Origin: IGP
-	originAttr, _ := anypb.New(&api.OriginAttribute{
-		Origin: 0, // IGP
-	})
+// 	// Path Attributes
+// 	originAttr, _ := anypb.New(&api.OriginAttribute{
+// 		Origin: 0, // IGP
+// 	})
+// 	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{
+// 		NextHop: req.NextHop,
+// 	})
+// 	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
+// 		Segments: []*api.AsSegment{
+// 			{
+// 				Type:    2, // AS_SEQUENCE
+// 				Numbers: req.ASPath,
+// 			},
+// 		},
+// 	})
 
-	// NextHop
-	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{
-		NextHop: req.NextHop,
-	})
+// 	// AddPath API call
+// 	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
+// 		Path: &api.Path{
+// 			Family: &api.Family{
+// 				Afi:  api.Family_AFI_IP,
+// 				Safi: api.Family_SAFI_UNICAST,
+// 			},
+// 			Nlri:   nlri,
+// 			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
+// 		},
+// 	})
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add path", "details": err.Error()})
+// 		return
+// 	}
 
-	// AS_PATH
-	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
-		Segments: []*api.AsSegment{
-			{
-				Type:    2, // AS_SEQUENCE
-				Numbers: req.ASPath,
-			},
-		},
-	})
+// 	c.JSON(http.StatusOK, gin.H{"message": "✅ Route announced successfully"})
+// }
 
-	// AddPath API call
-	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
-		Path: &api.Path{
-			Family: &api.Family{
-				Afi:  api.Family_AFI_IP,
-				Safi: api.Family_SAFI_UNICAST,
-			},
-			Nlri:   nlri,
-			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
-		},
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add path", "details": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Route announced successfully"})
-}
 
 // package main
 
@@ -518,390 +529,390 @@ func announceHandler(c *gin.Context) {
 // // 	}
 // // 	return statusErr.Message()
 // // }
-// // package main
+package main
 
-// // import (
-// // 	"context"
-// // 	"fmt"
-// // 	"io"
-// // 	"net/http"
-// // 	"os"
+import (
+	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
 
-// // 	"github.com/gin-gonic/gin"
-// // 	apipb "github.com/osrg/gobgp/v3/api"
-// // 	"google.golang.org/grpc"
-// // 	"google.golang.org/grpc/credentials/insecure"
-// // 	"google.golang.org/protobuf/proto"
-// // 	"google.golang.org/protobuf/types/known/anypb"
-// // )
+	"github.com/gin-gonic/gin"
+	apipb "github.com/osrg/gobgp/v3/api"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
+)
 
-// // var bgpClient apipb.GobgpApiClient
+var bgpClient apipb.GobgpApiClient
 
-// // func mustMarshal(pb proto.Message) *anypb.Any {
-// //     a, err := anypb.New(pb)
-// //     if err != nil {
-// //         panic(err)
-// //     }
-// //     return a
-// // }
+func mustMarshal(pb proto.Message) *anypb.Any {
+    a, err := anypb.New(pb)
+    if err != nil {
+        panic(err)
+    }
+    return a
+}
 
-// // func connectBGP() {
-// //     bgpAddr := os.Getenv("GOBGPD_ADDR")
-// //     if bgpAddr == "" {
-// //         bgpAddr = "localhost:50051"
-// //     }
+func connectBGP() {
+    bgpAddr := os.Getenv("GOBGPD_ADDR")
+    if bgpAddr == "" {
+        bgpAddr = "localhost:50051"
+    }
 
-// //     conn, err := grpc.Dial(bgpAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-// //     if err != nil {
-// //         panic(err)
-// //     }
+    conn, err := grpc.Dial(bgpAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+    if err != nil {
+        panic(err)
+    }
 
-// //     bgpClient = apipb.NewGobgpApiClient(conn)
-// // }
-// // type AddPeerRequest struct {
-// //     NeighborAddress string `json:"neighbor_address"`
-// //     PeerAS          uint32 `json:"peer_as"`
-// // }
+    bgpClient = apipb.NewGobgpApiClient(conn)
+}
+type AddPeerRequest struct {
+    NeighborAddress string `json:"neighbor_address"`
+    PeerAS          uint32 `json:"peer_as"`
+}
 
-// // func addPeerHandler(c *gin.Context) {
-// //     var req AddPeerRequest
-// //     if err := c.ShouldBindJSON(&req); err != nil {
-// //         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// //         return
-// //     }
+func addPeerHandler(c *gin.Context) {
+    var req AddPeerRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     peer := &apipb.Peer{
-// //         Conf: &apipb.PeerConf{
-// //             NeighborAddress: req.NeighborAddress,
-// //             PeerAsn:         req.PeerAS,
-// //         },
-// //     }
+    peer := &apipb.Peer{
+        Conf: &apipb.PeerConf{
+            NeighborAddress: req.NeighborAddress,
+            PeerAsn:         req.PeerAS,
+        },
+    }
 
-// //     _, err := bgpClient.AddPeer(context.Background(), &apipb.AddPeerRequest{Peer: peer})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    _, err := bgpClient.AddPeer(context.Background(), &apipb.AddPeerRequest{Peer: peer})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     c.JSON(http.StatusOK, gin.H{"message": "Peer added"})
-// // }
+    c.JSON(http.StatusOK, gin.H{"message": "Peer added"})
+}
 
-// // func getPeersHandler(c *gin.Context) {
-// //     stream, err := bgpClient.ListPeer(context.Background(), &apipb.ListPeerRequest{})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+func getPeersHandler(c *gin.Context) {
+    stream, err := bgpClient.ListPeer(context.Background(), &apipb.ListPeerRequest{})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     var peers []gin.H
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err != nil {
-// //             break
-// //         }
-// //         peers = append(peers, gin.H{
-// //             "address": resp.Peer.Conf.NeighborAddress,
-// //             "as":      resp.Peer.Conf.PeerAsn,
-// //         })
-// //     }
+    var peers []gin.H
+    for {
+        resp, err := stream.Recv()
+        if err != nil {
+            break
+        }
+        peers = append(peers, gin.H{
+            "address": resp.Peer.Conf.NeighborAddress,
+            "as":      resp.Peer.Conf.PeerAsn,
+        })
+    }
 
-// //     c.JSON(http.StatusOK, gin.H{"peers": peers})
-// // }
+    c.JSON(http.StatusOK, gin.H{"peers": peers})
+}
 
-// // func getPeerInfoHandler(c *gin.Context) {
-// //     neighborAddress := c.Query("neighbor_address")
-// //     if neighborAddress == "" {
-// //         c.JSON(http.StatusBadRequest, gin.H{"error": "neighbor_address query param is required"})
-// //         return
-// //     }
+func getPeerInfoHandler(c *gin.Context) {
+    neighborAddress := c.Query("neighbor_address")
+    if neighborAddress == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "neighbor_address query param is required"})
+        return
+    }
 
-// //     stream, err := bgpClient.ListPeer(context.Background(), &apipb.ListPeerRequest{})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    stream, err := bgpClient.ListPeer(context.Background(), &apipb.ListPeerRequest{})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err == io.EOF {
-// //             break // End of stream
-// //         }
-// //         if err != nil {
-// //             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //             return
-// //         }
+    for {
+        resp, err := stream.Recv()
+        if err == io.EOF {
+            break // End of stream
+        }
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
 
-// //         if resp.Peer.Conf.NeighborAddress == neighborAddress {
-// //             c.JSON(http.StatusOK, resp.Peer)
-// //             return
-// //         }
-// //     }
+        if resp.Peer.Conf.NeighborAddress == neighborAddress {
+            c.JSON(http.StatusOK, resp.Peer)
+            return
+        }
+    }
 
  
-// //     c.JSON(http.StatusNotFound, gin.H{"message": "Peer not found"})
-// // }
+    c.JSON(http.StatusNotFound, gin.H{"message": "Peer not found"})
+}
 
 
-// // type AddRouteRequest struct {
-// //     Prefix    string `json:"prefix"`
-// //     PrefixLen uint32 `json:"prefix_len"`
-// //     NextHop   string `json:"next_hop"`
-// // }
-// // func marshalAny(pb proto.Message) (*anypb.Any, error) {
-// //     a, err := anypb.New(pb)
-// //     if err != nil {
-// //         return nil, err
-// //     }
-// //     return a, nil
-// // }
+type AddRouteRequest struct {
+    Prefix    string `json:"prefix"`
+    PrefixLen uint32 `json:"prefix_len"`
+    NextHop   string `json:"next_hop"`
+}
+func marshalAny(pb proto.Message) (*anypb.Any, error) {
+    a, err := anypb.New(pb)
+    if err != nil {
+        return nil, err
+    }
+    return a, nil
+}
 
-// // func addRouteHandler(c *gin.Context) {
-// //     var req AddRouteRequest
-// //     if err := c.ShouldBindJSON(&req); err != nil {
-// //         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// //         return
-// //     }
+func addRouteHandler(c *gin.Context) {
+    var req AddRouteRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     nlri, err := marshalAny(&apipb.IPAddressPrefix{
-// //         Prefix:    req.Prefix,
-// //         PrefixLen: req.PrefixLen,
-// //     })
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    nlri, err := marshalAny(&apipb.IPAddressPrefix{
+        Prefix:    req.Prefix,
+        PrefixLen: req.PrefixLen,
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     nextHopAttr, err := marshalAny(&apipb.NextHopAttribute{NextHop: req.NextHop})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    nextHopAttr, err := marshalAny(&apipb.NextHopAttribute{NextHop: req.NextHop})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     path := &apipb.Path{
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //         Nlri: nlri,
-// //         Pattrs: []*anypb.Any{
-// //             mustMarshal(&apipb.OriginAttribute{Origin: 0}),
-// //             nextHopAttr,
-// //         },
-// //     }
+    path := &apipb.Path{
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+        Nlri: nlri,
+        Pattrs: []*anypb.Any{
+            mustMarshal(&apipb.OriginAttribute{Origin: 0}),
+            nextHopAttr,
+        },
+    }
 
-// //     _, err = bgpClient.AddPath(context.Background(), &apipb.AddPathRequest{Path: path})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    _, err = bgpClient.AddPath(context.Background(), &apipb.AddPathRequest{Path: path})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     c.JSON(http.StatusOK, gin.H{"message": "Route advertised"})
-// // }
-
-
-// // func withdrawRouteHandler(c *gin.Context) {
-// //     var req AddRouteRequest
-// //     if err := c.ShouldBindJSON(&req); err != nil {
-// //         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     nextHopAttr, err := marshalAny(&apipb.NextHopAttribute{NextHop: req.NextHop})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     path := &apipb.Path{
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //         Nlri: mustMarshal(&apipb.IPAddressPrefix{
-// //             Prefix:    req.Prefix,
-// //             PrefixLen: req.PrefixLen,
-// //         }),
-// //         Pattrs: []*anypb.Any{
-// //             mustMarshal(&apipb.OriginAttribute{Origin: 0}),
-// //             nextHopAttr,
-// //         },
-// //     }
-
-// //     _, err = bgpClient.DeletePath(context.Background(), &apipb.DeletePathRequest{Path: path})
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     c.JSON(http.StatusOK, gin.H{"message": "Route withdrawn"})
-// // }
+    c.JSON(http.StatusOK, gin.H{"message": "Route advertised"})
+}
 
 
-// // func getRoutesHandler(c *gin.Context) {
-// //     stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //     })
+func withdrawRouteHandler(c *gin.Context) {
+    var req AddRouteRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
+    nextHopAttr, err := marshalAny(&apipb.NextHopAttribute{NextHop: req.NextHop})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //     var routes []string
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err != nil {
-// //             break
-// //         }
+    path := &apipb.Path{
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+        Nlri: mustMarshal(&apipb.IPAddressPrefix{
+            Prefix:    req.Prefix,
+            PrefixLen: req.PrefixLen,
+        }),
+        Pattrs: []*anypb.Any{
+            mustMarshal(&apipb.OriginAttribute{Origin: 0}),
+            nextHopAttr,
+        },
+    }
 
-// //         if resp.Destination == nil {
-// //             continue
-// //         }
+    _, err = bgpClient.DeletePath(context.Background(), &apipb.DeletePathRequest{Path: path})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-// //         for _, path := range resp.Destination.Paths {
-// //             prefix := &apipb.IPAddressPrefix{}
-// //             if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
-// //                 routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
-// //             }
-// //         }
-// //     }
-
-// //     c.JSON(http.StatusOK, gin.H{"routes": routes})
-// // }
-
-// // func getRoutesOutHandler(c *gin.Context) {
-// //     stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //         TableType: apipb.TableType_ADJ_OUT,
-// //     })
-
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     var routes []string
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err != nil {
-// //             break
-// //         }
-
-// //         if resp.Destination == nil {
-// //             continue
-// //         }
-
-// //         for _, path := range resp.Destination.Paths {
-// //             prefix := &apipb.IPAddressPrefix{}
-// //             if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
-// //                 routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
-// //             }
-// //         }
-// //     }
-
-// //     c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
-// // }
-
-// // func routesInHandler(c *gin.Context) {
-// //     stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //         TableType: apipb.TableType_ADJ_IN,
-// //     })
-
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     var routes []string
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err != nil {
-// //             break
-// //         }
-
-// //         if resp.Destination == nil {
-// //             continue
-// //         }
-
-// //         for _, path := range resp.Destination.Paths {
-// //             prefix := &apipb.IPAddressPrefix{}
-// //             if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
-// //                 routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
-// //             }
-// //         }
-// //     }
-
-// //     c.JSON(http.StatusOK, gin.H{"received_routes": routes})
-// // }
-// // func getAdvertisedRoutesHandler(c *gin.Context) {
-// //     stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
-// //         TableType: apipb.TableType_ADJ_OUT, // Only advertised (adj-out) routes
-// //         Family: &apipb.Family{
-// //             Afi:  apipb.Family_AFI_IP,
-// //             Safi: apipb.Family_SAFI_UNICAST,
-// //         },
-// //     })
-// //     if err != nil {
-// //         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// //         return
-// //     }
-
-// //     var routes []string
-// //     for {
-// //         resp, err := stream.Recv()
-// //         if err != nil {
-// //             break
-// //         }
-
-// //         if resp.Destination == nil {
-// //             continue
-// //         }
-
-// //         for _, path := range resp.Destination.Paths {
-// //             prefix := &apipb.IPAddressPrefix{}
-// //             if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
-// //                 routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
-// //             }
-// //         }
-// //     }
-
-// //     c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
-
-// // }
+    c.JSON(http.StatusOK, gin.H{"message": "Route withdrawn"})
+}
 
 
+func getRoutesHandler(c *gin.Context) {
+    stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+    })
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err != nil {
+            break
+        }
+
+        if resp.Destination == nil {
+            continue
+        }
+
+        for _, path := range resp.Destination.Paths {
+            prefix := &apipb.IPAddressPrefix{}
+            if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
+                routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
+            }
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{"routes": routes})
+}
+
+func getRoutesOutHandler(c *gin.Context) {
+    stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+        TableType: apipb.TableType_ADJ_OUT,
+    })
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err != nil {
+            break
+        }
+
+        if resp.Destination == nil {
+            continue
+        }
+
+        for _, path := range resp.Destination.Paths {
+            prefix := &apipb.IPAddressPrefix{}
+            if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
+                routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
+            }
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
+}
+
+func routesInHandler(c *gin.Context) {
+    stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+        TableType: apipb.TableType_ADJ_IN,
+    })
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err != nil {
+            break
+        }
+
+        if resp.Destination == nil {
+            continue
+        }
+
+        for _, path := range resp.Destination.Paths {
+            prefix := &apipb.IPAddressPrefix{}
+            if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
+                routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
+            }
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{"received_routes": routes})
+}
+func getAdvertisedRoutesHandler(c *gin.Context) {
+    stream, err := bgpClient.ListPath(context.Background(), &apipb.ListPathRequest{
+        TableType: apipb.TableType_ADJ_OUT, // Only advertised (adj-out) routes
+        Family: &apipb.Family{
+            Afi:  apipb.Family_AFI_IP,
+            Safi: apipb.Family_SAFI_UNICAST,
+        },
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    var routes []string
+    for {
+        resp, err := stream.Recv()
+        if err != nil {
+            break
+        }
+
+        if resp.Destination == nil {
+            continue
+        }
+
+        for _, path := range resp.Destination.Paths {
+            prefix := &apipb.IPAddressPrefix{}
+            if err := path.GetNlri().UnmarshalTo(prefix); err == nil {
+                routes = append(routes, fmt.Sprintf("%s/%d", prefix.Prefix, prefix.PrefixLen))
+            }
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{"advertised_routes": routes})
+
+}
 
 
-// // func main() {
-// //     connectBGP()
 
-// //     r := gin.Default()
 
-// //     // Peer endpoints
-// //     r.POST("/peers", addPeerHandler)
-// //     r.GET("/peers", getPeersHandler)
-// //     r.GET("/peer", getPeerInfoHandler)
+func main() {
+    connectBGP()
 
-// //     // Route endpoints
-// //     r.POST("/routes", addRouteHandler)
-// //     r.DELETE("/routes", withdrawRouteHandler)
-// //     r.GET("/routes", getRoutesHandler)
-// //     r.GET("/routes/out", getRoutesOutHandler)
-// //     r.GET("/routes/in", routesInHandler)
-// //     r.GET("/advertised-routes", getAdvertisedRoutesHandler) // alias
+    r := gin.Default()
 
-// //     r.Run(":2000")
-// // }
+    // Peer endpoints
+    r.POST("/peers", addPeerHandler)
+    r.GET("/peers", getPeersHandler)
+    r.GET("/peer", getPeerInfoHandler)
+
+    // Route endpoints
+    r.POST("/routes", addRouteHandler)
+    r.DELETE("/routes", withdrawRouteHandler)
+    r.GET("/routes", getRoutesHandler)
+    r.GET("/routes/out", getRoutesOutHandler)
+    r.GET("/routes/in", routesInHandler)
+    r.GET("/advertised-routes", getAdvertisedRoutesHandler) // alias
+
+    r.Run(":2000")
+}
 // // // package main
 
 // // // import (
