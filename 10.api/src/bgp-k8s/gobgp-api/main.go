@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+
 	"context"
 	"crypto/x509"
 	"encoding/json"
@@ -76,42 +76,104 @@ func main() {
 	contract = network.GetContract("basic")
 
 	router := gin.Default()
-	router.POST("/announce", announceHandler)
-	router.POST("/validatePath", func(c *gin.Context) {
-		var body struct {
-			Prefix string   `json:"prefix"`
-			Path   []string `json:"path"`
-		}
 
-		if err := c.ShouldBindJSON(&body); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
+router.POST("/validateAndAnnounce", func(c *gin.Context) {
+	var req struct {
+		Prefix string   `json:"prefix"` // Example: "203.0.113.0/24"
+		Path   []string `json:"path"`   // Example: ["65001", "65002", "65003"]
+	}
 
-		pathJSON, err := json.Marshal(body.Path)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal path"})
-			return
-		}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		return
+	}
 
-		result, commit, err := contract.SubmitAsync("ValidatePath", client.WithArguments(body.Prefix, string(pathJSON)))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
-			return
-		}
+	// Split prefix into IP and mask
+	var prefixOnly string
+	var prefixLen uint32
+	if _, err := fmt.Sscanf(req.Prefix, "%[^/]/%d", &prefixOnly, &prefixLen); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Prefix must be in CIDR format like x.x.x.x/nn"})
+		return
+	}
 
-		status, err := commit.Status()
-		if err != nil || !status.Successful {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "commit failed", "tx": status.TransactionID})
-			return
-		}
+	// Convert path to JSON for chaincode
+	pathJSON, err := json.Marshal(req.Path)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal AS path"})
+		return
+	}
 
-		c.JSON(http.StatusOK, gin.H{"message": "success", "tx": status.TransactionID, "result": string(result)})
+	// Step 1: Validate path using Fabric
+	result, commit, err := contract.SubmitAsync("ValidatePath", client.WithArguments(req.Prefix, string(pathJSON)))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain validation failed", "details": parseError(err)})
+		return
+	}
+	status, err := commit.Status()
+	if err != nil || !status.Successful {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain commit failed", "tx": status.TransactionID})
+		return
+	}
+	if string(result) != "VALID" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "❌ INVALID path — route not announced",
+			"tx":      status.TransactionID,
+			"result":  string(result),
+		})
+		return
+	}
+
+	// Step 2: Announce via GoBGP
+	asPath := []uint32{}
+	for _, s := range req.Path {
+		var num uint32
+		fmt.Sscanf(s, "%d", &num)
+		asPath = append(asPath, num)
+	}
+
+	// Build BGP path
+	client, conn, err := connectBGP()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	nlri, _ := anypb.New(&api.IPAddressPrefix{
+		Prefix:    prefixOnly,
+		PrefixLen: prefixLen,
+	})
+	originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) // IGP
+	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{NextHop: "127.0.0.11"})
+	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
+		Segments: []*api.AsSegment{
+			{Type: 2, Numbers: asPath},
+		},
 	})
 
-	router.GET("/getSystemManager", ReadHandleWithFunction(contract, "GetSystemManager"))
-	// router.POST("/validatePath", WriteHandleWithFunction(contract, "ValidatePath"))
-	router.POST("/createSystemManager", WriteHandleWithFunction(contract, "CreateSystemManager"))
+	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
+		Path: &api.Path{
+			Family: &api.Family{
+				Afi:  api.Family_AFI_IP,
+				Safi: api.Family_SAFI_UNICAST,
+			},
+			Nlri:   nlri,
+			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "BGP path announce failed", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "✅ Path VALIDATED and ANNOUNCED successfully",
+		"prefix":  prefixOnly,
+		"result":  string(result),
+		"tx":      status.TransactionID,
+	})
+})
+
 	fmt.Println("✅ REST API running on :2000")
 	router.Run(":2000")
 }
@@ -134,122 +196,8 @@ func connectBGP() (api.GobgpApiClient, *grpc.ClientConn, error) {
 	return client, conn, nil
 }
 
-func announceHandler(c *gin.Context) {
-	var req AnnounceRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 
-	client, conn, err := connectBGP()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to connect to GoBGP", "details": err.Error()})
-		return
-	}
-	defer conn.Close()
 
-	// NLRI (Prefix)
-	nlri, _ := anypb.New(&api.IPAddressPrefix{
-		Prefix:    req.Prefix,
-		PrefixLen: req.PrefixLen,
-	})
-
-	// Path Attributes
-	originAttr, _ := anypb.New(&api.OriginAttribute{
-		Origin: 0, // IGP
-	})
-	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{
-		NextHop: req.NextHop,
-	})
-	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
-		Segments: []*api.AsSegment{
-			{
-				Type:    2, // AS_SEQUENCE
-				Numbers: req.ASPath,
-			},
-		},
-	})
-
-	// AddPath API call
-	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
-		Path: &api.Path{
-			Family: &api.Family{
-				Afi:  api.Family_AFI_IP,
-				Safi: api.Family_SAFI_UNICAST,
-			},
-			Nlri:   nlri,
-			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
-		},
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add path", "details": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "✅ Route announced successfully"})
-}
-
-func ReadHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		args := c.QueryArray("args") // handles ?args=100&args=200
-
-		if len(args) == 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'args' query parameter(s)"})
-			return
-		}
-
-		result, err := contract.EvaluateTransaction(function, args...)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
-			return
-		}
-
-		var pretty bytes.Buffer
-		_ = json.Indent(&pretty, result, "", "  ")
-
-		c.JSON(http.StatusOK, gin.H{
-			"result": pretty.String(),
-		})
-	}
-}
-
-func WriteHandleWithFunction(contract *client.Contract, function string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var body struct {
-			Args []string `json:"args"`
-		}
-		if err := c.ShouldBindJSON(&body); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		result, commit, err := contract.SubmitAsync(function, client.WithArguments(body.Args...))
-		if err != nil {
-			// Use parseError here to get detailed error message
-			c.JSON(http.StatusInternalServerError, gin.H{"error": parseError(err)})
-			return
-		}
-
-		status, err := commit.Status()
-		if err != nil || !status.Successful {
-			errMsg := "Commit failed"
-			if err != nil {
-				errMsg = parseError(err)
-			}
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": errMsg,
-				"tx":    status.TransactionID,
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message": "success",
-			"tx":      status.TransactionID,
-			"result":  string(result),
-		})
-	}
-}
 
 func newGrpcConnection() *grpc.ClientConn {
 	certPEM, err := os.ReadFile(tlsCertPath)
@@ -303,8 +251,6 @@ func newSign() identity.Sign {
 	}
 	return sign
 }
-
-// read helper: reads first file in a directory
 func readFirstFile(dir string) ([]byte, error) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -316,7 +262,6 @@ func readFirstFile(dir string) ([]byte, error) {
 	return os.ReadFile(path.Join(dir, files[0].Name()))
 }
 
-// parse chaincode/fabric error
 func parseError(err error) string {
 	statusErr := status.Convert(err)
 	for _, detail := range statusErr.Details() {
@@ -327,104 +272,4 @@ func parseError(err error) string {
 	return statusErr.Message()
 }
 
-// package main
 
-// import (
-// 	"context"
-// 	"log"
-// 	"net/http"
-// 	"os"
-
-// 	api "github.com/osrg/gobgp/v3/api"
-// 	"google.golang.org/grpc"
-// 	"google.golang.org/grpc/credentials/insecure"
-// 	anypb "google.golang.org/protobuf/types/known/anypb"
-
-// 	"github.com/gin-gonic/gin"
-// )
-// type AnnounceRequest struct {
-// 	Prefix    string   `json:"prefix"`     // e.g., "192.168.100.0"
-// 	PrefixLen uint32   `json:"prefixLen"`  // e.g., 24
-// 	NextHop   string   `json:"nextHop"`    // e.g., "127.0.0.11"
-// 	ASPath    []uint32 `json:"asPath"`     // e.g., [100, 200, 300]
-// }
-
-// func main() {
-// 	router := gin.Default()
-// 	router.POST("/announce", announceHandler)
-// 	log.Println("✅ BGP announce API running at :2000")
-// 	router.Run(":2000")
-// }
-
-// // connectBGP establishes a reusable gRPC client connection to GoBGP
-// func connectBGP() (api.GobgpApiClient, *grpc.ClientConn, error) {
-// 	addr := os.Getenv("GOBGPD_ADDR")
-
-// 	if addr == "" {
-// 		addr = "127.0.0.1:50051"
-// 		log.Println("⚠️  GOBGPD_ADDR not set. Defaulting to", addr)
-// 	}
-
-// 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-
-// 	client := api.NewGobgpApiClient(conn)
-// 	return client, conn, nil
-// }
-
-// func announceHandler(c *gin.Context) {
-// 	var req AnnounceRequest
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	client, conn, err := connectBGP()
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to connect to GoBGP", "details": err.Error()})
-// 		return
-// 	}
-// 	defer conn.Close()
-
-// 	// NLRI (Prefix)
-// 	nlri, _ := anypb.New(&api.IPAddressPrefix{
-// 		Prefix:    req.Prefix,
-// 		PrefixLen: req.PrefixLen,
-// 	})
-
-// 	// Path Attributes
-// 	originAttr, _ := anypb.New(&api.OriginAttribute{
-// 		Origin: 0, // IGP
-// 	})
-// 	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{
-// 		NextHop: req.NextHop,
-// 	})
-// 	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
-// 		Segments: []*api.AsSegment{
-// 			{
-// 				Type:    2, // AS_SEQUENCE
-// 				Numbers: req.ASPath,
-// 			},
-// 		},
-// 	})
-
-// 	// AddPath API call
-// 	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
-// 		Path: &api.Path{
-// 			Family: &api.Family{
-// 				Afi:  api.Family_AFI_IP,
-// 				Safi: api.Family_SAFI_UNICAST,
-// 			},
-// 			Nlri:   nlri,
-// 			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
-// 		},
-// 	})
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add path", "details": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"message": "✅ Route announced successfully"})
-// }
