@@ -21,7 +21,7 @@ curl -X POST http://localhost:2000/revokeRoute \
     "next_hop": "127.0.0.11"
   }'
 
-
+curl http://localhost:2000/router-info
 
 
 curl http://localhost:2000/routes
