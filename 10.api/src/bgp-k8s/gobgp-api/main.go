@@ -77,6 +77,123 @@ func main() {
 	contract = network.GetContract("basic")
 
 	router := gin.Default()
+	router.GET("/routes", func(c *gin.Context) {
+		client, conn, err := connectBGP()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Failed to connect to GoBGP",
+				"details": err.Error(),
+			})
+			return
+		}
+		defer conn.Close()
+
+		stream, err := client.ListPath(context.Background(), &api.ListPathRequest{
+			TableType: api.TableType_GLOBAL,
+			Family: &api.Family{
+				Afi:  api.Family_AFI_IP,
+				Safi: api.Family_SAFI_UNICAST,
+			},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Failed to list BGP paths",
+				"details": err.Error(),
+			})
+			return
+		}
+
+		var routes []gin.H
+
+		for {
+			res, err := stream.Recv()
+			if err != nil {
+				break // End of stream
+			}
+			if res.Destination == nil {
+				continue
+			}
+
+			for _, path := range res.Destination.Paths {
+				nlri := &api.IPAddressPrefix{}
+				if err := path.Nlri.UnmarshalTo(nlri); err != nil {
+					continue
+				}
+
+				route := gin.H{
+					"prefix": fmt.Sprintf("%s/%d", nlri.Prefix, nlri.PrefixLen),
+				}
+
+				// Parse attributes
+				for _, attr := range path.Pattrs {
+					var nextHop api.NextHopAttribute
+					if err := attr.UnmarshalTo(&nextHop); err == nil {
+						route["next_hop"] = nextHop.NextHop
+						continue
+					}
+
+					var asPath api.AsPathAttribute
+					if err := attr.UnmarshalTo(&asPath); err == nil {
+						var asns []uint32
+						for _, seg := range asPath.Segments {
+							asns = append(asns, seg.Numbers...)
+						}
+						route["as_path"] = asns
+						continue
+					}
+
+					var origin api.OriginAttribute
+					if err := attr.UnmarshalTo(&origin); err == nil {
+						route["origin"] = origin.Origin
+					}
+				}
+
+				routes = append(routes, route)
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{"routes": routes})
+	})
+	router.POST("/revokeRoute", func(c *gin.Context) {
+		var req struct {
+			Prefix string `json:"prefix"`     // e.g., "203.0.113.0"
+			Length uint32 `json:"prefix_len"` // e.g., 24
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+			return
+		}
+
+		client, conn, err := connectBGP()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
+			return
+		}
+		defer conn.Close()
+
+		nlri, _ := anypb.New(&api.IPAddressPrefix{
+			Prefix:    req.Prefix,
+			PrefixLen: req.Length,
+		})
+
+		// Withdraw the path
+		_, err = client.DeletePath(context.Background(), &api.DeletePathRequest{
+			Path: &api.Path{
+				Family: &api.Family{
+					Afi:  api.Family_AFI_IP,
+					Safi: api.Family_SAFI_UNICAST,
+				},
+				Nlri: nlri,
+			},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to revoke route", "details": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "✅ Route revoked successfully", "prefix": fmt.Sprintf("%s/%d", req.Prefix, req.Length)})
+	})
 
 	router.POST("/validateAndAnnounce", func(c *gin.Context) {
 		var req struct {
@@ -123,7 +240,7 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain commit failed", "tx": status.TransactionID})
 			return
 		}
-		if string(result) != "INVALID" {
+		if string(result) != "VALID" {
 			c.JSON(http.StatusForbidden, gin.H{
 				"message": "❌ INVALID path or prefix — route not announced",
 				"tx":      status.TransactionID,
@@ -152,7 +269,7 @@ func main() {
 			Prefix:    prefixOnly,
 			PrefixLen: prefixLen,
 		})
-		originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) 
+		originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0})
 		nextHopAttr, _ := anypb.New(&api.NextHopAttribute{NextHop: "127.0.0.11"})
 		asPathAttr, _ := anypb.New(&api.AsPathAttribute{
 			Segments: []*api.AsSegment{
