@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"context"
 	"crypto/x509"
 	"encoding/json"
@@ -10,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -77,102 +78,110 @@ func main() {
 
 	router := gin.Default()
 
-router.POST("/validateAndAnnounce", func(c *gin.Context) {
-	var req struct {
-		Prefix string   `json:"prefix"` // Example: "203.0.113.0/24"
-		Path   []string `json:"path"`   // Example: ["65001", "65002", "65003"]
-	}
+	router.POST("/validateAndAnnounce", func(c *gin.Context) {
+		var req struct {
+			Prefix string   `json:"prefix"` // Example: "203.0.113.0/24"
+			Path   []string `json:"path"`   // Example: ["65001", "65002", "65003"]
+		}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
-		return
-	}
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+			return
+		}
 
-	// Split prefix into IP and mask
-	var prefixOnly string
-	var prefixLen uint32
-	if _, err := fmt.Sscanf(req.Prefix, "%[^/]/%d", &prefixOnly, &prefixLen); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Prefix must be in CIDR format like x.x.x.x/nn"})
-		return
-	}
+		// Split prefix into IP and mask
+		var prefixOnly string
+		var prefixLen uint32
+		parts := strings.Split(req.Prefix, "/")
+		if len(parts) != 2 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Prefix must be in CIDR format like x.x.x.x/nn"})
+			return
+		}
+		prefixOnly = parts[0]
+		lenParsed, err := strconv.Atoi(parts[1])
+		if err != nil || lenParsed < 0 || lenParsed > 32 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid prefix length"})
+			return
+		}
+		prefixLen = uint32(lenParsed)
 
-	// Convert path to JSON for chaincode
-	pathJSON, err := json.Marshal(req.Path)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal AS path"})
-		return
-	}
+		// Convert path to JSON for chaincode
+		pathJSON, err := json.Marshal(req.Path)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal AS path"})
+			return
+		}
 
-	// Step 1: Validate path using Fabric
-	result, commit, err := contract.SubmitAsync("ValidatePath", client.WithArguments(req.Prefix, string(pathJSON)))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain validation failed", "details": parseError(err)})
-		return
-	}
-	status, err := commit.Status()
-	if err != nil || !status.Successful {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain commit failed", "tx": status.TransactionID})
-		return
-	}
-	if string(result) != "VALID" {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "❌ INVALID path — route not announced",
-			"tx":      status.TransactionID,
-			"result":  string(result),
+		// Step 1: Validate path using Fabric
+		result, commit, err := contract.SubmitAsync("ValidatePath", client.WithArguments(req.Prefix, string(pathJSON)))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain validation failed", "details": parseError(err)})
+			return
+		}
+		status, err := commit.Status()
+		if err != nil || !status.Successful {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain commit failed", "tx": status.TransactionID})
+			return
+		}
+		if string(result) != "VALID" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"message": "❌ INVALID path — route not announced",
+				"tx":      status.TransactionID,
+				"result":  string(result),
+			})
+			return
+		}
+
+		// Step 2: Announce via GoBGP
+		asPath := []uint32{}
+		for _, s := range req.Path {
+			var num uint32
+			fmt.Sscanf(s, "%d", &num)
+			asPath = append(asPath, num)
+		}
+
+		// Build BGP path
+		client, conn, err := connectBGP()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
+			return
+		}
+		defer conn.Close()
+
+		nlri, _ := anypb.New(&api.IPAddressPrefix{
+			Prefix:    prefixOnly,
+			PrefixLen: prefixLen,
 		})
-		return
-	}
-
-	// Step 2: Announce via GoBGP
-	asPath := []uint32{}
-	for _, s := range req.Path {
-		var num uint32
-		fmt.Sscanf(s, "%d", &num)
-		asPath = append(asPath, num)
-	}
-
-	// Build BGP path
-	client, conn, err := connectBGP()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
-		return
-	}
-	defer conn.Close()
-
-	nlri, _ := anypb.New(&api.IPAddressPrefix{
-		Prefix:    prefixOnly,
-		PrefixLen: prefixLen,
-	})
-	originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) // IGP
-	nextHopAttr, _ := anypb.New(&api.NextHopAttribute{NextHop: "127.0.0.11"})
-	asPathAttr, _ := anypb.New(&api.AsPathAttribute{
-		Segments: []*api.AsSegment{
-			{Type: 2, Numbers: asPath},
-		},
-	})
-
-	_, err = client.AddPath(context.Background(), &api.AddPathRequest{
-		Path: &api.Path{
-			Family: &api.Family{
-				Afi:  api.Family_AFI_IP,
-				Safi: api.Family_SAFI_UNICAST,
+		originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) // IGP
+		nextHopAttr, _ := anypb.New(&api.NextHopAttribute{NextHop: "127.0.0.11"})
+		asPathAttr, _ := anypb.New(&api.AsPathAttribute{
+			Segments: []*api.AsSegment{
+				{Type: 2, Numbers: asPath},
 			},
-			Nlri:   nlri,
-			Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
-		},
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "BGP path announce failed", "details": err.Error()})
-		return
-	}
+		})
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "✅ Path VALIDATED and ANNOUNCED successfully",
-		"prefix":  prefixOnly,
-		"result":  string(result),
-		"tx":      status.TransactionID,
+		_, err = client.AddPath(context.Background(), &api.AddPathRequest{
+			Path: &api.Path{
+				Family: &api.Family{
+					Afi:  api.Family_AFI_IP,
+					Safi: api.Family_SAFI_UNICAST,
+				},
+				Nlri:   nlri,
+				Pattrs: []*anypb.Any{originAttr, nextHopAttr, asPathAttr},
+			},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "BGP path announce failed", "details": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "✅ Path VALIDATED and ANNOUNCED successfully",
+			"prefix":  prefixOnly,
+			"result":  string(result),
+			"tx":      status.TransactionID,
+		})
 	})
-})
 
 	fmt.Println("✅ REST API running on :2000")
 	router.Run(":2000")
@@ -195,9 +204,6 @@ func connectBGP() (api.GobgpApiClient, *grpc.ClientConn, error) {
 	client := api.NewGobgpApiClient(conn)
 	return client, conn, nil
 }
-
-
-
 
 func newGrpcConnection() *grpc.ClientConn {
 	certPEM, err := os.ReadFile(tlsCertPath)
@@ -271,5 +277,3 @@ func parseError(err error) string {
 	}
 	return statusErr.Message()
 }
-
-
