@@ -19,9 +19,9 @@ RUN apk add --no-cache bash iproute2 git curl unzip
 # Clone GoBGP source for proto files
 RUN git clone --depth=1 https://github.com/osrg/gobgp.git /gobgp-src
 
-# Explicitly copy raw .proto files to /gobgp-src/api/
-RUN mkdir -p /gobgp-src/api && \
-    cp /gobgp-src/api/*.proto /gobgp-src/api/ || echo "No .proto files found in /gobgp-src/api/"
+# Copy raw .proto files from api/proto into /gobgp-proto
+RUN mkdir -p /gobgp-proto && \
+    cp /gobgp-src/api/proto/*.proto /gobgp-proto/
 
 # Download and install grpcurl
 RUN curl -L https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz -o /tmp/grpcurl.tar.gz && \
