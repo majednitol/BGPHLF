@@ -30,8 +30,8 @@ COPY --from=builder /go/bin/gobgpd /usr/local/bin/
 COPY --from=builder /go/bin/gobgp /usr/local/bin/
 
 WORKDIR /gobgp
-COPY gobgp-router/router*.conf .
-COPY gobgp-router/run_routers.sh .
+COPY gobgp-router/router*.conf /gobgp/
+COPY gobgp-router/run_routers.sh /gobgp/
 
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
