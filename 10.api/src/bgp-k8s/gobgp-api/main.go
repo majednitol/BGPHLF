@@ -154,46 +154,71 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{"routes": routes})
 	})
-	router.POST("/revokeRoute", func(c *gin.Context) {
-		var req struct {
-			Prefix string `json:"prefix"`     // e.g., "203.0.113.0"
-			Length uint32 `json:"prefix_len"` // e.g., 24
-		}
+router.POST("/revokeRoute", func(c *gin.Context) {
+	var req struct {
+		Prefix   string `json:"prefix"`     // e.g., "203.0.113.0"
+		Length   uint32 `json:"prefix_len"` // e.g., 24
+		NextHop  string `json:"next_hop"`   // e.g., "127.0.0.11"
+	}
 
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
-			return
-		}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		return
+	}
 
-		client, conn, err := connectBGP()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
-			return
-		}
-		defer conn.Close()
+	// Connect to GoBGP daemon
+	client, conn, err := connectBGP()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
+		return
+	}
+	defer conn.Close()
 
-		nlri, _ := anypb.New(&api.IPAddressPrefix{
-			Prefix:    req.Prefix,
-			PrefixLen: req.Length,
-		})
-
-		// Withdraw the path
-		_, err = client.DeletePath(context.Background(), &api.DeletePathRequest{
-			Path: &api.Path{
-				Family: &api.Family{
-					Afi:  api.Family_AFI_IP,
-					Safi: api.Family_SAFI_UNICAST,
-				},
-				Nlri: nlri,
-			},
-		})
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to revoke route", "details": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "✅ Route revoked successfully", "prefix": fmt.Sprintf("%s/%d", req.Prefix, req.Length)})
+	// Build the NLRI (prefix object)
+	nlri, err := anypb.New(&api.IPAddressPrefix{
+		Prefix:    req.Prefix,
+		PrefixLen: req.Length,
 	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to build NLRI", "details": err.Error()})
+		return
+	}
+
+	// Set next-hop (mandatory for deletion match)
+	nextHopAttr, err := anypb.New(&api.NextHopAttribute{
+		NextHop: req.NextHop,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create nextHopAttr", "details": err.Error()})
+		return
+	}
+
+	// Call GoBGP DeletePath
+	_, err = client.DeletePath(context.Background(), &api.DeletePathRequest{
+		Path: &api.Path{
+			Family: &api.Family{
+				Afi:  api.Family_AFI_IP,
+				Safi: api.Family_SAFI_UNICAST,
+			},
+			Nlri:   nlri,
+			Pattrs: []*anypb.Any{nextHopAttr},
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to revoke route",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "✅ Route revoked successfully",
+		"prefix":  fmt.Sprintf("%s/%d", req.Prefix, req.Length),
+		"nexthop": req.NextHop,
+	})
+})
+
 
 	router.POST("/validateAndAnnounce", func(c *gin.Context) {
 		var req struct {
