@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gobgp-router
-          image: majedur708/hlf-api:300.44
+          image: majedur708/hlf-api:300.45
           ports:
             - containerPort: 50051   
             - containerPort: 50052   
@@ -82,7 +82,7 @@ spec:
             claimName: mypvc
       containers:
         - name: gobgp-api
-          image: majedur708/hlf-api:50.28
+          image: majedur708/hlf-api:50.31
           ports:
             - containerPort: 2000
           env:

@@ -110,7 +110,7 @@ func main() {
 	})
 
 	router.GET("/getSystemManager", ReadHandleWithFunction(contract, "GetSystemManager"))
-	router.POST("/validatePath", WriteHandleWithFunction(contract, "ValidatePath"))
+	// router.POST("/validatePath", WriteHandleWithFunction(contract, "ValidatePath"))
 	router.POST("/createSystemManager", WriteHandleWithFunction(contract, "CreateSystemManager"))
 	fmt.Println("✅ REST API running on :2000")
 	router.Run(":2000")
