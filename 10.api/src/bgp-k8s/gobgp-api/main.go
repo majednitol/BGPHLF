@@ -219,6 +219,46 @@ router.POST("/revokeRoute", func(c *gin.Context) {
 	})
 })
 
+router.GET("/router-info", func(c *gin.Context) {
+	client, conn, err := connectBGP()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to GoBGP", "details": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	stream, err := client.ListPeer(context.Background(), &api.ListPeerRequest{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to list peers", "details": err.Error()})
+		return
+	}
+
+	var peers []gin.H
+
+	for {
+		res, err := stream.Recv()
+		if err != nil {
+			break
+		}
+		peer := res.Peer
+		if peer == nil || peer.Conf == nil || peer.Transport == nil || peer.State == nil {
+			continue
+		}
+
+		peers = append(peers, gin.H{
+			"local_as":        peer.Conf.LocalAsn, 
+			"neighbor_address": peer.Conf.NeighborAddress,
+			"peer_as":          peer.Conf.PeerAsn,
+			"local_address":    peer.Transport.LocalAddress,
+			"remote_port":      peer.Transport.RemotePort,
+			"description":      peer.Conf.Description,
+			"admin_state":      peer.State.AdminState.String(),
+			"session_state":    peer.State.SessionState.String(),
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"peers": peers})
+})
 
 	router.POST("/validateAndAnnounce", func(c *gin.Context) {
 		var req struct {

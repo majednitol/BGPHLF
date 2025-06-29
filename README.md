@@ -17,8 +17,10 @@ curl -X POST http://localhost:2000/revokeRoute \
   -H "Content-Type: application/json" \
   -d '{
     "prefix": "203.0.113.0",
-    "prefix_len": 24
+    "prefix_len": 24,
+    "next_hop": "127.0.0.11"
   }'
+
 
 
 
