@@ -123,9 +123,9 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Blockchain commit failed", "tx": status.TransactionID})
 			return
 		}
-		if string(result) != "VALID" {
+		if string(result) != "INVALID" {
 			c.JSON(http.StatusForbidden, gin.H{
-				"message": "❌ INVALID path — route not announced",
+				"message": "❌ INVALID path or prefix — route not announced",
 				"tx":      status.TransactionID,
 				"result":  string(result),
 			})
@@ -152,7 +152,7 @@ func main() {
 			Prefix:    prefixOnly,
 			PrefixLen: prefixLen,
 		})
-		originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) // IGP
+		originAttr, _ := anypb.New(&api.OriginAttribute{Origin: 0}) 
 		nextHopAttr, _ := anypb.New(&api.NextHopAttribute{NextHop: "127.0.0.11"})
 		asPathAttr, _ := anypb.New(&api.AsPathAttribute{
 			Segments: []*api.AsSegment{
