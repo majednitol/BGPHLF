@@ -18,7 +18,7 @@ spec:
         app: chaincode-basic-rono
     spec:
       containers:
-        - image: majedur708/hlf-api:18.100.49
+        - image: majedur708/hlf-api:18.100.50
           name: chaincode-basic-rono
           imagePullPolicy: Always
           env:
