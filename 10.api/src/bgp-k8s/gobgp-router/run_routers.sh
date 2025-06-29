@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # --- Add loopback IP aliases inside the container ---
 ip addr add 127.0.0.11/8 dev lo
 ip addr add 127.0.0.12/8 dev lo
@@ -10,7 +9,7 @@ ip addr add 127.0.0.16/8 dev lo
 ip addr add 127.0.0.17/8 dev lo
 ip addr add 127.0.0.18/8 dev lo
 ip addr add 127.0.0.19/8 dev lo
-ip addr add 127.0.0.20/8 dev lo
+ip addr add 127.0.0.20/8 dev lo 
 ip addr add 127.0.0.21/8 dev lo
 ip addr add 127.0.0.22/8 dev lo
 ip addr add 127.0.0.23/8 dev lo

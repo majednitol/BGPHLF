@@ -12,6 +12,8 @@ RUN adduser -D -u 1000 appuser
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/server .
 
+
 USER 1000
 EXPOSE 2000
 CMD ["./server"]
+  

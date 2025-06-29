@@ -6,8 +6,9 @@ toolchain go1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/osrg/gobgp/v3 v3.37.0
+	github.com/osrg/gobgp/v3 v3.36.0
 	google.golang.org/grpc v1.69.2
+	google.golang.org/protobuf v1.36.3
 )
 
 require (
@@ -37,7 +38,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
-	google.golang.org/protobuf v1.36.3 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
