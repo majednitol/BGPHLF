@@ -1206,7 +1206,56 @@ func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionC
 	}
 	return requests, nil
 }
+func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, asn string, prefixJSON string, assignedTo string, assignedBy string, timestamp string) error {
+	asKey := "AS_" + asn
 
+	// Parse prefixes from JSON
+	var prefixes []string
+	if err := json.Unmarshal([]byte(prefixJSON), &prefixes); err != nil {
+		return fmt.Errorf("invalid prefix JSON: %v", err)
+	}
+
+	asData := AS{
+		ASN:        asn,
+		Prefix:     prefixes,
+		AssignedTo: assignedTo,
+		AssignedBy: assignedBy,
+		Timestamp:  timestamp,
+	}
+
+	asBytes, err := json.Marshal(asData)
+	if err != nil {
+		return fmt.Errorf("failed to marshal AS struct: %v", err)
+	}
+
+	return ctx.GetStub().PutState(asKey, asBytes)
+}
+
+func (s *SmartContract) GetAllASData(ctx contractapi.TransactionContextInterface) ([]*AS, error) {
+	iter, err := ctx.GetStub().GetStateByRange("AS_", "AS_~")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get state range: %v", err)
+	}
+	defer iter.Close()
+
+	var result []*AS
+
+	for iter.HasNext() {
+		kv, err := iter.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var as AS
+		if err := json.Unmarshal(kv.Value, &as); err != nil {
+			continue // skip bad entries
+		}
+
+		result = append(result, &as)
+	}
+
+	return result, nil
+}
 
 func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string, asn string) (*PrefixAssignment, error) {
 	// Fetch ASN entry
