@@ -98,6 +98,7 @@ async function processQueue() {
       );
         console.log(result)
       console.log(`✅ Stored ASN ${asn} → ${prefix}`);
+       console.log(`📊 Finished queue processing: ${success} succeeded, ${fail} failed`);
       success++;
     } catch (err) {
       console.error(`⚠️ Failed to store ASN ${asn}, prefix ${prefix}: ${err.message}`);
@@ -111,7 +112,7 @@ async function processQueue() {
 let isRunning = false;
 
 export function scheduleRIRJob() {
-  cron.schedule("0 * * * *", async () => { 
+  cron.schedule("* * * * *", async () => { 
     if (isRunning) {
       console.warn("⏳ Skipping — previous job still running");
       return;
