@@ -82,10 +82,10 @@ async function processQueue() {
         },
         "200" // admin user ID
     );
-
+    let successCount = 0;
+    let failureCount = 0;
     while (requestQueue.length > 0) {
         const { asn, prefix, assignedTo, assignedBy, timestamp } = requestQueue.shift();
-// console.log("asn",asn,"prefix",prefix,"assignedTo",assignedTo,"assignedBy",assignedBy,"timestamp",timestamp)
         try {
             const prefixJSON = JSON.stringify([prefix]);
             const result = await contract.submitTransaction(
@@ -96,17 +96,20 @@ async function processQueue() {
                 assignedBy,
                 timestamp
             );
-       console.log("result",result)
+       console.log("result",result.toString())
             console.log(`✅ Stored ASN ${asn} → ${prefix}`);
+            successCount++;
         } catch (error) {
             console.error(`⚠️ Failed to store ASN ${asn}, prefix ${prefix}: ${error.message}`);
+            failureCount++;
         }
     }
+     console.log(`📊 Queue processing summary: ${successCount} succeeded, ${failureCount} failed.`);
 }
 
 // ⏱️ Scheduled task: run every hour
 export function scheduleRIRJob() {
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("*/15 * * * *", async () => {
         console.log("⏳ Starting scheduled RIR import...");
         await SetASData();
         console.log("✅ RIR import complete");
