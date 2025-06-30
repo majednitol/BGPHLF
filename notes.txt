@@ -326,7 +326,7 @@ peer chaincode query \
 
 // access couch db
 kubectl port-forward services/peer0-org1 5984:5984 [http://localhost:5984/_utils/]
-kubectl port-forward services/api 5982:5982 
+kubectl port-forward services/couchdb 5984:5984 
 kubectl port-forward services/gobgp-api 2000:2000
 
 // create connection profile for client
