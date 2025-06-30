@@ -769,7 +769,7 @@ func (s *SmartContract) AssignPrefix(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return fmt.Errorf("failed to parse prefix JSON: %v", err)
 	}
-	if mspID != "Org6MSP" {
+	if mspID != "RonoMSP" {
 		return fmt.Errorf("unauthorized: only RONO can assign prefixes")
 	}
 	if assignedTo == "" {
