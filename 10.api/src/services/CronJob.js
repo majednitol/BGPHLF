@@ -107,14 +107,28 @@ async function processQueue() {
      console.log(`📊 Queue processing summary: ${successCount} succeeded, ${failureCount} failed.`);
 }
 
-// ⏱️ Scheduled task: run every hour
+let isRunning = false; 
 export function scheduleRIRJob() {
-    cron.schedule("*/15 * * * *", async () => {
+    cron.schedule("* * * * *", async () => {
+        if (isRunning) {
+            console.warn("⏳ Previous RIR import is still running. Skipping this round...");
+            return;
+        }
+
+        isRunning = true;
         console.log("⏳ Starting scheduled RIR import...");
-        await SetASData();
-        console.log("✅ RIR import complete");
+
+        try {
+            await SetASData();
+            console.log("✅ RIR import complete");
+        } catch (err) {
+            console.error("❌ Error during RIR import:", err.message);
+        } finally {
+            isRunning = false; 
+        }
     });
 }
+
 
 
 scheduleRIRJob();
