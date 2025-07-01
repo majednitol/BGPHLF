@@ -3,7 +3,7 @@ import fs from 'fs';
 import cron from 'node-cron';
 
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
-const ROA_FILE = process.env.ROA_FILE || '/app/roas.json';
+const ROA_FILE = process.env.ROA_FILE || '/data/roas.json';
 
 const prefixes = ['10.1.0.0/24', '192.168.0.0/24', '172.16.0.0/16'];
 const asns = [100, 200, 300];
