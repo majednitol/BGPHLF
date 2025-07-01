@@ -10,6 +10,8 @@ const prefixes = ['10.1.0.0/24', '192.168.0.0/24', '172.16.0.0/16'];
 const asns = [100, 200, 300];
 
 const ajv = new Ajv();
+
+
 const schema = {
   type: "object",
   properties: {
@@ -17,14 +19,7 @@ const schema = {
       type: "object",
       properties: {
         generated: { type: "integer" },
-        counts: {
-          type: "object",
-          properties: {
-            ipv4: { type: "integer" },
-            ipv6: { type: "integer" }
-          },
-          required: ["ipv4", "ipv6"]
-        }
+        counts: { type: "integer" } 
       },
       required: ["generated", "counts"]
     },
@@ -78,15 +73,12 @@ async function refreshROAs() {
   const roaData = {
     metadata: {
       generated: Math.floor(Date.now() / 1000),
-      counts: {
-        ipv4: roas.length,
-        ipv6: 0
-      }
+      counts: roas.length  
     },
     roas
   };
 
-  validateROA(roaData); // ✅ Validate AFTER data is built
+  validateROA(roaData);
 
   fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
   console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
