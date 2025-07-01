@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-
 KEY_DIR="${KEY_DIR:-/app/keys}"
 DATA_DIR="${DATA_DIR:-/data}"
 
@@ -15,7 +14,7 @@ mkdir -p "$KEY_DIR"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-
+# Generate keys if not exist
 if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
   log "[Signer] Keys not found. Generating new self-signed keypair..."
   openssl req -x509 -newkey rsa:4096 \
@@ -26,17 +25,20 @@ if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
   log "[Signer] Keypair generated."
 fi
 
-    
-if [[ ! -f "$CERT_DER" ]]; then
-  log "[Signer] Converting PEM cert to DER format for GoRTR..."
-  openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
-  log "[Signer] cert.der generated at $CERT_DER"
+# Always convert PEM to DER (even if DER exists)
+log "[Signer] Converting PEM cert to DER format for GoRTR..."
+openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
+log "[Signer] cert.der generated at $CERT_DER"
+
+# Skip signing if ROA is empty or missing
+if [[ ! -f "$INPUT_FILE" ]]; then
+  log "[WARN] Input ROA file not found at $INPUT_FILE. Skipping signature."
+  exit 0
 fi
 
-# Check for input file
-if [[ ! -f "$INPUT_FILE" ]]; then
-  log "[ERROR] Input ROA file not found at $INPUT_FILE"
-  exit 1
+if [[ ! -s "$INPUT_FILE" || "$(jq '.roas | length' "$INPUT_FILE")" -eq 0 ]]; then
+  log "[WARN] ROA file is empty (0 entries). Skipping signature."
+  exit 0
 fi
 
 # Sign the ROA JSON file
