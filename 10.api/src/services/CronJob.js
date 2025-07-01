@@ -96,7 +96,7 @@ async function processQueue() {
         assignedBy,
         timestamp
       );
-        console.log(result)
+        console.log(result.toString())
       console.log(`✅ Stored ASN ${asn} → ${prefix}`);
        console.log(`📊 Finished queue processing: ${success} succeeded, ${fail} failed`);
       success++;
