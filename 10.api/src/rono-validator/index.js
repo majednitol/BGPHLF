@@ -56,7 +56,7 @@ function validateROA(data) {
 
 function signROA() {
   return new Promise((resolve, reject) => {
-    exec('./sign.sh', (error, stdout, stderr) => {
+    exec('./sign-roa.sh', (error, stdout, stderr) => {
       if (error) {
         console.error('[Signer] Error signing ROA:', error);
         reject(error);
