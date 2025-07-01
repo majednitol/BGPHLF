@@ -21,7 +21,7 @@ async function refreshROAs() {
         if (res.data === 'valid') {
           roas.push({
             prefix,
-            maxLength: prefix.split('/')[1],
+            maxLength: Number(prefix.split('/')[1]),
             asn: `AS${asn}`
           });
         }
@@ -33,7 +33,7 @@ async function refreshROAs() {
 
   const roaData = {
     metadata: {
-      generated: new Date().toISOString(),
+      generated: Math.floor(Date.now() / 1000),
       counts: {
         ipv4: roas.length,
         ipv6: 0
