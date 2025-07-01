@@ -22,17 +22,14 @@ spec:
             - name: ROA_FILE
               value: /data/roas.json
           volumeMounts:
-            - name: data
+            - name: mypvc
               mountPath: /data
-            - name: keys
-              mountPath: /app/keys     # where cert.pem and private.pem live
+            - name: mypvc
+              mountPath: /app/keys
       volumes:
-        - name: data
+        - name: mypvc
           persistentVolumeClaim:
             claimName: mypvc
-        - name: keys
-          persistentVolumeClaim:
-            claimName: keys-pvc
 
 ---
 apiVersion: apps/v1
@@ -60,24 +57,21 @@ spec:
             - -checktime=false
             - -verify=true
             - -verify.key
-            - /keys/cert.pem
+            - /app/keys/cert.pem
           volumeMounts:
-            - name: data
+            - name: mypvc
               mountPath: /data
-            - name: keys
-              mountPath: /keys         # required for cert.pem access
+            - name: mypvc
+              mountPath: /app/keys
           readinessProbe:
             tcpSocket:
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 10
       volumes:
-        - name: data
+        - name: mypvc
           persistentVolumeClaim:
             claimName: mypvc
-        - name: keys
-          persistentVolumeClaim:
-            claimName: keys-pvc
 
 ---
 apiVersion: v1
