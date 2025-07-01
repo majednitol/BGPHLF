@@ -20,14 +20,12 @@ spec:
             - name: API_BASE
               value: http://api.default.svc.cluster.local:4000
             - name: ROA_FILE
-              value: /data/roas.json
+              value: /app/data/roas.json
           volumeMounts:
-            - name: mypvc
-              mountPath: /data
-            - name: mypvc
-              mountPath: /app/keys
+            - name: data
+              mountPath: /app/data
       volumes:
-        - name: mypvc
+        - name: data
           persistentVolumeClaim:
             claimName: mypvc
 
@@ -53,23 +51,21 @@ spec:
             - -bind
             - :8282
             - -cache
-            - /data/roas.json
+            - /app/data/roas.json
             - -checktime=false
             - -verify=true
             - -verify.key
-            - /app/keys/cert.der
+            - /app/data/keys/cert.der
           volumeMounts:
-            - name: mypvc
-              mountPath: /data
-            - name: mypvc
-              mountPath: /app/keys
+            - name: data
+              mountPath: /app/data
           readinessProbe:
             tcpSocket:
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 10
       volumes:
-        - name: mypvc
+        - name: data
           persistentVolumeClaim:
             claimName: mypvc
 

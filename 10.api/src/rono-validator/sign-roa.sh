@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-KEY_DIR="${KEY_DIR:-/app/keys}"
-DATA_DIR="${DATA_DIR:-/data}"
+KEY_DIR="${KEY_DIR:-/app/data/keys}"
+DATA_DIR="${DATA_DIR:-/app/data}"
 
 PRIVATE_KEY="$KEY_DIR/private.pem"
 CERTIFICATE="$KEY_DIR/cert.pem"
@@ -14,7 +14,7 @@ mkdir -p "$KEY_DIR"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-# Generate keys if not exist
+# Generate cert/key if not exist
 if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
   log "[Signer] Keys not found. Generating new self-signed keypair..."
   openssl req -x509 -newkey rsa:4096 \
@@ -25,12 +25,12 @@ if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
   log "[Signer] Keypair generated."
 fi
 
-# Always convert PEM to DER (even if DER exists)
+# Always convert PEM to DER
 log "[Signer] Converting PEM cert to DER format for GoRTR..."
 openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
 log "[Signer] cert.der generated at $CERT_DER"
 
-# Skip signing if ROA is empty or missing
+# Skip signing if empty or not found
 if [[ ! -f "$INPUT_FILE" ]]; then
   log "[WARN] Input ROA file not found at $INPUT_FILE. Skipping signature."
   exit 0
@@ -41,7 +41,7 @@ if [[ ! -s "$INPUT_FILE" || "$(jq '.roas | length' "$INPUT_FILE")" -eq 0 ]]; the
   exit 0
 fi
 
-# Sign the ROA JSON file
+# Sign ROA
 log "[Signer] Signing $INPUT_FILE..."
 openssl cms -sign \
   -in "$INPUT_FILE" \
