@@ -54,7 +54,8 @@ spec:
             - /data/roas.json        # Changed to /data
             - -checktime=false
             - -sloppy
-            - -verify=false              # disables signature verification if needed
+            - -verify=false
+            - -verify.key=""              # disables signature verification if needed
       # For TLS:
            # - -tls.bind=:443
      # - -tls.cert=/path/to/cert.pem
