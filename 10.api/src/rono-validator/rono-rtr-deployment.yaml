@@ -1,5 +1,3 @@
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,10 +20,10 @@ spec:
             - name: API_BASE
               value: http://api.default.svc.cluster.local:4000
             - name: ROA_FILE
-              value: /app/roas.json
+              value: /data/roas.json       # Changed to /data
           volumeMounts:
             - name: data
-              mountPath: /app
+              mountPath: /data             # Changed from /app to /data
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -53,11 +51,11 @@ spec:
             - -bind
             - :8282
             - -cache
-            - /app/roas.json
+            - /data/roas.json        # Changed to /data
             - -checktime=false
           volumeMounts:
             - name: data
-              mountPath: /app
+              mountPath: /data         # Changed from /app to /data
           readinessProbe:
             tcpSocket:
               port: 8282
