@@ -124,9 +124,10 @@ export const tracePrefix = createAsyncThunk(
 export const getAllASData = createAsyncThunk(
   'ipPrefix/getAllASData',
   async (_, thunkAPI) => {
+    console.log("getAllASData")
     try {
 
-      const response = await apiRepository.get('ip/get-all-as-data', params, true);
+      const response = await apiRepository.get('ip/get-all-as-data', true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
