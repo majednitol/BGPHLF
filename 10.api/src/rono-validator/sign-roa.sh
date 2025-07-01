@@ -37,7 +37,7 @@ openssl cms -sign \
   -outform DER \
   -out "$SIGNATURE_FILE" \
   -nosmimecap \
-  -detached \
+  -binary \
   -nocerts
 
 log "[Signer] Signature saved to $SIGNATURE_FILE"
