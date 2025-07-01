@@ -57,7 +57,7 @@ spec:
             - -checktime=false
             - -verify=true
             - -verify.key
-            - /app/keys/cert.pem
+            - /app/keys/cert.der
           volumeMounts:
             - name: mypvc
               mountPath: /data
