@@ -53,7 +53,12 @@ spec:
             - -cache
             - /data/roas.json        # Changed to /data
             - -checktime=false
-            - -sloppy  
+            - -sloppy
+            - -verify=false              # disables signature verification if needed
+      # For TLS:
+           # - -tls.bind=:443
+     # - -tls.cert=/path/to/cert.pem
+      # - -tls.key=/path/to/key.pem  
           volumeMounts:
             - name: data
               mountPath: /data         # Changed from /app to /data
