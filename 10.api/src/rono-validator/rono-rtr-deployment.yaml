@@ -20,14 +20,19 @@ spec:
             - name: API_BASE
               value: http://api.default.svc.cluster.local:4000
             - name: ROA_FILE
-              value: /data/roas.json       # Changed to /data
+              value: /data/roas.json
           volumeMounts:
             - name: data
-              mountPath: /data             # Changed from /app to /data
+              mountPath: /data
+            - name: keys
+              mountPath: /app/keys     # where cert.pem and private.pem live
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
+        - name: keys
+          persistentVolumeClaim:
+            claimName: keys-pvc
 
 ---
 apiVersion: apps/v1
@@ -51,18 +56,16 @@ spec:
             - -bind
             - :8282
             - -cache
-            - /data/roas.json        # Changed to /data
+            - /data/roas.json
             - -checktime=false
-            - -sloppy
-            - -verify=false
-            - -verify.key=""              # disables signature verification if needed
-      # For TLS:
-           # - -tls.bind=:443
-     # - -tls.cert=/path/to/cert.pem
-      # - -tls.key=/path/to/key.pem  
+            - -verify=true
+            - -verify.key
+            - /keys/cert.pem
           volumeMounts:
             - name: data
-              mountPath: /data         # Changed from /app to /data
+              mountPath: /data
+            - name: keys
+              mountPath: /keys         # required for cert.pem access
           readinessProbe:
             tcpSocket:
               port: 8282
@@ -72,6 +75,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
+        - name: keys
+          persistentVolumeClaim:
+            claimName: keys-pvc
 
 ---
 apiVersion: v1
