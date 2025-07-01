@@ -223,23 +223,32 @@ export async function listPendingRequests(req, res) {
 }
 
 export async function getAllASData(req, res) {
-    try {
-        let payload = {
-            "org": req.org,
-            "channelName": channelName,
-            "chaincodeName": chaincodeName,
-            "userID": req.userId
+  try {
+    const payload = {
+      org: req.org,
+      channelName: channelName,
+      chaincodeName: chaincodeName,
+      userID: req.userId,
+    };
 
-        }
-        console.log("payload", payload)
-        let result = await GetAllASData(payload);
-        console.log("result app", result)
-        res.json(result)
-    } catch (error) {
-        console.log(error)
-        res.send(error)
-    }
+    console.log("payload", payload);
+    const result = await GetAllASData(payload);
+    console.log("result app", result);
+    res.json(result);
+
+  } catch (error) {
+    console.error("GetAllASData API Error:", error);
+
+    const statusCode = error.status || 500;
+    const message = error.message || "Internal Server Error";
+
+    res.status(statusCode).json({
+      success: false,
+      message,
+    });
+  }
 }
+
 export async function listAllASNValues(req, res) {
     try {
         let payload = {
