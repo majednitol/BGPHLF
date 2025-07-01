@@ -127,7 +127,7 @@ export const getAllASData = createAsyncThunk(
     console.log("getAllASData")
     try {
 
-      const response = await apiRepository.get('ip/get-all-as-data', true);
+      const response = await apiRepository.get('ip/get-all-as-data',{}, true);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

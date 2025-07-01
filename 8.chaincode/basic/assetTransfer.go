@@ -1209,7 +1209,16 @@ func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionC
 func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, asn string, prefixJSON string, assignedTo string, assignedBy string, timestamp string) error {
 	asKey := "AS_" + asn
 
-	// Parse prefixes from JSON
+	// Check if ASN already exists
+	existing, err := ctx.GetStub().GetState(asKey)
+	if err != nil {
+		return fmt.Errorf("failed to read ASN from world state: %v", err)
+	}
+	if existing != nil {
+		return fmt.Errorf("ASN %s already exists", asn)
+	}
+
+	// Parse prefix JSON
 	var prefixes []string
 	if err := json.Unmarshal([]byte(prefixJSON), &prefixes); err != nil {
 		return fmt.Errorf("invalid prefix JSON: %v", err)
@@ -1228,8 +1237,16 @@ func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, a
 		return fmt.Errorf("failed to marshal AS struct: %v", err)
 	}
 
-	return ctx.GetStub().PutState(asKey, asBytes)
+	if err := ctx.GetStub().PutState(asKey, asBytes); err != nil {
+		return fmt.Errorf("failed to store ASN: %v", err)
+	}
+
+	// ✅ You can log internally here; response is handled at client side
+	fmt.Printf("✅ ASN %s successfully stored with %d prefixes\n", asn, len(prefixes))
+
+	return nil
 }
+
 
 func (s *SmartContract) GetAllASData(ctx contractapi.TransactionContextInterface) ([]*AS, error) {
 	iter, err := ctx.GetStub().GetStateByRange("AS_", "AS_~")

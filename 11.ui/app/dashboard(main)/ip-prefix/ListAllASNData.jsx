@@ -49,18 +49,14 @@ const ListAllASNData = () => {
             </tr>
           </thead>
           <tbody>
+           
             {data
-              .sort((a, b) => Number(a.asn) - Number(b.asn))
-              .map((item, idx) => (
-                <tr key={idx}>
-                  <td style={styles.td}>{item.asn}</td>
-                  <td style={styles.td}>
-                    <ul style={styles.prefixList}>
-                      {item.prefix.map((p, i) => (
-                        <li key={i}>{p}</li>
-                      ))}
-                    </ul>
-                  </td>
+  .map((item, idx) => (
+    <tr key={idx}>
+      {console.log(item)}
+      <td style={styles.td}>{item.asn}</td>
+                  <td style={styles.td}>{item.prefix}</td>
+      
                   <td style={styles.td}>{item.assignedTo}</td>
                   <td style={styles.td}>{item.assignedBy}</td>
                   <td style={styles.td}>{formatDate(item.timestamp)}</td>
@@ -123,7 +119,7 @@ const styles = {
     textAlign: 'center',
   },
   prefixList: {
-    listStyleType: 'disc',
+    listStyleType: 'none',
     margin: 0,
     paddingLeft: '20px',
     textAlign: 'left',
