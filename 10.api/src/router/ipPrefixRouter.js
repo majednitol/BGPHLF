@@ -1,6 +1,6 @@
 import express from 'express'
 import authenticate from '../middleware/authenticate.js';
-import { announceRoute, assignPrefix, getAllOwnedPrefixes, getPrefixAssignment, listAllASNValues, listAllMembers, listApprovedRequests, listPendingRequests, revokeRoute, subAssignPrefix, tracePrefix, validatePath } from '../controllers/ipPrefixController.js';
+import { announceRoute, assignPrefix, getAllASData, getAllOwnedPrefixes, getPrefixAssignment, listAllASNValues, listAllMembers, listApprovedRequests, listPendingRequests, revokeRoute, subAssignPrefix, tracePrefix, validatePath } from '../controllers/ipPrefixController.js';
 const ipPrefixRouter = express.Router()
 ipPrefixRouter.post("/validate-path",authenticate, validatePath)
 
@@ -12,6 +12,7 @@ ipPrefixRouter.post("/revoke-route",authenticate, revokeRoute)
 ipPrefixRouter.get("/get-prefix-assignment", authenticate, getPrefixAssignment)
 ipPrefixRouter.get("/trace-prefix",authenticate, tracePrefix)
 
+ipPrefixRouter.get("/get-all-as-data",authenticate, getAllASData)
 ipPrefixRouter.get("/list-pending-requests",authenticate, listPendingRequests)
 
 ipPrefixRouter.get("/list-approved-requests",authenticate, listApprovedRequests)

@@ -1243,19 +1243,24 @@ func (s *SmartContract) GetAllASData(ctx contractapi.TransactionContextInterface
 	for iter.HasNext() {
 		kv, err := iter.Next()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to iterate state: %v", err)
 		}
 
 		var as AS
 		if err := json.Unmarshal(kv.Value, &as); err != nil {
-			continue // skip bad entries
+			continue // Skip malformed entries
 		}
 
 		result = append(result, &as)
 	}
 
+	if len(result) == 0 {
+		return nil, fmt.Errorf("no ASN amd Prefix records found")
+	}
+
 	return result, nil
 }
+
 
 func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string, asn string) (*AS, error) {
     // Fetch ASN entry from state

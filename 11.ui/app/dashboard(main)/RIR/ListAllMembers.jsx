@@ -33,14 +33,16 @@ const ListAllMembers = () => {
   }, [dispatch]);
 
   const handleApprove = async (memberID) => {
+    console.log("memberID",memberID)
     try {
-      await dispatch(approveMember()).unwrap();
+      await dispatch(approveMember({memberID})).unwrap();
       toast.success(`Member ${memberID} approved successfully!`);
 
       // Refresh member list
       await dispatch(listAllMembers()).unwrap();
     } catch (err) {
       toast.error(`Approval failed: ${err}`);
+      console.log(err)
     }
   };
 

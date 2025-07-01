@@ -263,3 +263,32 @@ export async function ListAllMembers(request) {
         throw error;
     }
 }
+
+
+export async function GetAllASData(request) {
+  try {
+    const { userID } = request;
+    const contract = await smartContract(request, userID);
+    const result = await contract.evaluateTransaction("GetAllASData");
+
+    const parsedResult = JSON.parse(result.toString());
+
+    if (!Array.isArray(parsedResult) || parsedResult.length === 0) {
+      throw createHttpError(404, "No ASN and Prefix records found.");
+    }
+
+    console.log(`✅ Fetched ${parsedResult.length} ASN records`);
+    return parsedResult;
+
+  } catch (error) {
+    const message = error.message || "";
+
+    console.error("❌ Error in GetAllASData:", message);
+
+    if (message.includes("no ASN records found")) {
+      throw createHttpError(404, "No ASN records found.");
+    }
+
+    throw createHttpError(500, message || "Internal Server Error");
+  }
+}

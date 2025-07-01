@@ -9,7 +9,8 @@ userRouter.get('/get-system-manager',authenticate, getSystemManager);
 userRouter.post("/login-system-manager", loginSystemManager)
 userRouter.post("/create-system-manager", createSystemManager)
 userRouter.post("/loggin-user", getLoggedInUser)
-userRouter.get("/get-all-prefixes-assigned-by-org",authenticate, getAllPrefixesAssignedByOrg)
+userRouter.get("/get-all-prefixes-assigned-by-org", authenticate, getAllPrefixesAssignedByOrg)
+
 userRouter.post("/register", registerNewUser)
 userRouter.post("/create-user", createUser)
 userRouter.post("/login-user", loginUser)
