@@ -46,5 +46,5 @@ async function refreshROAs() {
   console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
 }
 
-// cron.schedule('*/10 * * * *', refreshROAs);
-// refreshROAs();
+cron.schedule('*/10 * * * *', refreshROAs);
+refreshROAs();
