@@ -121,6 +121,18 @@ export const tracePrefix = createAsyncThunk(
   }
 );
 
+export const getAllASData = createAsyncThunk(
+  'ipPrefix/getAllASData',
+  async (_, thunkAPI) => {
+    try {
+
+      const response = await apiRepository.get('ip/get-all-as-data', params, true);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 export const listPendingRequests = createAsyncThunk(
   'ipPrefix/listPendingRequests',
   async (_, thunkAPI) => {
@@ -352,6 +364,20 @@ const ipPrefixSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(listAllMembers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // getAllASData
+       .addCase(getAllASData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllASData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(getAllASData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

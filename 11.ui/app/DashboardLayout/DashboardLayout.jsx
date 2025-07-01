@@ -17,7 +17,9 @@ const navItems = {
     '/dashboard/rono/user-info',
      '/dashboard/rono/assign-ip-prefix',
     '/dashboard/rono/view-assigned-ip-prefix',
-    '/dashboard/ip/trace-prefix'
+    '/dashboard/ip/trace-prefix',
+    '/dashboard/ip/asn-prefix-data'
+
   
   ],
     rir: [
@@ -26,7 +28,8 @@ const navItems = {
     '/dashboard/rir/assign-resource',
     '/dashboard/rir/list-pending-requests',
       '/dashboard/rir/list-all-members',
-    '/dashboard/ip/trace-prefix'
+    '/dashboard/ip/trace-prefix',
+    '/dashboard/ip/asn-prefix-data'
   
   
   ],
