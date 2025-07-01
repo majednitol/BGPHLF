@@ -53,13 +53,15 @@
 
 # # Start all routers
 # CMD ["/bin/bash", "./run_routers.sh"]
-# -------- STAGE 1: Builder --------
+
+
+
+
+# -------- STAGE 1: Builder for GoBGP --------
 FROM golang:1.23-alpine AS builder
 
-# Install build tools
 RUN apk add --no-cache git build-base
 
-# Clone and build GoBGP v3.36.0
 WORKDIR /go/src/github.com/osrg/gobgp
 RUN git clone https://github.com/osrg/gobgp . && \
     git checkout v3.36.0 && \
@@ -69,31 +71,30 @@ RUN git clone https://github.com/osrg/gobgp . && \
 # -------- STAGE 2: Runtime --------
 FROM alpine:3.20
 
-# Install bash, iproute2, curl, and necessary deps for Routinator
+# Install required tools
 RUN apk add --no-cache bash iproute2 curl libgcc libstdc++ tzdata
 
-# Install Routinator (fetch binary, verify latest version from https://github.com/NLnetLabs/routinator/releases)
-ENV ROUTINATOR_VERSION=v0.10.0
+# Set Routinator version
+ENV ROUTINATOR_VERSION=0.13.1
 
-RUN curl -L https://github.com/NLnetLabs/routinator/releases/download/${ROUTINATOR_VERSION}/routinator-${ROUTINATOR_VERSION}-x86_64-alpine-linux-musl.tar.gz \
-    | tar xz -C /usr/local/bin --strip-components=1 routinator-${ROUTINATOR_VERSION}-x86_64-alpine-linux-musl/routinator
+# Download and extract Routinator binary
+RUN curl -L https://github.com/NLnetLabs/routinator/releases/download/v${ROUTINATOR_VERSION}/routinator-${ROUTINATOR_VERSION}-x86_64-unknown-linux-musl.tar.gz \
+    | tar -xz -C /usr/local/bin --strip-components=1 --wildcards '*/routinator'
 
-# Copy GoBGP binaries from builder
+# Copy GoBGP from builder
 COPY --from=builder /go/bin/gobgpd /usr/local/bin/
 COPY --from=builder /go/bin/gobgp /usr/local/bin/
 
-# Set workdir and copy config and script files
+# Set working directory
 WORKDIR /gobgp
 COPY gobgp-router/*.conf ./
-COPY gobgp-router/run_routers.sh .
+COPY gobgp-router/run_routers.sh ./
 
-# Ensure script has Unix line endings and is executable
+# Make script executable
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
-# Expose GoBGP gRPC API ports
-EXPOSE 50051-50067
+# Expose BGP and Routinator ports
+EXPOSE 179 50051-50067 3323 8282
 
-# Routinator ports (default HTTP validation cache and RPKI-RTR port)
-EXPOSE 3323 8282
-
+# Start routers (you can add Routinator to the script or supervise it)
 CMD ["/bin/bash", "./run_routers.sh"]
