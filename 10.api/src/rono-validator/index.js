@@ -11,7 +11,7 @@ const asns = [100, 200, 300];
 
 const ajv = new Ajv();
 
-
+// ✅ Correct schema with object counts
 const schema = {
   type: "object",
   properties: {
@@ -19,7 +19,14 @@ const schema = {
       type: "object",
       properties: {
         generated: { type: "integer" },
-        counts: { type: "integer" } 
+        counts: {
+          type: "object",
+          properties: {
+            ipv4: { type: "integer" },
+            ipv6: { type: "integer" }
+          },
+          required: ["ipv4", "ipv6"]
+        }
       },
       required: ["generated", "counts"]
     },
@@ -39,6 +46,7 @@ const schema = {
   required: ["metadata", "roas"]
 };
 
+// ✅ Validate JSON against schema
 function validateROA(data) {
   const validate = ajv.compile(schema);
   if (!validate(data)) {
@@ -73,7 +81,10 @@ async function refreshROAs() {
   const roaData = {
     metadata: {
       generated: Math.floor(Date.now() / 1000),
-      counts: roas.length  
+      counts: {
+        ipv4: roas.length,
+        ipv6: 0
+      }
     },
     roas
   };
@@ -84,5 +95,5 @@ async function refreshROAs() {
   console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
 }
 
-cron.schedule('*/10 * * * *', refreshROAs);
 refreshROAs();
+cron.schedule('*/10 * * * *', refreshROAs);
