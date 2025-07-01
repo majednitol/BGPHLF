@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "ajv": "^8.17.1",
     "axios": "^1.10.0",
     "node-cron": "^4.2.0",
     "nodemon": "^3.1.10"
