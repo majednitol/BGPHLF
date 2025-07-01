@@ -1,0 +1,50 @@
+import axios from 'axios';
+import fs from 'fs';
+import cron from 'node-cron';
+
+const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
+const ROA_FILE = process.env.ROA_FILE || '/app/roas.json';
+
+const prefixes = ['10.1.0.0/24', '192.168.0.0/24', '172.16.0.0/16'];
+const asns = [100, 200, 300];
+
+async function refreshROAs() {
+  const roas = [];
+
+  for (const prefix of prefixes) {
+    for (const asn of asns) {
+      try {
+        const res = await axios.get(`${API_BASE}/api/validateAsnPrefix`, {
+          params: { asn, prefix }
+        });
+
+        if (res.data === 'valid') {
+          roas.push({
+            prefix,
+            maxLength: prefix.split('/')[1],
+            asn: `AS${asn}`
+          });
+        }
+      } catch (err) {
+        console.error(`Validation error for ASN ${asn}, Prefix ${prefix}:`, err.message);
+      }
+    }
+  }
+
+  const roaData = {
+    metadata: {
+      generated: new Date().toISOString(),
+      counts: {
+        ipv4: roas.length,
+        ipv6: 0
+      }
+    },
+    roas
+  };
+
+  fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
+  console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
+}
+
+cron.schedule('*/10 * * * *', refreshROAs);
+refreshROAs();

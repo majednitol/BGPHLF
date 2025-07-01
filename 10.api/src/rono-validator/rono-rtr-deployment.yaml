@@ -1,0 +1,85 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gortr-config
+  labels:
+    app: gortr
+  namespace: default
+data:
+  startup.sh: |
+    #!/bin/sh
+    gortr -bind :8282 -cache /app/roas.json -checktime=false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rono-validator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rono-validator
+  template:
+    metadata:
+      labels:
+        app: rono-validator
+    spec:
+      containers:
+        - name: validator
+          image: majedur708/hlf-api:500.0
+          env:
+            - name: API_BASE
+              value: http://api.default.svc.cluster.local:4000
+            - name: ROA_FILE
+              value: /app/roas.json
+          volumeMounts:
+            - name: data
+              mountPath: /app
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gortr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gortr
+  template:
+    metadata:
+      labels:
+        app: gortr
+    spec:
+      containers:
+        - name: gortr
+          image: cloudflare/gortr:latest
+          command: ["/bin/sh", "/app/config/startup.sh"]
+          volumeMounts:
+            - name: data
+              mountPath: /app
+            - name: config
+              mountPath: /app/config
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
+        - name: config
+          configMap:
+            name: gortr-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gortr
+spec:
+  selector:
+    app: gortr
+  ports:
+    - name: rtr
+      port: 8282
+      targetPort: 8282
