@@ -53,6 +53,7 @@ spec:
             - -cache
             - /data/roas.json        # Changed to /data
             - -checktime=false
+            - -sloppy  
           volumeMounts:
             - name: data
               mountPath: /data         # Changed from /app to /data
