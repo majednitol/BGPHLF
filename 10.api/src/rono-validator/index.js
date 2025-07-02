@@ -7,11 +7,13 @@ import { exec } from 'child_process';
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
 const ROA_FILE = process.env.ROA_FILE || '/data/roas.json';
 
-const prefixes = ['103.108.202.0/23', '103.144.125.0/24', '103.148.241.0/24'];
-const asns = [132000, 132001, 132058];
+const prefixASNList = [
+  { prefix: '103.108.202.0/23', asn: 132000 },
+  { prefix: '103.144.125.0/24', asn: 132001 },
+  { prefix: '103.148.241.0/24', asn: 132058 }
+];
 
 const ajv = new Ajv();
-
 const schema = {
   type: "object",
   properties: {
@@ -63,7 +65,7 @@ function signROA() {
         return;
       }
       if (stderr) {
-        console.error('[Signer] Signing stderr:', stderr);
+        console.warn('[Signer] Signing stderr:', stderr);
       }
       console.log('[Signer] Signing output:', stdout);
       resolve();
@@ -75,24 +77,31 @@ async function refreshROAs() {
   console.log('[RONO] Starting ROA refresh...');
   const roas = [];
 
-  for (const prefix of prefixes) {
-    for (const asn of asns) {
-      try {
-        const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
-          params: { asn, prefix }
+  for (const { prefix, asn } of prefixASNList) {
+    try {
+      const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
+        params: { prefix, asn }
+      });
+
+      const status = res.data;
+      console.log(`${prefix} - AS${asn}: ${status}`);
+
+      if (status === 'valid') {
+        roas.push({
+          prefix,
+          maxLength: Number(prefix.split('/')[1]),
+          asn: `AS${asn}`
         });
-        console.log("res.data", res.data)
-        if (res.data === 'valid') {
-          roas.push({
-            prefix,
-            maxLength: Number(prefix.split('/')[1]),
-            asn: `AS${asn}`
-          });
-        }
-      } catch (err) {
-        console.error(`Validation error for ASN ${asn}, Prefix ${prefix}:`, err.message);
       }
+
+    } catch (err) {
+      console.error(`[ERROR] Validation failed for ${prefix} - AS${asn}:`, err.message);
     }
+  }
+
+  if (roas.length === 0) {
+    console.warn('[WARN] No valid ROAs found. Skipping signing.');
+    return;
   }
 
   const roaData = {
@@ -107,7 +116,6 @@ async function refreshROAs() {
   };
 
   validateROA(roaData);
-
   fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
   console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
 
@@ -115,5 +123,8 @@ async function refreshROAs() {
   console.log('[RONO] ROA signing complete.');
 }
 
-refreshROAs();
-cron.schedule('*/10 * * * *', refreshROAs);
+// Start once at launch
+(async () => {
+  await refreshROAs();
+  cron.schedule('*/10 * * * *', refreshROAs); // every 10 minutes
+})();
