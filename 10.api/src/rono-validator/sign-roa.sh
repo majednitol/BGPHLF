@@ -7,6 +7,7 @@ DATA_DIR="${DATA_DIR:-/app/data}"
 PRIVATE_KEY="$KEY_DIR/private.pem"
 CERTIFICATE="$KEY_DIR/cert.pem"
 CERT_DER="$KEY_DIR/cert.der"
+PUBLIC_KEY="$KEY_DIR/public.pem"
 INPUT_FILE="$DATA_DIR/roas.json"
 SIGNATURE_FILE="$DATA_DIR/roas.json.sig"
 
@@ -21,27 +22,40 @@ if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
     -keyout "$PRIVATE_KEY" \
     -out "$CERTIFICATE" \
     -days 365 -nodes \
-    -subj "/CN=RPKI Validator"
+    -subj "/CN=RPKI Validator" \
+    -addext "keyUsage=digitalSignature,keyCertSign"
   log "[Signer] Keypair generated."
 fi
 
-# Always convert PEM to DER
-log "[Signer] Converting PEM cert to DER format for GoRTR..."
-openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
-log "[Signer] cert.der generated at $CERT_DER"
+# Extract public key
+log "[Signer] Extracting public key..."
+openssl x509 -in "$CERTIFICATE" -pubkey -noout > "$PUBLIC_KEY"
 
-# Skip signing if empty or not found
+# Validate public key file
+if [[ ! -s "$PUBLIC_KEY" ]]; then
+  log "[ERROR] Public key extraction failed"
+  exit 1
+fi
+log "[Signer] Public key saved to $PUBLIC_KEY"
+
+# Convert PEM to DER for GoRTR or Routinator
+log "[Signer] Converting PEM cert to DER format..."
+openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
+chmod 644 "$CERT_DER"
+log "[Signer] DER certificate saved to $CERT_DER"
+
+# Skip signing if ROA file not found or empty
 if [[ ! -f "$INPUT_FILE" ]]; then
-  log "[WARN] Input ROA file not found at $INPUT_FILE. Skipping signature."
+  log "[WARN] ROA file not found at $INPUT_FILE. Skipping signature."
   exit 0
 fi
 
 if [[ ! -s "$INPUT_FILE" || "$(jq '.roas | length' "$INPUT_FILE")" -eq 0 ]]; then
-  log "[WARN] ROA file is empty (0 entries). Skipping signature."
+  log "[WARN] ROA file is empty. Skipping signature."
   exit 0
 fi
 
-# Sign ROA
+# Sign the ROA file
 log "[Signer] Signing $INPUT_FILE..."
 openssl cms -sign \
   -in "$INPUT_FILE" \
@@ -54,4 +68,5 @@ openssl cms -sign \
   -nodetach \
   -nocerts
 
+chmod 644 "$SIGNATURE_FILE"
 log "[Signer] Signature saved to $SIGNATURE_FILE"

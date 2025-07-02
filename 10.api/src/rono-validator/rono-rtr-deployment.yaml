@@ -53,12 +53,12 @@ spec:
             - -cache
             - /app/data/roas.json
             - -checktime=false
-            - -verify=false
-            - -verify.key
-            - /app/data/keys/cert.der
+            - -verify=true
+            - -verify.key=/app/data/keys/public.pem
           volumeMounts:
             - name: data
               mountPath: /app/data
+              readOnly: true
           readinessProbe:
             tcpSocket:
               port: 8282
