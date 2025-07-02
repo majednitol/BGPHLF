@@ -56,8 +56,6 @@ spec:
             - -verify=false
             - -verify.key
             - /app/data/keys/cert.der
-            - -verify.sig
-            - /app/data/roas.json.sig
           volumeMounts:
             - name: data
               mountPath: /app/data
