@@ -1278,35 +1278,57 @@ func (s *SmartContract) GetAllASData(ctx contractapi.TransactionContextInterface
 	return result, nil
 }
 
-
-func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string, asn string) (*AS, error) {
-    // Fetch ASN entry from state
+func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string, asn string) (string, error) {
     key := "AS_" + asn
     asnBytes, err := ctx.GetStub().GetState(key)
     if err != nil {
-        return nil, fmt.Errorf("failed to read ASN %s from state: %v", asn, err)
+        return "not found", fmt.Errorf("failed to read ASN %s from state: %v", asn, err)
     }
     if asnBytes == nil {
-        return nil, fmt.Errorf("ASN %s not found in ledger", asn)
+        return "not found", nil
     }
+
     var as AS
     if err := json.Unmarshal(asnBytes, &as); err != nil {
-        return nil, fmt.Errorf("failed to unmarshal ASN %s data: %v", asn, err)
+        return "not found", fmt.Errorf("failed to unmarshal ASN %s data: %v", asn, err)
     }
 
-    prefixFound := false
     for _, p := range as.Prefix {
         if p == prefix {
-            prefixFound = true
-            break
+            return "valid", nil
         }
     }
-    if !prefixFound {
-        return nil, fmt.Errorf(" Invalid prefix %s for ASN %s", prefix, asn)
-    }
-
-    return &as, nil
+    return "invalid", nil
 }
+
+// func (s *SmartContract) TracePrefix(ctx contractapi.TransactionContextInterface, prefix string, asn string) (*AS, error) {
+//     // Fetch ASN entry from state
+//     key := "AS_" + asn
+//     asnBytes, err := ctx.GetStub().GetState(key)
+//     if err != nil {
+//         return nil, fmt.Errorf("failed to read ASN %s from state: %v", asn, err)
+//     }
+//     if asnBytes == nil {
+//         return nil, fmt.Errorf("ASN %s not found in ledger", asn)
+//     }
+//     var as AS
+//     if err := json.Unmarshal(asnBytes, &as); err != nil {
+//         return nil, fmt.Errorf("failed to unmarshal ASN %s data: %v", asn, err)
+//     }
+
+//     prefixFound := false
+//     for _, p := range as.Prefix {
+//         if p == prefix {
+//             prefixFound = true
+//             break
+//         }
+//     }
+//     if !prefixFound {
+//         return nil, fmt.Errorf(" Invalid prefix %s for ASN %s", prefix, asn)
+//     }
+
+//     return &as, nil
+// }
 
 
 
