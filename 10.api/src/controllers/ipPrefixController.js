@@ -184,10 +184,10 @@ export async function getPrefixAssignment(req, res) {
 export async function tracePrefix(req, res) {
     try {
         let payload = {
-            "org": req.org,
+            "org": "AfrinicMSP",
             "channelName": channelName,
             "chaincodeName": chaincodeName,
-            "userId": req.userId,
+            "userId": "222",
             "prefix": req.query.prefix,
             "asn": req.query.asn
         }

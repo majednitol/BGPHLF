@@ -7,8 +7,8 @@ import { exec } from 'child_process';
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
 const ROA_FILE = process.env.ROA_FILE || '/data/roas.json';
 
-const prefixes = ['10.1.0.0/24', '192.168.0.0/24', '172.16.0.0/16'];
-const asns = [100, 200, 300];
+const prefixes = ['103.108.202.0/23', '103.144.125.0/24', '103.148.241.0/24'];
+const asns = [132000, 132001, 132058];
 
 const ajv = new Ajv();
 
@@ -78,10 +78,10 @@ async function refreshROAs() {
   for (const prefix of prefixes) {
     for (const asn of asns) {
       try {
-        const res = await axios.get(`${API_BASE}/api/validateAsnPrefix`, {
+        const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
           params: { asn, prefix }
         });
-
+        console.log("res.data", res.data)
         if (res.data === 'valid') {
           roas.push({
             prefix,

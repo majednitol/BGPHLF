@@ -10,7 +10,7 @@ ipPrefixRouter.post("/announce-route",authenticate, announceRoute)
 ipPrefixRouter.post("/revoke-route",authenticate, revokeRoute)
 
 ipPrefixRouter.get("/get-prefix-assignment", authenticate, getPrefixAssignment)
-ipPrefixRouter.get("/trace-prefix",authenticate, tracePrefix)
+ipPrefixRouter.get("/trace-prefix", tracePrefix)
 
 ipPrefixRouter.get("/get-all-as-data",authenticate, getAllASData)
 ipPrefixRouter.get("/list-pending-requests",authenticate, listPendingRequests)
