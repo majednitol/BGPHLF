@@ -5,7 +5,7 @@ import Ajv from 'ajv';
 import { exec } from 'child_process';
 
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
-const ROA_FILE = process.env.ROA_FILE || '/data/roas.json';
+const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
 
 const prefixASNList = [
   { prefix: '103.108.202.0/23', asn: 132000 },
@@ -14,6 +14,7 @@ const prefixASNList = [
 ];
 
 const ajv = new Ajv();
+
 const schema = {
   type: "object",
   properties: {
@@ -21,14 +22,7 @@ const schema = {
       type: "object",
       properties: {
         generated: { type: "integer" },
-        counts: {
-          type: "object",
-          properties: {
-            ipv4: { type: "integer" },
-            ipv6: { type: "integer" }
-          },
-          required: ["ipv4", "ipv6"]
-        }
+        counts: { type: "integer" }  // Fixed: counts as integer, not object
       },
       required: ["generated", "counts"]
     },
@@ -107,10 +101,7 @@ async function refreshROAs() {
   const roaData = {
     metadata: {
       generated: Math.floor(Date.now() / 1000),
-      counts: {
-        ipv4: roas.length,
-        ipv6: 0
-      }
+      counts: roas.length
     },
     roas
   };
@@ -123,8 +114,8 @@ async function refreshROAs() {
   console.log('[RONO] ROA signing complete.');
 }
 
-// Start once at launch
+// Start once at launch and then every 10 minutes
 (async () => {
   await refreshROAs();
-  cron.schedule('*/10 * * * *', refreshROAs); // every 10 minutes
+  cron.schedule('*/10 * * * *', refreshROAs);
 })();

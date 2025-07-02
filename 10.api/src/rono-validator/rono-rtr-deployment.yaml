@@ -53,9 +53,9 @@ spec:
             - -cache
             - /app/data/roas.json
             - -checktime=false
-            - -verify=true
-            - -verify.key
-            - /app/data/keys/cert.der
+            - -verify=false
+            # - -verify.key
+            # - /app/data/keys/cert.der
           volumeMounts:
             - name: data
               mountPath: /app/data
