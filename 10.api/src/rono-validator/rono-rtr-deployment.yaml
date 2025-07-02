@@ -16,13 +16,11 @@ spec:
         - name: stayrtr
           image: rpki/stayrtr:latest
           args:
-            - --refresh=600
-            - --input.roa.json=/app/data/roas.json
-            - --input.roa.sig=/app/data/roas.json.sig
-            - --input.roa.certificate=/app/data/keys/cert.der
-            - --bind=0.0.0.0:8282
-          ports:
-            - containerPort: 8282
+            - -cache
+            - /app/data/rpki.json
+            - -bind
+            - :8282
+            - -checktime=false
           volumeMounts:
             - name: data
               mountPath: /app/data
@@ -36,6 +34,7 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
+
 
 ---
 apiVersion: v1

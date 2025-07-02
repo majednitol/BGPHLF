@@ -113,7 +113,7 @@ async function refreshROAs() {
   console.log('[RONO] ROA signing complete.');
 }
 
-// Start once at launch and every 10 mins
+// Start at launch and every 10 mins
 (async () => {
   await refreshROAs();
   cron.schedule('*/10 * * * *', refreshROAs);
