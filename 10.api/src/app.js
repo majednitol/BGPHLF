@@ -7,7 +7,7 @@ import gobalErrorHander from "./middleware/gobalErrorHander.js";
 
 import ipPrefixRouter from "./router/ipPrefixRouter.js";
 import companyRouter from "./router/companyRouter.js";
-import { scheduleRIRJob } from "./services/CronJob.js";
+// import { scheduleRIRJob } from "./services/CronJob.js";
 app.use(cors())
 app.use(express.json());
 

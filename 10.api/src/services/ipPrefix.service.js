@@ -158,7 +158,7 @@ export async function TracePrefix(request) {
     const result = await contract.evaluateTransaction("TracePrefix", prefix, asn);
     console.log("✅ Transaction Result:", result.toString());
 
-    return JSON.parse(result.toString());
+    return result.toString()
 
   } catch (error) {
     const message = error.message || "";
