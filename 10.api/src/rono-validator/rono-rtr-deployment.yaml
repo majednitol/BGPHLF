@@ -1,60 +1,28 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rono-validator
+  name: stayrtr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rono-validator
+      app: stayrtr
   template:
     metadata:
       labels:
-        app: rono-validator
+        app: stayrtr
     spec:
       containers:
-        - name: validator
-          image: majedur708/hlf-api:500.18
-          env:
-            - name: API_BASE
-              value: http://api.default.svc.cluster.local:4000
-            - name: ROA_FILE
-              value: /app/data/roas.json
-          volumeMounts:
-            - name: data
-              mountPath: /app/data
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: mypvc
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: gortr
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: gortr
-  template:
-    metadata:
-      labels:
-        app: gortr
-    spec:
-      containers:
-        - name: gortr
-          image: cloudflare/gortr:latest
+        - name: stayrtr
+          image: rpki/stayrtr:latest
           args:
-            - -bind
-            - :8282
-            - -cache
-            - /app/data/roas.json
-            - -checktime=false
-            - -verify=true
-            - -verify.key=/app/data/keys/public.pem
+            - --refresh=600
+            - --input.roa.json=/app/data/roas.json
+            - --input.roa.sig=/app/data/roas.json.sig
+            - --input.roa.certificate=/app/data/keys/cert.der
+            - --bind=0.0.0.0:8282
+          ports:
+            - containerPort: 8282
           volumeMounts:
             - name: data
               mountPath: /app/data
@@ -73,14 +41,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gortr
+  name: stayrtr
 spec:
   selector:
-    app: gortr
+    app: stayrtr
   ports:
     - name: rtr
       port: 8282
       targetPort: 8282
 
-
-# time="2025-07-02T12:51:46Z" level=fatal msg="Not EDCSA public key"

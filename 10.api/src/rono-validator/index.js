@@ -14,7 +14,6 @@ const prefixASNList = [
 ];
 
 const ajv = new Ajv();
-
 const schema = {
   type: "object",
   properties: {
@@ -22,7 +21,7 @@ const schema = {
       type: "object",
       properties: {
         generated: { type: "integer" },
-        counts: { type: "integer" }  // Fixed: counts as integer, not object
+        counts: { type: "integer" }
       },
       required: ["generated", "counts"]
     },
@@ -114,7 +113,7 @@ async function refreshROAs() {
   console.log('[RONO] ROA signing complete.');
 }
 
-// Start once at launch and then every 10 minutes
+// Start once at launch and every 10 mins
 (async () => {
   await refreshROAs();
   cron.schedule('*/10 * * * *', refreshROAs);
