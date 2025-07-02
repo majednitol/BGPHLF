@@ -15,36 +15,38 @@ mkdir -p "$KEY_DIR"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-# Generate cert/key if not exist
+# Generate ECDSA cert/key if not exist
 if [[ ! -f "$PRIVATE_KEY" || ! -f "$CERTIFICATE" ]]; then
-  log "[Signer] Keys not found. Generating new self-signed keypair..."
-  openssl req -x509 -newkey rsa:4096 \
-    -keyout "$PRIVATE_KEY" \
+  log "[Signer] Keys not found. Generating new ECDSA keypair (secp256r1)..."
+  openssl ecparam -name prime256v1 -genkey -noout -out "$PRIVATE_KEY"
+  openssl req -x509 -new -key "$PRIVATE_KEY" \
     -out "$CERTIFICATE" \
-    -days 365 -nodes \
+    -days 365 \
     -subj "/CN=RPKI Validator" \
     -addext "keyUsage=digitalSignature,keyCertSign"
-  log "[Signer] Keypair generated."
+  log "[Signer] ECDSA Keypair generated."
 fi
 
-# Extract public key
+# Extract ECDSA public key
 log "[Signer] Extracting public key..."
 openssl x509 -in "$CERTIFICATE" -pubkey -noout > "$PUBLIC_KEY"
 
-# Validate public key file
-if [[ ! -s "$PUBLIC_KEY" ]]; then
-  log "[ERROR] Public key extraction failed"
+# Validate public key format
+if ! openssl ec -pubin -in "$PUBLIC_KEY" -text &>/dev/null; then
+  log "[ERROR] Invalid ECDSA public key format"
   exit 1
 fi
+
+chmod 644 "$PUBLIC_KEY"
 log "[Signer] Public key saved to $PUBLIC_KEY"
 
-# Convert PEM to DER for GoRTR or Routinator
-log "[Signer] Converting PEM cert to DER format..."
+# Convert PEM to DER for GoRTR
+log "[Signer] Converting cert to DER format..."
 openssl x509 -in "$CERTIFICATE" -outform DER -out "$CERT_DER"
 chmod 644 "$CERT_DER"
 log "[Signer] DER certificate saved to $CERT_DER"
 
-# Skip signing if ROA file not found or empty
+# Skip signing if ROA file missing or empty
 if [[ ! -f "$INPUT_FILE" ]]; then
   log "[WARN] ROA file not found at $INPUT_FILE. Skipping signature."
   exit 0

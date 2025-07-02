@@ -81,3 +81,6 @@ spec:
     - name: rtr
       port: 8282
       targetPort: 8282
+
+
+# time="2025-07-02T12:51:46Z" level=fatal msg="Not EDCSA public key"
