@@ -18,7 +18,7 @@ spec:
         app: chaincode-basic-arin
     spec:
       containers:
-        - image: majedur708/hlf-api:18.100.54
+        - image: majedur708/hlf-api:18.100.55
           name: chaincode-basic-arin
           imagePullPolicy: Always
           env:

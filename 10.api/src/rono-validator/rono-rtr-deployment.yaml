@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: validator
-          image: majedur708/hlf-api:500.10
+          image: majedur708/hlf-api:500.16
           env:
             - name: API_BASE
               value: http://api.default.svc.cluster.local:4000
