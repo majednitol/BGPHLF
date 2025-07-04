@@ -1,20 +1,20 @@
 //approve chaincode peer0-afrinic
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:9e3e0aeefd8a6991b499b590aa94d107051c81742c53ccf488c9a971ecc627f7 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:d5ccc9e1231d41b211e8b950e003e3b9627741f0f1c913206ed6aaba37b79eb5 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-apnic
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:cfcaac4f17c1cacde7b7625faca366485156a1b7ddbb24d1c1b54c90ff4a645b --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:0ed85e7c72fd806e84a998b8e6944e66340d374138ab8f6f28e826cf99603055 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-arin
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:7e4cd7e0c92c7c5fa1c3983b013afab28649db0bdd35306c8f19d9887575a16d --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:a1fe86efccefb80ac23cefaa5d8eb7caa77bcc70a92bc326b2078b344de13e1f --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-ripencc
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:13d6a9462c5ff8c28f30a2661afe1dac71b150ccab5314be6085c8243bf53c81 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:576b88f01089c78d4e28b3e4c94ada7ea47015e088939b62e9615f98edacd5f1 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-lacnic
 peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:36c54f040899b903e3d740b09d433b62cc597df05c9e6895a63549ce4e821f61 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-rono
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:9593325f222d68865623d3c3b29136a8e98cc640693ec95f63c129b5945714c1 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:67aeec0ef66c14e116faaae946a12d3bc3fc7a10b58f76b094600cc2908ff620 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
 
 
 //checkcommitreadiness

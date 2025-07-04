@@ -57,3 +57,14 @@ kubectl delete services --all
 
 
 
+<!-- backup full system data  -->
+1. sudo chmod -R 777 ~/coding/backup_data
+2. sudo rsync -av --progress --delete ~/coding/nfs_clientshare/ ~/coding/backup_data/
+3. sudo crontab -e
+4. * * * * * rsync -av --delete /Users/majedurrahman/coding/nfs_clientshare/ /Users/majedurrahman/coding/backup_data/
+
+// check crontab
+ sudo crontab -l
+
+
+sudo cp -R ~/coding/backup_data/. ~/coding/nfs_clientshare/
