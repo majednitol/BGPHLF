@@ -10,7 +10,7 @@
 
 6. tar cfz code.tar.gz connection.json && tar cfz basic-lacnic.tgz code.tar.gz metadata.json && nano connection.json
 
-7. tar cfz code.tar.gz connection.json && tar cfz basic-rono.tgz code.tar.gz metadata.json && nano connection.json
+7. tar cfz code.tar.gz connection.json && tar cfz basic-rono.tgz code.tar.gz metadata.json
 
 
 

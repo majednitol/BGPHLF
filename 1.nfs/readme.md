@@ -20,12 +20,16 @@
 ## NFS Client (MacOS)
 
 1. mkdir nfs_clientshare
-2. sudo mount -o nolocks -t nfs 167.71.238.9:/mnt/nfs_share ./nfs_clientshare
+2. sudo mount -o nolocks -t nfs 212.2.247.23:/mnt/nfs_share ./nfs_clientshare
 
 cd usr/share/nginx/html
 
 sudo cp -R prerequsite/* ../nfs_clientshare
 
+
+sudo chmod 777 chaincode connection-profile configtx organizations -R
+
+sudo rm -rf chaincode connection-profile scripts fabric-ca configtx organizations
 ## minikube NFS (local deployment)
 minikube start --disk-size=20g --memory=7835 --cpus=8
 sudo chmod -R 777 ../nfs_share      
@@ -35,10 +39,17 @@ minikube stop
  minikube mount ../nfs_share:/mnt/data  
 
 
-doctl kubernetes cluster kubeconfig save 994d2367-c91f-49e0-98ec-f56d2d3887d2
- 
-ssh root@139.59.74.85
-vm p@$$W0rd
+civo kubernetes create bgphlf \
+  --size g4s.kube.large \
+  --nodes 3 \
+  --region LON1 \
+  --save
+
+ civo kubernetes remove bgphlf --region LON1 --yes
+civo instance create bgphlf ubuntu --size g4s.small --wait
+
+ssh civo@212.2.247.23
+vm ELrmo3Qq1t
 
 
 kubectl delete deployments --all
@@ -46,12 +57,3 @@ kubectl delete services --all
 
 
 
-
-| **Org Role** | **Old Org Name** | **Old Domain**   | **New Org Name** | **New Domain (Production)** | **Connection Profile Name** | **MSP ID**  |
-| ------------ | ---------------- | ---------------- | ---------------- | --------------------------- | --------------------------- | ---------- |
-| AFRINIC      | org1             | org1.example.com | afrinic          | afrinic.rono.com            | connection-afrinic.json     | AfrinicMSP |
-| APNIC        | org2             | org2.example.com | apnic            | apnic.rono.com              | connection-apnic.json       | ApnicMSP   |
-| ARIN         | org3             | org3.example.com | arin             | arin.rono.com               | connection-arin.json        | ArinMSP    |
-| RIPE NCC     | org4             | org4.example.com | ripencc          | ripencc.rono.com            | connection-ripencc.json     | RipenccMSP |
-| LACNIC       | org5             | org5.example.com | lacnic           | lacnic.rono.com             | connection-lacnic.json      | LacnicMSP  |
-| RONO         | org6             | org6.example.com | rono             | rono.rono.com               | connection-rono.json        | RonoMSP    |
