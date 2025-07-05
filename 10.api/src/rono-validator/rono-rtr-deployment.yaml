@@ -21,24 +21,11 @@ spec:
 
             # TLS config
             - -tls.bind
-            - :8282
+            - :8283
             - -tls.key
             - /app/data/keys/private.pem
             - -tls.cert
             - /app/data/keys/server.pem
-
-            # SSH config (optional)
-            # - -ssh.bind
-            # - :8283
-            # - -ssh.key
-            # - /app/data/keys/private.pem
-            # - -ssh.method.password=true
-            # - -ssh.auth.user
-            # - rpki
-            # - -ssh.auth.password
-            # - rpki
-
-            # Disable time check if needed
             - -checktime=false
 
           volumeMounts:
@@ -47,13 +34,13 @@ spec:
 
           readinessProbe:
             tcpSocket:
-              port: 8282
+              port: 8283
             initialDelaySeconds: 5
             periodSeconds: 10
 
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
+            runAsGroup: 0
             allowPrivilegeEscalation: false
 
       volumes:
@@ -71,11 +58,8 @@ spec:
     app: stayrtr
   ports:
     - name: rtr
-      port: 8282
-      targetPort: 8282
-    # - name: rtr-ssh
-    #   port: 8283
-    #   targetPort: 8283
+      port: 8283
+      targetPort: 8283
 
 
 
