@@ -5,7 +5,7 @@ import Ajv from 'ajv';
 import { exec } from 'child_process';
 
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
-const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
+const ROA_FILE = process.env.ROA_FILE || '/app/data/rpki.json';
 
 const prefixASNList = [
   { prefix: '103.108.202.0/23', asn: 200 },
@@ -107,7 +107,7 @@ async function refreshROAs() {
 
   validateROA(roaData);
   fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
-  console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}`);
+  console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE} file ${roas}`);
 
   await signROA();
   console.log('[RONO] ROA signing complete.');
