@@ -5,7 +5,7 @@ import Ajv from 'ajv';
 import { exec } from 'child_process';
 
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
-const ROA_FILE = process.env.ROA_FILE || '/app/data/rpki.json';
+const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
 
 const prefixASNList = [
   { prefix: '103.108.202.0/23', asn: 200 },
