@@ -31,7 +31,7 @@ const schema = {
         properties: {
           prefix: { type: "string" },
           maxLength: { type: "integer" },
-          asn: { type: "integer" } // ✅ Must be integer, not string
+          asn: { type: "integer" } 
         },
         required: ["prefix", "maxLength", "asn"]
       }
@@ -71,20 +71,20 @@ async function refreshROAs() {
 
   for (const { prefix, asn } of prefixASNList) {
     try {
-      const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
-        params: { prefix, asn }
-      });
+      // const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
+      //   params: { prefix, asn }
+      // });
 
-      const status = res.data;
-      console.log(`${prefix} - AS${asn}: ${status}`);
+      // const status = res.data;
+      // console.log(`${prefix} - AS${asn}: ${status}`);
 
-      if (status === 'valid') {
+      // if (status === 'valid') {
         roas.push({
           prefix,
           maxLength: Number(prefix.split('/')[1]),
-          asn // ✅ Use integer directly, NOT "AS${asn}"
+          asn 
         });
-      }
+      // }
 
     } catch (err) {
       console.error(`[ERROR] Validation failed for ${prefix} - AS${asn}:`, err.message);
