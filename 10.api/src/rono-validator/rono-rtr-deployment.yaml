@@ -23,20 +23,20 @@ spec:
             - -tls.bind
             - :8282
             - -tls.key
-            - /keys/private.pem
+            - /app/data/keys/private.pem
             - -tls.cert
-            - /keys/server.pem
+            - /app/data/keys/server.pem
 
             # SSH config
-            - -ssh.bind
-            - :8283
-            - -ssh.key
-            - /keys/private.pem
-            - -ssh.method.password=true
-            - -ssh.auth.user
-            - rpki
-            - -ssh.auth.password
-            - rpki
+            # - -ssh.bind
+            # - :8283
+            # - -ssh.key
+            # - /app/data/keys/private.pem
+            # - -ssh.method.password=true
+            # - -ssh.auth.user
+            # - rpki
+            # - -ssh.auth.password
+            # - rpki
 
             # Disable time check if needed
             - -checktime=false
@@ -69,12 +69,12 @@ spec:
   selector:
     app: stayrtr
   ports:
-    - name: rtr-tls
+    - name: rtr
       port: 8282
       targetPort: 8282
-    - name: rtr-ssh
-      port: 8283
-      targetPort: 8283
+    # - name: rtr-ssh
+    #   port: 8283
+    #   targetPort: 8283
 
 
 # apiVersion: apps/v1

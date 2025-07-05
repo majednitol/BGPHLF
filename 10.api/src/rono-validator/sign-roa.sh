@@ -18,11 +18,18 @@
 #!/bin/bash
 set -euo pipefail
 
+# DATA_DIR="${DATA_DIR:-/app/data}"
+# INPUT_FILE="$DATA_DIR/roas.json"
+# OUTPUT_FILE="$DATA_DIR/rpki.json"
+# KEY_FILE="$DATA_DIR/private.pem"
+# CERT_FILE="$DATA_DIR/server.pem"
+
 DATA_DIR="${DATA_DIR:-/app/data}"
+KEY_DIR="$DATA_DIR/keys"
 INPUT_FILE="$DATA_DIR/roas.json"
 OUTPUT_FILE="$DATA_DIR/rpki.json"
-KEY_FILE="$DATA_DIR/private.pem"
-CERT_FILE="$DATA_DIR/server.pem"
+KEY_FILE="$KEY_DIR/private.pem"
+CERT_FILE="$KEY_DIR/server.pem"
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"

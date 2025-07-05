@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
         - name: validator
-          image: majedur708/hlf-api:500.25
+          image: majedur708/hlf-api:500.26
           env:
             - name: ROA_FILE
-              value: /app/data/roas.json
+              value: /app/data/rpki.json
             - name: API_BASE
               value: http://api.default.svc.cluster.local:4000
           volumeMounts:
