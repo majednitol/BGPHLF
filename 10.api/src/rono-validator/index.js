@@ -107,13 +107,12 @@ async function refreshROAs() {
 
   validateROA(roaData);
   fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
-  console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE} file ${roas}`);
+  console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}: [${roas.map(r => r.prefix).join(', ')}]`);
+
 
   await signROA();
   console.log('[RONO] ROA signing complete.');
 }
-
-// Start at launch and refresh every 10 mins
 (async () => {
   await refreshROAs();
   cron.schedule('*/10 * * * *', refreshROAs);
