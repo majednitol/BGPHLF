@@ -9,8 +9,7 @@ const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
 
 const prefixASNList = [
   { prefix: '103.108.202.0/23', asn: 200 },
-  // { prefix: '103.144.125.0/24', asn: 132001 },
-  // { prefix: '103.148.241.0/24', asn: 132058 }
+  // Add more prefixes if needed
 ];
 
 const ajv = new Ajv();
@@ -32,7 +31,7 @@ const schema = {
         properties: {
           prefix: { type: "string" },
           maxLength: { type: "integer" },
-          asn: { type: "string" }
+          asn: { type: "integer" } // ✅ Must be integer, not string
         },
         required: ["prefix", "maxLength", "asn"]
       }
@@ -83,7 +82,7 @@ async function refreshROAs() {
         roas.push({
           prefix,
           maxLength: Number(prefix.split('/')[1]),
-          asn: `AS${asn}`
+          asn // ✅ Use integer directly, NOT "AS${asn}"
         });
       }
 
@@ -113,7 +112,7 @@ async function refreshROAs() {
   console.log('[RONO] ROA signing complete.');
 }
 
-// Start at launch and every 10 mins
+// Start at launch and refresh every 10 mins
 (async () => {
   await refreshROAs();
   cron.schedule('*/10 * * * *', refreshROAs);

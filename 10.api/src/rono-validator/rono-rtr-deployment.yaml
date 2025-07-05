@@ -20,6 +20,8 @@ spec:
             - /app/data/rpki.json
 
             # TLS config
+            - -bind
+            - "" 
             - -tls.bind
             - :8283
             - -tls.key
