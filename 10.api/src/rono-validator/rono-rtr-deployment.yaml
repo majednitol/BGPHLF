@@ -1,70 +1,3 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: stayrtr
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: stayrtr
-  template:
-    metadata:
-      labels:
-        app: stayrtr
-    spec:
-      containers:
-        - name: stayrtr
-          image: rpki/stayrtr:latest
-          args:
-            - -cache
-            - /app/data/rpki.json
-
-            # TLS config
-            - -bind
-            - "" 
-            - -tls.bind
-            - :8283
-            - -tls.key
-            - /app/data/keys/private.pem
-            - -tls.cert
-            - /app/data/keys/server.pem
-            - -checktime=false
-
-          volumeMounts:
-            - name: data
-              mountPath: /app/data
-
-          readinessProbe:
-            tcpSocket:
-              port: 8283
-            initialDelaySeconds: 5
-            periodSeconds: 10
-
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            allowPrivilegeEscalation: false
-
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: mypvc
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: stayrtr
-spec:
-  selector:
-    app: stayrtr
-  ports:
-    - name: rtr
-      port: 8283
-      targetPort: 8283
-
-
-
 # apiVersion: apps/v1
 # kind: Deployment
 # metadata:
@@ -85,23 +18,37 @@ spec:
 #           args:
 #             - -cache
 #             - /app/data/rpki.json
+
+#             # TLS config
 #             - -bind
-#             - :8282
+#             - "" 
+#             - -tls.bind
+#             - :8283
+#             - -tls.key
+#             - /app/data/keys/private.pem
+#             - -tls.cert
+#             - /app/data/keys/server.pem
 #             - -checktime=false
+
 #           volumeMounts:
 #             - name: data
 #               mountPath: /app/data
-#               readOnly: true
+
 #           readinessProbe:
 #             tcpSocket:
-#               port: 8282
+#               port: 8283
 #             initialDelaySeconds: 5
 #             periodSeconds: 10
+
+#           securityContext:
+#             runAsUser: 0
+#             runAsGroup: 0
+#             allowPrivilegeEscalation: false
+
 #       volumes:
 #         - name: data
 #           persistentVolumeClaim:
 #             claimName: mypvc
-
 
 # ---
 # apiVersion: v1
@@ -113,6 +60,59 @@ spec:
 #     app: stayrtr
 #   ports:
 #     - name: rtr
-#       port: 8282
-#       targetPort: 8282
+#       port: 8283
+#       targetPort: 8283
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stayrtr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stayrtr
+  template:
+    metadata:
+      labels:
+        app: stayrtr
+    spec:
+      containers:
+        - name: stayrtr
+          image: rpki/stayrtr:latest
+          args:
+            - -cache
+            - /app/data/rpki.json
+            - -bind
+            - :8282
+            - -checktime=false
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: 8282
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stayrtr
+spec:
+  selector:
+    app: stayrtr
+  ports:
+    - name: rtr
+      port: 8282
+      targetPort: 8282
 
