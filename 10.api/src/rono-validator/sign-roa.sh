@@ -15,6 +15,8 @@
 # cp "$INPUT_FILE" "$OUTPUT_FILE"
 # chmod 644 "$OUTPUT_FILE"
 # log "[Signer] Exported ROA to $OUTPUT_FILE"
+
+
 #!/bin/bash
 set -euo pipefail
 
@@ -28,11 +30,9 @@ CERT_FILE="$KEY_DIR/server.pem"
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
-
-# Ensure directories exist
+mkdir -p "$DATA_DIR"
 mkdir -p "$KEY_DIR"
-chmod 755 "$KEY_DIR"
-
+chmod 700 "$KEY_DIR"
 # --- Step 1: Generate TLS key/cert if missing ---
 if [[ ! -f "$KEY_FILE" || ! -f "$CERT_FILE" ]]; then
   log "[TLS] Generating new private key and self-signed certificate..."
@@ -44,11 +44,6 @@ if [[ ! -f "$KEY_FILE" || ! -f "$CERT_FILE" ]]; then
 else
   log "[TLS] TLS key and certificate already exist. Skipping generation."
 fi
-
-# Fix ownership and permissions
-chown -R 1000:1000 "$KEY_DIR" "$DATA_DIR" || true
-chmod -R go+r "$KEY_DIR"
-chmod -R go+r "$DATA_DIR"
 
 # --- Step 2: Wait for roas.json to appear (max 30s) ---
 for i in {1..30}; do
@@ -67,6 +62,5 @@ fi
 
 cp "$INPUT_FILE" "$OUTPUT_FILE"
 chmod 644 "$OUTPUT_FILE"
-chown 1000:1000 "$OUTPUT_FILE" || true
 log "[Signer] Exported ROA to $OUTPUT_FILE"
 

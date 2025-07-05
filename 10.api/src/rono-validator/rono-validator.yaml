@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: validator
-          image: majedur708/hlf-api:500.29
+          image: majedur708/hlf-api:500.30
           env:
             - name: ROA_FILE
               value: /app/data/rpki.json

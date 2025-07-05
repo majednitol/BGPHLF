@@ -27,7 +27,7 @@ spec:
             - -tls.cert
             - /app/data/keys/server.pem
 
-            # SSH config
+            # SSH config (optional)
             # - -ssh.bind
             # - :8283
             # - -ssh.key
@@ -51,6 +51,11 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -71,6 +76,7 @@ spec:
     # - name: rtr-ssh
     #   port: 8283
     #   targetPort: 8283
+
 
 
 # apiVersion: apps/v1
