@@ -34,7 +34,9 @@ CERT_FILE="$KEY_DIR/server.pem"
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
-
+mkdir -p "$DATA_DIR"
+mkdir -p "$KEY_DIR"
+chmod 700 "$KEY_DIR"
 # --- Step 1: Generate TLS key/cert if missing ---
 if [[ ! -f "$KEY_FILE" || ! -f "$CERT_FILE" ]]; then
   log "[TLS] Generating new private key and self-signed certificate..."
