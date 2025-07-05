@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: validator
-          image: majedur708/hlf-api:500.27
+          image: majedur708/hlf-api:500.28
           env:
             - name: ROA_FILE
               value: /app/data/rpki.json
@@ -23,8 +23,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
-            - name: data
-              mountPath: /app/data/keys
       volumes:
         - name: data
           persistentVolumeClaim:
