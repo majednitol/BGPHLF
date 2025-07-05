@@ -23,7 +23,41 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
+            - name: keys
+              mountPath: /keys
+              readOnly: true
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: rono-validator
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: rono-validator
+#   template:
+#     metadata:
+#       labels:
+#         app: rono-validator
+#     spec:
+#       containers:
+#         - name: validator
+#           image: majedur708/hlf-api:500.24
+#           env:
+#             - name: ROA_FILE
+#               value: /app/data/rpki.json
+#             - name: API_BASE
+#               value: http://api.default.svc.cluster.local:4000
+#           volumeMounts:
+#             - name: data
+#               mountPath: /app/data
+#       volumes:
+#         - name: data
+#           persistentVolumeClaim:
+#             claimName: mypvc

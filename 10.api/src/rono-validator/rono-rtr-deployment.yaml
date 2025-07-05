@@ -18,23 +18,47 @@ spec:
           args:
             - -cache
             - /app/data/rpki.json
-            - -bind
+
+            # TLS config
+            - -tls.bind
             - :8282
+            - -tls.key
+            - /keys/private.pem
+            - -tls.cert
+            - /keys/server.pem
+
+            # SSH config
+            - -ssh.bind
+            - :8283
+            - -ssh.key
+            - /keys/private.pem
+            - -ssh.method.password=true
+            - -ssh.auth.user
+            - rpki
+            - -ssh.auth.password
+            - rpki
+
+            # Disable time check if needed
             - -checktime=false
+
           volumeMounts:
             - name: data
               mountPath: /app/data
               readOnly: true
+            - name: keys
+              mountPath: /app/data/keys
+              readOnly: true
+
           readinessProbe:
             tcpSocket:
               port: 8282
             initialDelaySeconds: 5
             periodSeconds: 10
+
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mypvc
-
 
 ---
 apiVersion: v1
@@ -45,7 +69,62 @@ spec:
   selector:
     app: stayrtr
   ports:
-    - name: rtr
+    - name: rtr-tls
       port: 8282
       targetPort: 8282
+    - name: rtr-ssh
+      port: 8283
+      targetPort: 8283
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: stayrtr
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: stayrtr
+#   template:
+#     metadata:
+#       labels:
+#         app: stayrtr
+#     spec:
+#       containers:
+#         - name: stayrtr
+#           image: rpki/stayrtr:latest
+#           args:
+#             - -cache
+#             - /app/data/rpki.json
+#             - -bind
+#             - :8282
+#             - -checktime=false
+#           volumeMounts:
+#             - name: data
+#               mountPath: /app/data
+#               readOnly: true
+#           readinessProbe:
+#             tcpSocket:
+#               port: 8282
+#             initialDelaySeconds: 5
+#             periodSeconds: 10
+#       volumes:
+#         - name: data
+#           persistentVolumeClaim:
+#             claimName: mypvc
+
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: stayrtr
+# spec:
+#   selector:
+#     app: stayrtr
+#   ports:
+#     - name: rtr
+#       port: 8282
+#       targetPort: 8282
 
