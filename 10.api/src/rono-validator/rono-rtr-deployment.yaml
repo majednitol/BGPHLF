@@ -44,10 +44,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
-              readOnly: true
-            - name: keys
-              mountPath: /app/data/keys
-              readOnly: true
 
           readinessProbe:
             tcpSocket:
