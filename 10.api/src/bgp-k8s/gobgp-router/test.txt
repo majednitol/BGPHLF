@@ -1,0 +1,23 @@
+➤ RPKI Data (in StayRTR)
+
+{
+  "prefix": "103.108.202.0/23",
+  "asn": 200
+}
+gobgp global rib add 103.108.202.0/23 origin igp -p 50052
+➤ Validate:
+gobgp -p 50053 neighbor 127.0.0.12 adj-in 103.108.202.0/23 validation
+
+
+➤ Announce the same prefix with the wrong ASN:
+
+gobgp global rib add 103.108.202.0/23 origin igp aspath 999 -p 50052
+➤ Validate:
+
+gobgp -p 50053 neighbor 127.0.0.12 adj-in 103.108.202.0/23 validation
+
+➤ Announce a prefix that does NOT exist in RPKI (not listed in any VRP):
+gobgp global rib add 5.6.7.0/24 origin igp aspath 300 -p 50052
+➤ Validate:
+gobgp -p 50053 neighbor 127.0.0.12 adj-in 5.6.7.0/24 validation
+

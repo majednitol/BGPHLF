@@ -230,27 +230,7 @@ peer chaincode invoke \
   -n basic \
   --peerAddresses peer0-afrinic:7051 \
   --tlsRootCertFiles /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt \
-  -c '{
-    "function": "RegisterCompanyWithMember",
-    "Args": [
-      "com_gp_bd",
-      "Grameenphone Ltd",
-      "Telecommunications",
-      "GP House, Bashundhara",
-      "Dhaka",
-      "Dhaka",
-      "1229",
-      "BD",
-      "+8801700000000",
-      "info@grameenphone.com",
-      "abuse@grameenphone.com",
-      "false",
-      "mem_gp001",
-      "GP Network Admin",
-      "BD",
-      "admin@grameenphone.com"
-    ]
-  }' \
+  -c '{"function":"SetASData","Args":["200", "[\"103.108.202.0/23\"]", "BD", "APNIC", "2025-07-05T13:30:00Z"]}' \
   --waitForEvent
 
 

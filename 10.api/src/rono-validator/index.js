@@ -9,8 +9,8 @@ const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
 
 const prefixASNList = [
   { prefix: '103.108.202.0/23', asn: 200 },
-  { prefix: '103.144.125.0/24', asn: 132001 },
-  { prefix: '103.148.241.0/24', asn: 132058 }
+  // { prefix: '103.144.125.0/24', asn: 132001 },
+  // { prefix: '103.148.241.0/24', asn: 132058 }
 ];
 
 const ajv = new Ajv();

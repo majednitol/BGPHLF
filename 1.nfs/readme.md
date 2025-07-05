@@ -50,7 +50,7 @@ civo instance create bgphlf ubuntu --size g4s.small --wait
 
 ssh civo@212.2.247.23
 vm ELrmo3Qq1t
-
+./scripts/ccp.sh 
 
 kubectl delete deployments --all
 kubectl delete services --all
@@ -68,3 +68,11 @@ kubectl delete services --all
 
 
 sudo cp -R ~/coding/backup_data/. ~/coding/nfs_clientshare/
+
+
+
+gobgp global rib add 103.108.202.0/23 origin igp -p 50052
+gobgp global rib
+gobgp -p 50053 neighbor 127.0.0.12 adj-in 103.108.202.0/23 validation
+gobgp global rib del 103.108.202.0/23 origin igp -p 50052
+gobgp global rib add 103.108.202.0/23 origin igp aspath 300 -p 50052
