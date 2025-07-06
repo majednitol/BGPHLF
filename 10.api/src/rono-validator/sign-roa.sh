@@ -12,9 +12,9 @@
 #   exit 0
 # fi
 
-cp "$INPUT_FILE" "$OUTPUT_FILE"
-chmod 644 "$OUTPUT_FILE"
-log "[Signer] Exported ROA to $OUTPUT_FILE"
+# cp "$INPUT_FILE" "$OUTPUT_FILE"
+# chmod 644 "$OUTPUT_FILE"
+# log "[Signer] Exported ROA to $OUTPUT_FILE"
 
 
 #!/bin/bash
