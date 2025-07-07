@@ -3,9 +3,10 @@ import path from "path";
 import Papa from "papaparse";
 import { smartContract } from "./smartContract.js";
 import cron from "node-cron";
-
+import { fileURLToPath } from "url";
 const requestQueue = [];
- 
+ const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 async function processRIRDataFromCSV(filePath) {
   try {
     console.log(`📥 Reading CSV file: ${filePath}`);
