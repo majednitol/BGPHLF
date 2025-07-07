@@ -70,9 +70,7 @@ async function refreshROAs() {
     for (const entry of data) {
       console.log("entry",entry)
        const asn = entry.asn.trim();
-        console.log("asn",asn)
       for (const prefix of entry.prefix) {
-        console.log("prefix", prefix)
         console.log("entry.prefix", entry.prefix)
         try {
           const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
@@ -82,10 +80,9 @@ async function refreshROAs() {
           const status = res.data;
           console.log(`${prefix} - ${asn}: ${status}`);
           const asnNum = parseInt(entry.asn.replace("AS", "").trim());
-          console.log("asnNum",asnNum)
           if (status === 'valid') {
             roas.push({
-              prefix,
+              prefix:prefix.trim(),
               maxLength: Number(prefix.split('/')[1]),
               asn: asnNum
             });
