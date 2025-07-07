@@ -224,13 +224,18 @@ export async function listPendingRequests(req, res) {
 
 export async function getAllASData(req, res) {
   try {
-    const payload = {
-      org: req.org,
-      channelName: channelName,
-      chaincodeName: chaincodeName,
-      userID: req.userId,
+    // const payload = {
+    //   org: req.org,
+    //   channelName: channelName,
+    //   chaincodeName: chaincodeName,
+    //   userID: req.userId,
+    // };
+const payload = {
+      org: "AfrinicMSP",
+      channelName,
+      chaincodeName,
+      userId: "222"
     };
-
     console.log("payload", payload);
     const result = await GetAllASData(payload);
     console.log("result app", result);

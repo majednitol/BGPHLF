@@ -151,6 +151,21 @@ export async function RevokeRoute(request) {
 // }
 
 
+export async function GetAllASData(request) {
+  try {
+    const contract = await smartContract(request, request.userId);
+    const result = await contract.evaluateTransaction("GetAllASData");
+    console.log("✅ All AS Data Result:", result.toString());
+
+    return JSON.parse(result.toString());
+  } catch (error) {
+    const message = error.message || "";
+    console.error("❌ Error in GetAllASData:", message);
+    throw createHttpError(500, message || "Internal Server Error");
+  }
+}
+
+
 export async function TracePrefix(request) {
   try {
     const { prefix, asn, userId } = request;
