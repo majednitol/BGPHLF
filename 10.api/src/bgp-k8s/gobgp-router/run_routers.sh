@@ -3,13 +3,13 @@
 
 set -e
 
-# Load dummy module
-sudo modprobe dummy
+# Load dummy module (only works if running as root and module is available)
+modprobe dummy || echo "Skipping modprobe dummy (may already be loaded or not allowed)"
 
 # Create dummy0 only if it doesn't exist
 if ! ip link show dummy0 &>/dev/null; then
   echo "Creating dummy0 interface"
-  sudo ip link add dummy0 type dummy
+  ip link add dummy0 type dummy
 else
   echo "dummy0 already exists, skipping creation"
 fi
@@ -22,17 +22,16 @@ ips=(
 )
 
 for ip in "${ips[@]}"; do
-  # Check if IP is already assigned to dummy0
   if ! ip addr show dummy0 | grep -qw "${ip%/*}"; then
     echo "Adding IP $ip to dummy0"
-    sudo ip addr add "$ip" dev dummy0
+    ip addr add "$ip" dev dummy0
   else
     echo "IP $ip already assigned to dummy0"
   fi
 done
 
 # Bring dummy0 up
-sudo ip link set dummy0 up
+ip link set dummy0 up
 
 echo "dummy0 setup complete."
 
