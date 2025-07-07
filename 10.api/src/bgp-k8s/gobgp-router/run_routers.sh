@@ -69,8 +69,18 @@ gobgp -p 50051 global rib add 156.243.83.0/24 origin igp
 # --- Router2 (AS 15169) ---
 echo "→ Router2 (AS 15169)"
 gobgp -p 50052 global rib add 45.192.224.0/24 origin igp
+gobgp -p 50052 global rib add 142.250.0.0/15 origin igp
+gobgp -p 50052 global rib add 199.36.154.0/23 origin igp
 
+# --- Router3 (AS 15169) ---
+echo "→ Router3 (AS 15169)"
+gobgp -p 50053 global rib add 142.250.0.0/15 origin igp
+gobgp -p 50053 global rib add 107.129.0.0/18 origin igp
 
+# --- Router4 (AS 15169) ---
+echo "→ Router4 (AS 15169)"
+gobgp -p 50054 global rib add 200.16.68.0/22 origin igp
+gobgp -p 50054 global rib add 156.243.83.0/24 origin igp
 echo "Static route injection complete."
 
 # Live logs
