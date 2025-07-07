@@ -84,7 +84,6 @@ export function scheduleRIRJob() {
 
     isRunning = true;
     console.log("⏳ Starting scheduled CSV import job...");
-
     try {
       const filePath = path.resolve(__dirname, "data", "sample_roa_dataset.csv");
       await processRIRDataFromCSV(filePath);
