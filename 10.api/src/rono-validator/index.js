@@ -7,13 +7,6 @@ import { exec } from 'child_process';
 const API_BASE = process.env.API_BASE || 'http://api.default.svc.cluster.local:4000';
 const ROA_FILE = process.env.ROA_FILE || '/app/data/roas.json';
 
-const prefixASNList = [
-  { prefix: '103.108.202.0/23', asn: 200 },
-  { prefix: '104.108.202.0/23', asn: 300 },
-  { prefix: '105.108.202.0/23', asn: 400 },
-  // Add more prefixes if needed
-];
-
 const ajv = new Ajv();
 const schema = {
   type: "object",
@@ -71,26 +64,37 @@ async function refreshROAs() {
   console.log('[RONO] Starting ROA refresh...');
   const roas = [];
 
-  for (const { prefix, asn } of prefixASNList) {
-    try {
-      // const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
-      //   params: { prefix, asn }
-      // });
+  try {
+    const { data } = await axios.get(`${API_BASE}/ip/get-all-as-data`);
 
-      // const status = res.data;
-      // console.log(`${prefix} - AS${asn}: ${status}`);
+    // Flatten and validate each prefix individually
+    for (const entry of data) {
+      const asnNum = parseInt(entry.asn.replace("AS", "").trim());
 
-      // if (status === 'valid') {
-        roas.push({
-          prefix,
-          maxLength: Number(prefix.split('/')[1]),
-          asn 
-        });
-      // }
+      for (const prefix of entry.prefix) {
+        try {
+          const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
+            params: { prefix, asn: asnNum }
+          });
 
-    } catch (err) {
-      console.error(`[ERROR] Validation failed for ${prefix} - AS${asn}:`, err.message);
+          const status = res.data;
+          console.log(`${prefix} - AS${asnNum}: ${status}`);
+
+          if (status === 'valid') {
+            roas.push({
+              prefix,
+              maxLength: Number(prefix.split('/')[1]),
+              asn: asnNum
+            });
+          }
+        } catch (err) {
+          console.error(`[ERROR] Validation failed for ${prefix} - AS${asnNum}:`, err.message);
+        }
+      }
     }
+  } catch (err) {
+    console.error(`[FATAL] Failed to fetch ASN data: ${err.message}`);
+    return;
   }
 
   if (roas.length === 0) {
@@ -110,10 +114,11 @@ async function refreshROAs() {
   fs.writeFileSync(ROA_FILE, JSON.stringify(roaData, null, 2));
   console.log(`[RONO] Wrote ${roas.length} ROAs to ${ROA_FILE}: [${roas.map(r => r.prefix).join(', ')}]`);
 
-
   await signROA();
   console.log('[RONO] ROA signing complete.');
 }
+
+// Run once at start and then every 10 minutes
 (async () => {
   await refreshROAs();
   cron.schedule('*/10 * * * *', refreshROAs);

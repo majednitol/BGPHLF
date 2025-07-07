@@ -12,7 +12,7 @@ ipPrefixRouter.post("/revoke-route",authenticate, revokeRoute)
 ipPrefixRouter.get("/get-prefix-assignment", authenticate, getPrefixAssignment)
 ipPrefixRouter.get("/trace-prefix", tracePrefix)
 
-ipPrefixRouter.get("/get-all-as-data",authenticate, getAllASData)
+ipPrefixRouter.get("/get-all-as-data", getAllASData)
 ipPrefixRouter.get("/list-pending-requests",authenticate, listPendingRequests)
 
 ipPrefixRouter.get("/list-approved-requests",authenticate, listApprovedRequests)
