@@ -96,4 +96,4 @@ export function scheduleRIRJob() {
     }
   });
 }
-scheduleRIRJob(); 
+ 
