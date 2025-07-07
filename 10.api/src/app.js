@@ -16,7 +16,7 @@ app.use('/ip', ipPrefixRouter);
 app.use("/user", userRouter)
 app.use("/company", companyRouter)
 app.use(gobalErrorHander)
-scheduleRIRJob();
+// scheduleRIRJob();
 app.listen(4000, () => {
     console.log("server started");
 
