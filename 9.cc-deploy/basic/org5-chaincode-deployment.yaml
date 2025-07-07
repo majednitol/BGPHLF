@@ -18,7 +18,7 @@ spec:
         app: chaincode-basic-lacnic
     spec:
       containers:
-        - image: majedur708/hlf-api:18.100.56
+        - image: majedur708/hlf-api:18.100.57
           name: chaincode-basic-lacnic
           imagePullPolicy: Always
           env:
