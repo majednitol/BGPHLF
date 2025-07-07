@@ -1,9 +1,47 @@
+
 #!/bin/bash
-# --- Add loopback IP aliases inside the container ---
-ip addr add 209.55.246.1/32 dev lo  # R1 loopback
-ip addr add 34.190.208.1/32 dev lo  # R2 loopback
-# ip addr add 107.202.0.1/32 dev lo   # R3 loopback
-ip addr add 138.0.40.1/32 dev lo    # R4 loopback
+
+set -e
+
+# Load dummy module
+sudo modprobe dummy
+
+# Create dummy0 only if it doesn't exist
+if ! ip link show dummy0 &>/dev/null; then
+  echo "Creating dummy0 interface"
+  sudo ip link add dummy0 type dummy
+else
+  echo "dummy0 already exists, skipping creation"
+fi
+
+# List of IPs to assign
+ips=(
+  "209.55.246.1/32"
+  "34.190.208.1/32"
+  "138.0.40.1/32"
+)
+
+for ip in "${ips[@]}"; do
+  # Check if IP is already assigned to dummy0
+  if ! ip addr show dummy0 | grep -qw "${ip%/*}"; then
+    echo "Adding IP $ip to dummy0"
+    sudo ip addr add "$ip" dev dummy0
+  else
+    echo "IP $ip already assigned to dummy0"
+  fi
+done
+
+# Bring dummy0 up
+sudo ip link set dummy0 up
+
+echo "dummy0 setup complete."
+
+# #!/bin/bash
+# # --- Add loopback IP aliases inside the container ---
+# ip addr add 209.55.246.1/32 dev lo  # R1 loopback
+# ip addr add 34.190.208.1/32 dev lo  # R2 loopback
+# # ip addr add 107.202.0.1/32 dev lo   # R3 loopback
+# ip addr add 138.0.40.1/32 dev lo    # R4 loopback
 # ip addr add 190.151.64.1/32 dev lo  # R5 loopback
 # ip addr add 189.0.32.1/32 dev lo    # R6 loopback
 # ip addr add 153.112.201.1/32 dev lo # R7 loopback
