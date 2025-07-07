@@ -68,14 +68,14 @@ async function refreshROAs() {
     const { data } = await axios.get(`${API_BASE}/ip/get-all-as-data`);
     console.log("data",data)
     for (const entry of data) {
-      const asnNum = parseInt(entry.asn.replace("AS", "").trim());
-console.log("asnNum",asnNum)
+       const asn = entry.asn.trim();
+
       for (const prefix of entry.prefix) {
         console.log("prefix", prefix)
         console.log("entry.prefix", entry.prefix)
         try {
           const res = await axios.get(`${API_BASE}/ip/trace-prefix`, {
-            params: { prefix, asn: asnNum }
+            params: { prefix, asn: asn }
           });
 
           const status = res.data;
