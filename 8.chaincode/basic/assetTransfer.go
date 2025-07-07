@@ -1209,48 +1209,49 @@ func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionC
 func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, asn string, prefixJSON string, assignedTo string, assignedBy string, timestamp string) error {
 	asKey := "AS_" + asn
 
-	// Get existing ASN data (if any)
-	existing, err := ctx.GetStub().GetState(asKey)
-	if err != nil {
-		return fmt.Errorf("failed to read ASN from world state: %v", err)
-	}
+	// Parse the input prefix JSON
 	var newPrefixes []string
 	if err := json.Unmarshal([]byte(prefixJSON), &newPrefixes); err != nil {
 		return fmt.Errorf("invalid prefix JSON: %v", err)
 	}
 
-	var asData AS
+	// Check if ASN already exists
+	existing, err := ctx.GetStub().GetState(asKey)
+	if err != nil {
+		return fmt.Errorf("failed to read ASN from world state: %v", err)
+	}
+
 	if existing != nil {
+		// ASN already exists → check for duplicate prefixes
+		var asData AS
 		if err := json.Unmarshal(existing, &asData); err != nil {
 			return fmt.Errorf("failed to unmarshal existing ASN data: %v", err)
 		}
-		prefixSet := make(map[string]struct{})
+
+		existingPrefixSet := make(map[string]bool)
 		for _, p := range asData.Prefix {
-			prefixSet[p] = struct{}{}
+			existingPrefixSet[p] = true
 		}
+
 		for _, np := range newPrefixes {
-			prefixSet[np] = struct{}{}
+			if existingPrefixSet[np] {
+				return fmt.Errorf("prefix %s already exists under ASN %s", np, asn)
+			}
 		}
-		mergedPrefixes := make([]string, 0, len(prefixSet))
-		for p := range prefixSet {
-			mergedPrefixes = append(mergedPrefixes, p)
-		}
-		asData.Prefix = mergedPrefixes
-		asData.AssignedTo = assignedTo
-		asData.AssignedBy = assignedBy
-		asData.Timestamp = timestamp
-	} else {
-		
-		asData = AS{
-			ASN:        asn,
-			Prefix:     newPrefixes,
-			AssignedTo: assignedTo,
-			AssignedBy: assignedBy,
-			Timestamp:  timestamp,
-		}
+
+		// Entire ASN already exists → reject insert
+		return fmt.Errorf("ASN %s already exists", asn)
 	}
 
-	
+	// New ASN record
+	asData := AS{
+		ASN:        asn,
+		Prefix:     newPrefixes,
+		AssignedTo: assignedTo,
+		AssignedBy: assignedBy,
+		Timestamp:  timestamp,
+	}
+
 	asBytes, err := json.Marshal(asData)
 	if err != nil {
 		return fmt.Errorf("failed to marshal AS struct: %v", err)
@@ -1263,6 +1264,7 @@ func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, a
 	fmt.Printf("✅ ASN %s successfully stored with %d prefixes\n", asn, len(asData.Prefix))
 	return nil
 }
+
 
 
 
