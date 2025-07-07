@@ -91,7 +91,7 @@ async function refreshROAs() {
             });
           }
         } catch (err) {
-          console.error(`[ERROR] Validation failed for ${prefix} - AS${asnNum}:`, err.message);
+          console.error(`[ERROR] Validation failed for ${prefix} - ${asn}:`, err.message);
         }
       }
     }
