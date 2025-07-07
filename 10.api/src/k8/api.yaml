@@ -35,7 +35,7 @@ spec:
             requests:
               memory: "400Mi"
               cpu: "300m"
-          image: majedur708/hlf-api:31.76
+          image: majedur708/hlf-api:31.78
           imagePullPolicy: Always
           env:
             - name: COUCHDB_URL
