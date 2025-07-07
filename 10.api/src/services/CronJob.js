@@ -4,9 +4,11 @@ import Papa from "papaparse";
 import { smartContract } from "./smartContract.js";
 import cron from "node-cron";
 import { fileURLToPath } from "url";
+
 const requestQueue = [];
- const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 async function processRIRDataFromCSV(filePath) {
   try {
     console.log(`📥 Reading CSV file: ${filePath}`);
@@ -17,6 +19,7 @@ async function processRIRDataFromCSV(filePath) {
       skipEmptyLines: true,
     });
 
+    const grouped = new Map();
     const timestamp = new Date().toISOString();
 
     for (const item of result.data) {
@@ -25,11 +28,32 @@ async function processRIRDataFromCSV(filePath) {
         console.warn("⚠️ Skipping incomplete record:", item);
         continue;
       }
- 
-      requestQueue.push({ asn, prefix, assignedBy: assignBy, assignedTo, timestamp });
+
+      if (!grouped.has(asn)) {
+        grouped.set(asn, {
+          asn,
+          prefixes: new Set(),
+          assignedBy: assignBy,
+          assignedTo,
+          timestamp
+        });
+      }
+
+      grouped.get(asn).prefixes.add(prefix.trim());
     }
 
-    console.log(`✅ Queued ${requestQueue.length} records from CSV`);
+    // Convert Set to Array and push to requestQueue
+    for (const entry of grouped.values()) {
+      requestQueue.push({
+        asn: entry.asn,
+        prefix: Array.from(entry.prefixes),
+        assignedBy: entry.assignedBy,
+        assignedTo: entry.assignedTo,
+        timestamp: entry.timestamp
+      });
+    }
+
+    console.log(`✅ Queued ${requestQueue.length} grouped ASN records`);
   } catch (err) {
     console.error(`❌ Failed to process CSV file: ${err.message}`);
   }
@@ -51,8 +75,8 @@ async function processQueue() {
   while (requestQueue.length > 0) {
     const { asn, prefix, assignedTo, assignedBy, timestamp } = requestQueue.shift();
     try {
-      const prefixJSON = JSON.stringify([prefix]);
-      console.log(asn, prefixJSON, assignedTo, assignedBy, timestamp)
+      const prefixJSON = JSON.stringify(prefix); // array
+      console.log(asn, prefixJSON, assignedTo, assignedBy, timestamp);
       const result = await contract.submitTransaction(
         "SetASData",
         asn,
@@ -62,11 +86,10 @@ async function processQueue() {
         timestamp
       );
       console.log(result.toString());
-      console.log(`✅ Stored ASN ${asn} → ${prefix}`);
-      console.log(asn, prefix, assignedTo, assignedBy, timestamp)
+      console.log(`✅ Stored ASN ${asn} → ${prefix.join(", ")}`);
       success++;
     } catch (err) {
-      console.error(`⚠️ Failed to store ASN ${asn}, prefix ${prefix}: ${err.message}`);
+      console.error(`⚠️ Failed to store ASN ${asn}: ${err.message}`);
       fail++;
     }
   }
@@ -96,4 +119,3 @@ export function scheduleRIRJob() {
     }
   });
 }
- 

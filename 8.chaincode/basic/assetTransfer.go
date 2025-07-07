@@ -1209,29 +1209,48 @@ func (s *SmartContract) GetResourceRequestsByMember(ctx contractapi.TransactionC
 func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, asn string, prefixJSON string, assignedTo string, assignedBy string, timestamp string) error {
 	asKey := "AS_" + asn
 
-	// Check if ASN already exists
+	// Get existing ASN data (if any)
 	existing, err := ctx.GetStub().GetState(asKey)
 	if err != nil {
 		return fmt.Errorf("failed to read ASN from world state: %v", err)
 	}
-	if existing != nil {
-		return fmt.Errorf("ASN %s already exists", asn)
-	}
-
-	// Parse prefix JSON
-	var prefixes []string
-	if err := json.Unmarshal([]byte(prefixJSON), &prefixes); err != nil {
+	var newPrefixes []string
+	if err := json.Unmarshal([]byte(prefixJSON), &newPrefixes); err != nil {
 		return fmt.Errorf("invalid prefix JSON: %v", err)
 	}
 
-	asData := AS{
-		ASN:        asn,
-		Prefix:     prefixes,
-		AssignedTo: assignedTo,
-		AssignedBy: assignedBy,
-		Timestamp:  timestamp,
+	var asData AS
+	if existing != nil {
+		if err := json.Unmarshal(existing, &asData); err != nil {
+			return fmt.Errorf("failed to unmarshal existing ASN data: %v", err)
+		}
+		prefixSet := make(map[string]struct{})
+		for _, p := range asData.Prefix {
+			prefixSet[p] = struct{}{}
+		}
+		for _, np := range newPrefixes {
+			prefixSet[np] = struct{}{}
+		}
+		mergedPrefixes := make([]string, 0, len(prefixSet))
+		for p := range prefixSet {
+			mergedPrefixes = append(mergedPrefixes, p)
+		}
+		asData.Prefix = mergedPrefixes
+		asData.AssignedTo = assignedTo
+		asData.AssignedBy = assignedBy
+		asData.Timestamp = timestamp
+	} else {
+		
+		asData = AS{
+			ASN:        asn,
+			Prefix:     newPrefixes,
+			AssignedTo: assignedTo,
+			AssignedBy: assignedBy,
+			Timestamp:  timestamp,
+		}
 	}
 
+	
 	asBytes, err := json.Marshal(asData)
 	if err != nil {
 		return fmt.Errorf("failed to marshal AS struct: %v", err)
@@ -1241,11 +1260,10 @@ func (s *SmartContract) SetASData(ctx contractapi.TransactionContextInterface, a
 		return fmt.Errorf("failed to store ASN: %v", err)
 	}
 
-	// ✅ You can log internally here; response is handled at client side
-	fmt.Printf("✅ ASN %s successfully stored with %d prefixes\n", asn, len(prefixes))
-
+	fmt.Printf("✅ ASN %s successfully stored with %d prefixes\n", asn, len(asData.Prefix))
 	return nil
 }
+
 
 
 func (s *SmartContract) GetAllASData(ctx contractapi.TransactionContextInterface) ([]*AS, error) {
