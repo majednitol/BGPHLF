@@ -341,7 +341,6 @@ router.GET("/router-info", func(c *gin.Context) {
 				{Type: 2, Numbers: asPath},
 			},
 		})
-
 		_, err = client.AddPath(context.Background(), &api.AddPathRequest{
 			Path: &api.Path{
 				Family: &api.Family{

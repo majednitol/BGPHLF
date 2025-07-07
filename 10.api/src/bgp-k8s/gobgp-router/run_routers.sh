@@ -68,7 +68,7 @@ gobgp -p 50051 global rib add 156.243.83.0/24 origin igp
 
 # --- Router2 (AS 15169) ---
 echo "→ Router2 (AS 15169)"
-gobgp -p 50052 global rib add 45.192.224.0/24/15 origin igp
+gobgp -p 50052 global rib add 45.192.224.0/24 origin igp
 
 
 echo "Static route injection complete."
