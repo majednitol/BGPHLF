@@ -81,7 +81,8 @@ async function refreshROAs() {
 
           const status = res.data;
           console.log(`${prefix} - AS${asnNum}: ${status}`);
-
+          const asnNum = parseInt(entry.asn.replace("AS", "").trim());
+          console.log("asnNum",asnNum)
           if (status === 'valid') {
             roas.push({
               prefix,
