@@ -1,5 +1,5 @@
 //approve chaincode peer0-afrinic
-peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:c9a8d10f0f4d956aca655b238e67a5029ea05836755d67518f01ace6a7cc164d --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
+peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:d4f4641a7fa270f91d5a17a5f2fee6bec0ad5385ad7b53e24937531d56b03ac0 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 
 
 //approve chaincode peer0-apnic
 peer lifecycle chaincode approveformyorg --channelID mychannel --name basic --version 1.0 --init-required --package-id basic:9cdc47d49891551ec34982238996d1380d578e64f9a1c76ff9319946150ee72d --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA 

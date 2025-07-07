@@ -28,16 +28,14 @@ sudo cp -R prerequsite/* ../nfs_clientshare
 
 mkdir organizations
 sudo cp -R fabric-ca organizations && rm -rf fabric-ca
-sudo chmod 777 chaincode connection-profile configtx organizations channel-artifacts -R
+sudo chmod 777 chaincode connection-profile configtx organizations -R
 sudo chmod +x scripts -R
 sudo rm -rf chaincode connection-profile scripts fabric-ca configtx organizations system-genesis-block scripts channel-artifacts state
 
-// backup data
+<!-- // backup data -->
 cp -R nfs_share/* backup_data/
 cp -R backup_data/* nfs_share/
 sudo chmod 777 chaincode connection-profile configtx organizations channel-artifacts system-genesis-block state -R
-sudo chmod 644 system-genesis-block/genesis.block
-sudo chmod 755 system-genesis-block
 ## minikube NFS (local deployment)
 minikube start --disk-size=20g --memory=7835 --cpus=8
 sudo chmod -R 777 ../nfs_share      
@@ -65,17 +63,7 @@ kubectl delete services --all
 
 
 
-<!-- backup full system data  -->
-1. sudo chmod -R 777 ~/coding/backup_data
-2. sudo rsync -av --progress --delete ~/coding/nfs_clientshare/ ~/coding/backup_data/
-3. sudo crontab -e
-4. * * * * * rsync -av --delete /Users/majedurrahman/coding/nfs_clientshare/ /Users/majedurrahman/coding/backup_data/
 
-// check crontab
- sudo crontab -l
-
-
-sudo cp -R ~/coding/backup_data/. ~/coding/nfs_clientshare/
 
 
 

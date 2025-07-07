@@ -1,17 +1,5 @@
-1. go to nfs_clientshare/chaincode/basic/packaging
-
-2. tar cfz code.tar.gz afrinic-connection.json && tar cfz basic-afrinic.tgz code.tar.gz metadata.json && rm -rf code.tar.gz 
-
-3. tar cfz code.tar.gz apnic-connection.json && tar cfz basic-apnic.tgz code.tar.gz metadata.json && rm -rf code.tar.gz 
-
-4. tar cfz code.tar.gz arin-connection.json && tar cfz basic-arin.tgz code.tar.gz metadata.json 
-
-5. tar cfz code.tar.gz ripencc-connection.json && tar cfz basic-ripencc.tgz code.tar.gz metadata.json 
-
-6. tar cfz code.tar.gz lacnic-connection.json && tar cfz basic-lacnic.tgz code.tar.gz metadata.json 
-
-7. tar cfz code.tar.gz rono-connection.json && tar cfz basic-rono.tgz code.tar.gz metadata.json
-
+sudo chmod +x package.sh
+./package.sh
 
 
 go to peer cli ;;;; cd opt/gopath/src/github.com/chaincode/basic/packaging

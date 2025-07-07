@@ -6,8 +6,7 @@
 }
 gobgp global rib add 103.108.202.0/23 origin igp -p 50051
 ➤ Validate:
-gobgp -p 50051 neighbor 34.190.208.1 adj-in 
-
+gobgp -p 50051 neighbor 34.190.208.1 adj-in 103.108.202.0/23 validation
 
 ➤ Announce the same prefix with the wrong ASN:
 
