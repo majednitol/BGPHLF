@@ -17,8 +17,8 @@ fi
 ips=(
   "209.55.246.1/32"
   "34.190.208.1/32"
-  "138.0.40.1/32"
   "107.202.0.1/32"
+  "138.0.40.1/32"
   "190.151.64.1/32"
   "189.0.32.1/32"
   "153.112.201.1/32"
@@ -64,96 +64,96 @@ echo "Injecting static routes..."
 
 # --- Router1 (AS 13335) ---
 echo "→ Router1 (AS 13335)"
-gobgp -p 50051 global rib add 45.192.224.0/24 nexthop 45.192.224.1 origin igp
-gobgp -p 50051 global rib add 156.243.83.0/24 nexthop 156.243.83.1 origin igp
+gobgp -p 50051 global rib add 45.192.224.0/24 nexthop 209.55.246.1 origin igp
+gobgp -p 50051 global rib add 156.243.83.0/24 nexthop 209.55.246.1 origin igp
 
 # --- Router2 (AS 15169) ---
 echo "→ Router2 (AS 15169)"
-gobgp -p 50052 global rib add 45.192.224.0/24 nexthop 45.192.224.2 origin igp
-gobgp -p 50052 global rib add 142.250.0.0/15 nexthop 142.250.0.1 origin igp
-gobgp -p 50052 global rib add 199.36.154.0/23 nexthop 199.36.154.1 origin igp
+gobgp -p 50052 global rib add 45.192.224.0/24 nexthop 34.190.208.1 origin igp
+gobgp -p 50052 global rib add 142.250.0.0/15 nexthop 34.190.208.1 origin igp
+gobgp -p 50052 global rib add 199.36.154.0/23 nexthop 34.190.208.1 origin igp
 
-# --- Router3 (AS 15169) ---
-echo "→ Router3 (AS 15169)"
-gobgp -p 50053 global rib add 142.250.0.0/15 nexthop 142.250.0.2 origin igp
-gobgp -p 50053 global rib add 107.129.0.0/18 nexthop 107.129.0.1 origin igp
+# --- Router3 (AS 7018) ---
+echo "→ Router3 (AS 7018)"
+gobgp -p 50053 global rib add 142.250.0.0/15 nexthop 107.202.0.1 origin igp
+gobgp -p 50053 global rib add 107.129.0.0/18 nexthop 107.202.0.1 origin igp
 
-# --- Router4 (AS 15169) ---
-echo "→ Router4 (AS 15169)"
-gobgp -p 50054 global rib add 200.16.68.0/22 nexthop 200.16.68.1 origin igp
+# --- Router4 (AS 52320) ---
+echo "→ Router4 (AS 52320)"
+gobgp -p 50054 global rib add 200.16.68.0/22 nexthop 138.0.40.1 origin igp
 gobgp -p 50054 global rib add 156.243.83.0/24 nexthop 156.243.83.2 origin igp
 
 
-# --- Router5 (AS 15169) ---
-echo "→ Router5 (AS 15169)"
-gobgp -p 50055 global rib add 199.36.154.0/23 nexthop 199.36.154.2 origin igp
-gobgp -p 50055 global rib add 164.77.157.0/24 nexthop 164.77.157.1 origin igp
-gobgp -p 50055 global rib add 200.16.68.0/22 nexthop 200.16.68.2 origin igp
+# --- Router5 (AS 6471) ---
+echo "→ Router5 (AS 6471 )" 
+gobgp -p 50055 global rib add 199.36.154.0/23 nexthop 190.151.64.1 origin igp
+gobgp -p 50055 global rib add 164.77.157.0/24 nexthop 190.151.64.1 origin igp
+gobgp -p 50055 global rib add 200.16.68.0/22 nexthop 190.151.64.1 origin igp
 
-# --- Router6 (AS 15169) ---
-echo "→ Router6 (AS 15169)"
-gobgp -p 50056 global rib add 107.129.0.0/18 nexthop 107.129.0.2 origin igp
-gobgp -p 50056 global rib add 164.77.157.0/24 nexthop 164.77.157.2 origin igp
-gobgp -p 50056 global rib add 177.9.0.0/16 nexthop 177.9.0.1 origin igp
-gobgp -p 50056 global rib add 201.95.0.0/16 nexthop 201.95.0.1 origin igp
+# --- Router6 (AS 27699) ---
+echo "→ Router6 (AS 27699)"
+gobgp -p 50056 global rib add 107.129.0.0/18 nexthop 189.0.32.1 origin igp
+gobgp -p 50056 global rib add 164.77.157.0/24 nexthop 189.0.32.1 origin igp
+gobgp -p 50056 global rib add 177.9.0.0/16 nexthop 189.0.32.1 origin igp
+gobgp -p 50056 global rib add 201.95.0.0/16 nexthop 189.0.32.1 origin igp
 
-# --- Router7 (AS 15169) ---
-echo "→ Router7 (AS 15169)"
-gobgp -p 50057 global rib add 177.9.0.0/16 nexthop 177.9.0.2 origin igp
-gobgp -p 50057 global rib add 2.22.36.0/22 nexthop 2.22.36.1 origin igp
+# --- Router7 (AS 1299) ---
+echo "→ Router7 (AS 1299)"
+gobgp -p 50057 global rib add 177.9.0.0/16 nexthop 153.112.201.1 origin igp
+gobgp -p 50057 global rib add 2.22.36.0/22 nexthop 153.112.201.1 origin igp
 
-# --- Router8 (AS 15169) ---
-echo "→ Router8 (AS 15169)"
-gobgp -p 50058 global rib add 201.95.0.0/16 nexthop 201.95.0.2 origin igp
-gobgp -p 50058 global rib add 197.188.0.0/16 nexthop 197.188.0.1 origin igp
+# --- Router8 (AS 20485) ---
+echo "→ Router8 (AS 20485)"
+gobgp -p 50058 global rib add 201.95.0.0/16 nexthop 83.234.128.1 origin igp
+gobgp -p 50058 global rib add 197.188.0.0/16 nexthop 83.234.128.1 origin igp
 
 
 # --- Router9 (AS 3320) ---
 echo "→ Router9 (AS 3320)"
-gobgp -p 50059 global rib add 2.22.36.0/22 nexthop 2.22.36.2 origin igp
-gobgp -p 50059 global rib add 197.188.0.0/16 nexthop 197.188.0.2 origin igp
-gobgp -p 50059 global rib add 217.181.64.0/21 nexthop 217.181.64.1 origin igp
+gobgp -p 50059 global rib add 2.22.36.0/22 nexthop 82.27.105.1 origin igp
+gobgp -p 50059 global rib add 197.188.0.0/16 nexthop 82.27.105.1 origin igp
+gobgp -p 50059 global rib add 217.181.64.0/21 nexthop 82.27.105.1 origin igp
 
 # --- Router10 (AS 36996) ---
 echo "→ Router10 (AS 36996)"
-gobgp -p 50060 global rib add 217.181.64.0/21 nexthop 217.181.64.2 origin igp
-gobgp -p 50060 global rib add 196.44.128.0/19 nexthop 196.44.128.1 origin igp
-gobgp -p 50060 global rib add 197.188.0.0/16  nexthop 197.188.0.3 origin igp
+gobgp -p 50060 global rib add 217.181.64.0/21 nexthop 41.182.0.1 origin igp
+gobgp -p 50060 global rib add 196.44.128.0/19 nexthop 41.182.0.1 origin igp
+gobgp -p 50060 global rib add 197.188.0.0/16  nexthop 41.182.0.1 origin igp
 
 # --- Router11 (AS 328352) ---
 echo "→ Router11 (AS 328352)"
-gobgp -p 50061 global rib add 196.44.128.0/19 nexthop 196.44.128.2 origin igp
+gobgp -p 50061 global rib add 196.44.128.0/19 nexthop 102.135.189.1 origin igp
 
 # --- Router12 (AS 37693) ---
 echo "→ Router12 (AS 37693)"
-gobgp -p 50062 global rib add 196.203.76.0/24 nexthop 196.203.76.1 origin igp
+gobgp -p 50062 global rib add 196.203.76.0/24 nexthop 41.228.48.1 origin igp
 
 # --- Router13 (AS 37332) ---
 echo "→ Router13 (AS 37332)"
-gobgp -p 50063 global rib add 197.188.0.0/16 nexthop 197.188.0.4 origin igp
-gobgp -p 50063 global rib add 196.203.76.0/24 nexthop 196.203.76.2 origin igp
-gobgp -p 50063 global rib add 41.60.52.0/24 nexthop 41.60.52.1 origin igp
+gobgp -p 50063 global rib add 197.188.0.0/16 nexthop 41.173.214.1 origin igp
+gobgp -p 50063 global rib add 196.203.76.0/24 nexthop 41.173.214.1 origin igp
+gobgp -p 50063 global rib add 41.60.52.0/24 nexthop 41.173.214.1 origin igp
 
 # --- Router14 (AS 17494) ---
 echo "→ Router14 (AS 17494)"
-gobgp -p 50064 global rib add 41.60.52.0/24 nexthop 41.60.52.2 origin igp
-gobgp -p 50064 global rib add 180.211.206.0/24 nexthop 180.211.206.1 origin igp
-gobgp -p 50064 global rib add 209.58.24.0/24 nexthop 209.58.24.1 origin igp
+gobgp -p 50064 global rib add 41.60.52.0/24 nexthop 123.49.32.1 origin igp
+gobgp -p 50064 global rib add 180.211.206.0/24 nexthop 123.49.32.1 origin igp
+gobgp -p 50064 global rib add 209.58.24.0/24 nexthop 123.49.32.1 origin igp
 
 # --- Router15 (AS 4755) ---
 echo "→ Router15 (AS 4755)"
-gobgp -p 50065 global rib add 180.211.206.0/24 nexthop 180.211.206.2 origin igp
-gobgp -p 50065 global rib add 5.157.88.0/24 nexthop 5.157.88.1 origin igp
+gobgp -p 50065 global rib add 180.211.206.0/24 nexthop 115.112.0.1 origin igp
+gobgp -p 50065 global rib add 5.157.88.0/24 nexthop 115.112.0.1 origin igp
 
 # --- Router16 (AS 4637) ---
 echo "→ Router16 (AS 4637)"
-gobgp -p 50066 global rib add 209.58.24.0/24 nexthop 209.58.24.2 origin igp
-gobgp -p 50066 global rib add 82.29.26.0/24 nexthop 82.29.26.1 origin igp
+gobgp -p 50066 global rib add 209.58.24.0/24 nexthop 82.21.134.1 origin igp
+gobgp -p 50066 global rib add 82.29.26.0/24 nexthop 82.21.134.1 origin igp
 
 # --- Router17 (AS 4804) ---
 echo "→ Router17 (AS 4804)"
-gobgp -p 50067 global rib add 5.157.88.0/24 nexthop 5.157.88.2 origin igp
-gobgp -p 50067 global rib add 82.29.26.0/24 nexthop 82.29.26.2 origin igp
+gobgp -p 50067 global rib add 5.157.88.0/24 nexthop 110.33.21.1 origin igp
+gobgp -p 50067 global rib add 82.29.26.0/24 nexthop 110.33.21.1 origin igp
 
 echo "Static route injection complete."
 # Live logs
