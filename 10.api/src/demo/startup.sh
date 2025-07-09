@@ -71,25 +71,9 @@ ip netns exec r3 vtysh -f /configs/r3.conf
 
 echo "[INFO] All BGP routers are configured and running."
 echo "[INFO] You can inspect them using: ip netns exec r1 vtysh -c 'show ip bgp summary'"
-
+ 
 # Keep container running
 tail -f /dev/null
 
 
 
-# docker run --rm -it --privileged frr-allinone21
-# 2025/07/09 05:58:18 ZEBRA: [NNACN-54BDA][EC 4043309110] Disabling MPLS support (no kernel support)
-# 2025/07/09 05:58:19 ZEBRA: [NNACN-54BDA][EC 4043309110] Disabling MPLS support (no kernel support)
-# 2025/07/09 05:58:19 ZEBRA: [NNACN-54BDA][EC 4043309110] Disabling MPLS support (no kernel support)
-# [91|zebra] sending configuration
-# [97|bgpd] sending configuration
-# [91|zebra] done
-# % Can not configure the local system as neighbor
-# line 16: Failure to communicate[13] to bgpd, line:  neighbor 10.0.31.2 remote-as 65003
-
-# % Specify remote-as or peer-group commands first
-# line 17: Failure to communicate[13] to bgpd, line:  neighbor 10.0.31.2 update-source 10.0.31.1
-
-# [97|bgpd] Configuration file[/etc/frr/frr.conf] processing failure: 13
-# Waiting for children to finish applying config...
-# majed@DESKTOP-161F6TB:/BGPHLF/10.api/src/demo$ 
