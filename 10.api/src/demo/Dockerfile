@@ -55,9 +55,8 @@ COPY --from=builder /usr/lib/frr /usr/libexec/frr
 COPY --from=builder /usr/bin /usr/bin
 COPY --from=builder /etc/frr /etc/frr
 
-# Copy startup script and configuration files
-COPY startup.sh /startup.sh
 COPY configs/ /configs/
+COPY startup.sh /startup.sh
 
 # Make the startup script executable
 RUN chmod +x /startup.sh

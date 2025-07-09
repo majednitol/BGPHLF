@@ -121,6 +121,6 @@ echo "  ip netns exec r3 vtysh -c 'show ip bgp summary'"
 tail -f /dev/null
 
 
-
+ 
 
 # ip netns exec r1 vtysh -c "show running-config"
