@@ -1,0 +1,3 @@
+docker build -t frr-allinone40 .
+
+docker run --rm -it --privileged frr-allinone39
