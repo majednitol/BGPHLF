@@ -1,16 +1,29 @@
+#!/bin/bash
+
+ORG_NAMES=("afrinic" "apnic" "arin" "ripencc" "lacnic" "rono")
+PEER_PORTS=(7051 9051 11051 12051 13051 14051)
+MSPS=("AfrinicMSP" "ApnicMSP" "ArinMSP" "RipenccMSP" "LacnicMSP" "RonoMSP")
+
+for i in "${!ORG_NAMES[@]}"; do
+  ORG=${ORG_NAMES[$i]}
+  PEER_PORT=${PEER_PORTS[$i]}
+  MSP_ID=${MSPS[$i]}
+  PEER_NAME="peer0-${ORG}"
+
+  cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: peer0-afrinic
+  name: ${PEER_NAME}
 spec:
   selector:
     matchLabels:
-      name: peer0-afrinic
+      name: ${PEER_NAME}
   replicas: 1
   template:
     metadata:
       labels:
-        name: peer0-afrinic
+        name: ${PEER_NAME}
     spec:
       volumes:
         - name: fabricfiles
@@ -51,21 +64,21 @@ spec:
             - name: CORE_PEER_ADDRESSAUTODETECT
               value: "true"
             - name: CORE_PEER_ID
-              value: peer0-afrinic
+              value: ${PEER_NAME}
             - name: CORE_PEER_ADDRESS
-              value: peer0-afrinic:7051
+              value: ${PEER_NAME}:${PEER_PORT}
             - name: CORE_PEER_LISTENADDRESS
-              value: 0.0.0.0:7051
+              value: 0.0.0.0:${PEER_PORT}
             - name: CORE_PEER_GATEWAY_ENABLED
               value: "true"
             - name: CORE_PEER_EVENTS_ADDRESS
               value: 0.0.0.0:7061
             - name: CORE_PEER_GOSSIP_BOOTSTRAP
-              value: peer0-afrinic:7051
+              value: ${PEER_NAME}:${PEER_PORT}
             - name: CORE_PEER_GOSSIP_ENDPOINT
-              value: peer0-afrinic:7051
+              value: ${PEER_NAME}:${PEER_PORT}
             - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
-              value: peer0-afrinic:7051
+              value: ${PEER_NAME}:${PEER_PORT}
             - name: CORE_PEER_GOSSIP_ORGLEADER
               value: "false"
             - name: CORE_PEER_GOSSIP_USELEADERELECTION
@@ -73,30 +86,29 @@ spec:
             - name: CORE_PEER_PROFILE_ENABLED
               value: "true"
             - name: CORE_PEER_LOCALMSPID
-              value: AfrinicMSP
+              value: ${MSP_ID}
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/msp
+              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/msp
             - name: FABRIC_LOGGING_SPEC
               value: debug
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.crt
+              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.crt
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/server.key
+              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/afrinic.rono.com/peers/peer0.afrinic.rono.com/tls/ca.crt
+              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/ca.crt
             - name: CORE_LEDGER_STATE_STATEDATABASE
               value: "goleveldb"
-            # Removed CouchDB config variables
             - name: FABRIC_CFG_PATH
               value: /etc/hyperledger/fabric
             - name: CORE_OPERATIONS_LISTENADDRESS
               value: 0.0.0.0:9443
             - name: CORE_METRICS_PROVIDER
               value: prometheus
-          ports:    
-            - containerPort: 7051
+          ports:
+            - containerPort: ${PEER_PORT}
             - containerPort: 7052
             - containerPort: 7053
             - containerPort: 9443
@@ -116,7 +128,7 @@ spec:
               subPath: organizations
             - mountPath: /var/hyperledger/production
               name: fabricfiles
-              subPath: state/afrinic/peer0
+              subPath: state/${ORG}/peer0
             - mountPath: /etc/hyperledger/fabric/core.yaml
               name: builders-config
               subPath: core.yaml
@@ -129,44 +141,46 @@ spec:
             - mountPath: /builders/external/bin/release
               name: external-builder-release
               subPath: release
-
-
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  name: peer0-afrinic
+  name: ${PEER_NAME}
   labels:
-    app: peer0-afrinic
+    app: ${PEER_NAME}
 spec:
   selector:
-    name: peer0-afrinic
+    name: ${PEER_NAME}
   type: ClusterIP
   ports:
     - name: grpc
-      port: 7051
+      port: ${PEER_PORT}
+      targetPort: ${PEER_PORT}
       protocol: TCP
     - name: event
       port: 7061
+      targetPort: 7061
       protocol: TCP
     - name: couchdb
       port: 5984
+      targetPort: 5984
       protocol: TCP
-
 ---
-#---------------- Peer0 afrinic Metrics Service ---------------
 apiVersion: v1
 kind: Service
 metadata:
+  name: ${PEER_NAME}-metrics
   labels:
-    app: peer0-afrinic
+    app: ${PEER_NAME}
     metrics-service: "true"
-  name: peer0-afrinic-metrics
 spec:
   type: ClusterIP
-  ports:
-  - name: "peer-metrics"
-    port: 9443
-    targetPort: 9443
   selector:
-    name: peer0-afrinic
+    name: ${PEER_NAME}
+  ports:
+    - name: peer-metrics
+      port: 9443
+      targetPort: 9443
+EOF
+
+done
