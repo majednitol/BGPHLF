@@ -15,16 +15,6 @@ kubectl apply -f "$SCRIPT_DIR/../1.nfs/pod.yaml"
 echo "Deploying Certificate Authority from 2.ca"
 bash "$SCRIPT_DIR/../2.ca/deploy_ca.sh"
 
-echo "Running certificate creation job from 3.certificates"
-kubectl apply -f "$SCRIPT_DIR/../3.certifcates/job.yaml"
-sleep 10
-kubectl logs job/create-certs -f
-
-echo "Running artifact generation job from 4.artifacts"
-kubectl apply -f "$SCRIPT_DIR/../4.artifacts/job.yaml"
-sleep 10
-kubectl logs job/artifacts -f
-
 echo "Deploying Orderer components from 5.orderer"
 bash "$SCRIPT_DIR/../5.orderer/deploy_orderers.sh"
 
@@ -43,6 +33,7 @@ bash "$SCRIPT_DIR/../8.chaincode/p.sh"
 echo "Deploying chaincode lifecycle from 9.cc-deploy"
 bash "$SCRIPT_DIR/../9.cc-deploy/basic/deploy_chaincodes.sh"
 bash "$SCRIPT_DIR/../9.cc-deploy/basic/lifecycle_chaincode.sh"
+
 echo "Deploying API services from 10.api"
 kubectl apply -f "$SCRIPT_DIR/../10.api/src/k8/configmap.yaml"
 kubectl apply -f "$SCRIPT_DIR/../10.api/src/k8/couchdb.yaml"
