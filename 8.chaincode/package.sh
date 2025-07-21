@@ -1,4 +1,4 @@
-cd ../../nfs_clientshare/chaincode/basic/packaging
+cd ../nfs_clientshare/chaincode/basic/packaging
 set -e
 cd "$(dirname "$0")"
 
