@@ -2,22 +2,28 @@
 
 CHAINCODE_IMAGE="majedur708/hlf-api:18.100.59"
 CHAINCODE_PORT=7052
-PACKAGE_FILE="package_identifiers.txt"
+FILE_PATH="/opt/gopath/src/github.com/chaincode/basic/packaging/package_identifiers.txt"
 
-if [ ! -f "$PACKAGE_FILE" ]; then
-  echo "$PACKAGE_FILE not found!"
-  exit 1
-fi
+ORG_LIST=(afrinic apnic arin lacnic ripencc rono)
 
-for ORG in afrinic apnic arin lacnic ripencc rono; do
-  CHAINCODE_ID=$(grep "^$ORG:" "$PACKAGE_FILE" | cut -d':' -f2- | xargs)
+for ORG in "${ORG_LIST[@]}"; do
+  CLI_POD=$(kubectl get pods -o name | grep "cli-peer0-afrinic" | head -n1)
 
-  if [ -z "$CHAINCODE_ID" ]; then
-    echo "Chaincode ID not found for $ORG"
+  if [ -z "$CLI_POD" ]; then
+    echo "❌ Could not find CLI pod for $ORG"
     continue
   fi
 
-#   echo "Deploying chaincode for $ORG with ID: $CHAINCODE_ID"
+  echo "🔍 Fetching Chaincode ID from $CLI_POD..."
+
+  CHAINCODE_ID=$(kubectl exec "$CLI_POD" -- sh -c "grep '^$ORG:' $FILE_PATH | cut -d':' -f2-" | xargs)
+
+  if [ -z "$CHAINCODE_ID" ]; then
+    echo "❌ Chaincode ID not found for $ORG"
+    continue
+  fi
+
+  echo "🚀 Deploying chaincode for $ORG with ID: $CHAINCODE_ID"
 
   kubectl apply -f - <<EOF
 ---

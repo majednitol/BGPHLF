@@ -32,19 +32,21 @@ for i in "${!ORG_NAMES[@]}"; do
   ORG="${ORG_NAMES[$i]}"
   PORT="${PEER_PORTS[$i]}"
 
-  PACKAGE_ID=$(grep "^${ORG}:" "$PACKAGE_FILE" | cut -d':' -f2- | xargs)
-  if [ -z "$PACKAGE_ID" ]; then
-    echo "❌ Package ID not found for $ORG"
-    exit 1
-  fi
-
-  CLI_POD=$(kubectl get pods -o name | grep "cli-peer0-${ORG}" | head -n1)
+   CLI_POD=$(kubectl get pods -o name | grep "cli-peer0-${ORG}" | head -n1)
   if [ -z "$CLI_POD" ]; then
     echo "❌ CLI pod not found for $ORG"
     exit 1
   fi
 
-  echo "➡️ Approving chaincode for $ORG using pod $CLI_POD on port $PORT..."
+  echo "🔍 Fetching Package ID from $CLI_POD..."
+  PACKAGE_ID=$(kubectl exec "$CLI_POD" -- sh -c "grep '^${ORG}:' /opt/gopath/src/github.com/chaincode/basic/packaging/package_identifiers.txt | cut -d':' -f2-" | xargs)
+
+  if [ -z "$PACKAGE_ID" ]; then
+    echo "❌ Package ID not found in pod for $ORG"
+    exit 1
+  fi
+
+  echo "➡️ Approving chaincode for $ORG using pod $CLI_POD on port $PORT...$PACKAGE_ID"
 
   run_in_container "$CLI_POD" "
     peer lifecycle chaincode approveformyorg \
