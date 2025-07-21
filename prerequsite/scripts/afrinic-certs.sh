@@ -4,11 +4,7 @@ mkdir -p /organizations/peerOrganizations/afrinic.rono.com/
 
 export FABRIC_CA_CLIENT_HOME=/organizations/peerOrganizations/afrinic.rono.com/
 
-
-
 fabric-ca-client enroll -u https://admin:adminpw@ca-afrinic:7054 --caname ca-afrinic --tls.certfiles "/organizations/fabric-ca/afrinic/tls-cert.pem"
-
-
 
 echo 'NodeOUs:
   Enable: true
