@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 run_in_container() {
   local POD=$1
@@ -11,7 +10,7 @@ run_in_container() {
 CHANNEL_NAME="mychannel"
 CHAINCODE_NAME="basic"
 CHAINCODE_VERSION="1.0"
-SEQUENCE="1"
+SEQUENCE="2"
 ORDERER_ADDRESS="orderer:7050"
 ORDERER_CA_PATH="/organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem"
 PACKAGE_FILE="package_identifiers.txt"
@@ -84,7 +83,7 @@ run_in_container "$AFRINIC_POD" "
     --tls \
     --cafile $ORDERER_CA_PATH
 "
-Commit chaincode
+  # Commit chaincode
 echo "📦 Committing chaincode from afrinic CLI pod..."
 COMMIT_CMD="peer lifecycle chaincode commit \
   -o $ORDERER_ADDRESS \

@@ -27,7 +27,8 @@ cd usr/share/nginx/html
 sudo cp -R prerequsite/* ../nfs_clientshare
 
 mkdir organizations
-sudo cp -R fabric-ca organizations && rm -rf fabric-ca
+sudo cp -R fabric-ca organizations
+sudo rm -rf fabric-ca
 sudo chmod 777 chaincode connection-profile configtx organizations -R
 sudo chmod +x scripts -R
 sudo rm -rf chaincode connection-profile scripts fabric-ca configtx organizations system-genesis-block scripts channel-artifacts state
@@ -58,9 +59,9 @@ ssh civo@212.2.247.23
 vm ELrmo3Qq1t
 ./scripts/ccp.sh 
 
-kubectl delete deployments --all
-kubectl delete services --all
 
+
+kubectl delete deployments,services,jobs,configmaps,pv,pvc --all
 
 
 

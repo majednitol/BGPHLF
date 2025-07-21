@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 CA_NAMES=("ca-orderer" "ca-afrinic" "ca-apnic" "ca-arin" "ca-ripencc" "ca-lacnic" "ca-rono")
 CA_PORTS=(10054 7054 8054 9054 11054 12054 13054)
 
@@ -7,7 +7,9 @@ for i in "${!CA_NAMES[@]}"; do
   CA_NAME="${CA_NAMES[$i]}"
   PORT="${CA_PORTS[$i]}"
   ORG_NAME=$(echo $CA_NAME | cut -d'-' -f2)
-
+if [ "$ORG_NAME" == "orderer" ]; then
+  ORG_NAME="ordererOrg"
+fi
   cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment

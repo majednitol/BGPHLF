@@ -86,7 +86,7 @@ run_in_container "$AFRINIC_POD" "
     --tls \
     --cafile $ORDERER_CA_PATH
 "
-Commit chaincode
+# Commit chaincode
 echo "📦 Committing chaincode from afrinic CLI pod..."
 COMMIT_CMD="peer lifecycle chaincode commit \
   -o $ORDERER_ADDRESS \
