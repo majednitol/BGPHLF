@@ -1,6 +1,10 @@
-cd ../nfs_clientshare/chaincode/basic/packaging
+#!/bin/bash
 set -e
-cd "$(dirname "$0")"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACKAGING_DIR="$SCRIPT_DIR/../../nfs_clientshare/chaincode/basic/packaging"
+cd "$PACKAGING_DIR" || { echo "❌ Packaging dir not found!"; exit 1; }
+
 
 for ORG in afrinic apnic arin ripencc lacnic rono; do
   echo " Packaging for $ORG..."
