@@ -1,17 +1,25 @@
 #!/bin/bash
+set -e
+# Load environment variables
+if [[ -f ./config.env ]]; then
+  source ./config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 
 # Base config
-ORDERER_IMAGE="hyperledger/fabric-orderer:2.4.9"
-GRPC_PORT=7050
-METRICS_PORT=9443
+# ORDERER_IMAGE="hyperledger/fabric-orderer:2.4.9"
+# GRPC_PORT=7050
+# METRICS_PORT=9443
 
-ORDERERS=(
-  "orderer:orderer.rono.com"
-  "orderer2:orderer2.rono.com"
-  "orderer3:orderer3.rono.com"
-  "orderer4:orderer4.rono.com"
-  "orderer5:orderer5.rono.com"
-)
+# ORDERERS=(
+#   "orderer:orderer.rono.com"
+#   "orderer2:orderer2.rono.com"
+#   "orderer3:orderer3.rono.com"
+#   "orderer4:orderer4.rono.com"
+#   "orderer5:orderer5.rono.com"
+# )
 
 for ENTRY in "${ORDERERS[@]}"; do
   NAME="${ENTRY%%:*}"

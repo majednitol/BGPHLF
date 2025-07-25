@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 
-ORG_LIST=("afrinic" "apnic" "arin")
-PORT_MAP=(7054 8054 9054)
+ORG_LIST=("afrinic" "apnic" "arin" "ripencc" "lacnic" "rono")
+PORT_MAP=(7054 8054 9054 11054 12054 13054)
 
 for index in "${!ORG_LIST[@]}"; do
   ORG="${ORG_LIST[$index]}"

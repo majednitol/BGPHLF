@@ -34,11 +34,13 @@ spec:
             - /bin/sh
             - -c
             - |
-              ./scripts/orderer-certs.sh &&
-              ./scripts/afrinic-certs.sh &&
-              ./scripts/apnic-certs.sh &&
-              ./scripts/arin-certs.sh &&
-              ./scripts/ripencc-certs.sh &&
-              ./scripts/lacnic-certs.sh &&
-              ./scripts/rono-certs.sh 
+              # ./scripts/orderer-certs.sh &&
+              # ./scripts/afrinic-certs.sh &&
+              # ./scripts/apnic-certs.sh &&
+              # ./scripts/arin-certs.sh &&
+              # ./scripts/ripencc-certs.sh &&
+              # ./scripts/lacnic-certs.sh &&
+              # ./scripts/rono-certs.sh 
+              ./scripts/orderers-certs.sh &&
+              ./scripts/org-certs.sh
       restartPolicy: Never
