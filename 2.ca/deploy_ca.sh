@@ -1,7 +1,13 @@
 #!/bin/bash
 set -e
-CA_NAMES=("ca-orderer" "ca-afrinic" "ca-apnic" "ca-arin" "ca-ripencc" "ca-lacnic" "ca-rono")
-CA_PORTS=(10054 7054 8054 9054 11054 12054 13054)
+
+# Load environment variables
+if [[ -f ../config.env ]]; then
+  source ../config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 
 for i in "${!CA_NAMES[@]}"; do
   CA_NAME="${CA_NAMES[$i]}"
@@ -10,6 +16,7 @@ for i in "${!CA_NAMES[@]}"; do
 if [ "$ORG_NAME" == "orderer" ]; then
   ORG_NAME="ordererOrg"
 fi
+echo "Deploying $CA_NAME on port $PORT with ORG_NAME=$ORG_NAME"
   cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment

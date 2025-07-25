@@ -7,24 +7,18 @@ run_in_container() {
   kubectl exec "$POD" -- sh -c "$CMD"
 }
 
-# Global config
-CHANNEL_NAME="mychannel"
-CHAINCODE_NAME="basic"
-CHAINCODE_VERSION="1.0"
-SEQUENCE="1"
-ORDERER_ADDRESS="orderer:7050"
-ORDERER_CA_PATH="/organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem"
+if [[ -f ../config.env ]]; then
+  source ../config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 PACKAGE_FILE="package_identifiers.txt"
-
 # Ensure package file exists
 if [ ! -f "$PACKAGE_FILE" ]; then
   echo "❌ $PACKAGE_FILE not found!"
   exit 1
 fi
-
-# Org and port mapping
-ORG_NAMES=("afrinic" "apnic" "arin" "ripencc" "lacnic" "rono")
-PEER_PORTS=(7051 9051 11051 12051 13051 14051)
 
 echo " Approving chaincode from each org's CLI pod..."
 
@@ -37,7 +31,7 @@ for i in "${!ORG_NAMES[@]}"; do
     echo "❌ CLI pod not found for $ORG"
     exit 1
   fi
-
+echo "Fetching $ORG ..$PORT from env"
   echo "🔍 Fetching Package ID from $CLI_POD..."
   PACKAGE_ID=$(kubectl exec "$CLI_POD" -- sh -c "grep '^${ORG}:' /opt/gopath/src/github.com/chaincode/basic/packaging/package_identifiers.txt | cut -d':' -f2-" | xargs)
 

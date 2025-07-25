@@ -1,7 +1,13 @@
 #!/bin/bash
 set -e
 
-ORG_LIST=(afrinic apnic arin lacnic ripencc rono)
+# Load environment variables
+if [[ -f ../config.env ]]; then
+  source ../config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 
 echo "📦 Starting remote packaging inside CLI pods..."
 

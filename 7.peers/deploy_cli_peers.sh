@@ -1,16 +1,19 @@
 #!/bin/bash
-
-ORG_NAMES=("afrinic" "apnic" "arin" "ripencc" "lacnic" "rono")
-PEER_PORTS=(7051 9051 11051 12051 13051 14051)
-MSPS=("AfrinicMSP" "ApnicMSP" "ArinMSP" "RipenccMSP" "LacnicMSP" "RonoMSP")
-
+set -e
+# Load environment variables
+if [[ -f ../config.env ]]; then
+  source ../config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 for i in "${!ORG_NAMES[@]}"; do
   ORG=${ORG_NAMES[$i]}
   PEER_PORT=${PEER_PORTS[$i]}
   MSP_ID=${MSPS[$i]}
   PEER_NAME="peer0-${ORG}"
   CLI_NAME="cli-${PEER_NAME}"
-
+echo "Deploying $ORG.. $PEER_PORT..$PEER_NAME"
   cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment

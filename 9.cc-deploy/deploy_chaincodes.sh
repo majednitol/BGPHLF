@@ -1,10 +1,12 @@
 #!/bin/bash
-
-CHAINCODE_IMAGE="majedur708/hlf-api:18.100.59"
-CHAINCODE_PORT=7052
-FILE_PATH="/opt/gopath/src/github.com/chaincode/basic/packaging/package_identifiers.txt"
-
-ORG_LIST=(afrinic apnic arin lacnic ripencc rono)
+set -e
+# Load environment variables
+if [[ -f ../config.env ]]; then
+  source ../config.env
+else
+  echo "❌ config.env file not found!"
+  exit 1
+fi
 
 for ORG in "${ORG_LIST[@]}"; do
   CLI_POD=$(kubectl get pods -o name | grep "cli-peer0-afrinic" | head -n1)
@@ -13,7 +15,7 @@ for ORG in "${ORG_LIST[@]}"; do
     echo "❌ Could not find CLI pod for $ORG"
     continue
   fi
-
+echo "🔑 Loading environment variables for $ORG..."
   echo "🔍 Fetching Chaincode ID from $CLI_POD..."
 
   CHAINCODE_ID=$(kubectl exec "$CLI_POD" -- sh -c "grep '^$ORG:' $FILE_PATH | cut -d':' -f2-" | xargs)
