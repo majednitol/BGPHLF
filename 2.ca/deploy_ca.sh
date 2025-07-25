@@ -13,9 +13,6 @@ for i in "${!CA_NAMES[@]}"; do
   CA_NAME="${CA_NAMES[$i]}"
   PORT="${CA_PORTS[$i]}"
   ORG_NAME=$(echo $CA_NAME | cut -d'-' -f2)
-if [ "$ORG_NAME" == "orderer" ]; then
-  ORG_NAME="ordererOrg"
-fi
 echo "Deploying $CA_NAME on port $PORT with ORG_NAME=$ORG_NAME"
   cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
