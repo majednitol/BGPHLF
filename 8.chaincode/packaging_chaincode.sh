@@ -10,8 +10,8 @@ else
 fi
 
 echo "📦 Starting remote packaging inside CLI pods..."
-
-for ORG in "${ORG_LIST[@]}"; do
+ORG_NAMES=( "${ORG_NAMES[@]:1}" )
+for ORG in "${ORG_NAMES[@]}"; do
   echo "👉 Packaging for $ORG..."
 
   CLI_POD=$(kubectl get pods -o name | grep "cli-peer0-$ORG" | head -n1)

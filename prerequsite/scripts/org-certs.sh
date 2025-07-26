@@ -7,10 +7,11 @@ else
   echo "❌ config.env file not found at /scripts/config.env(org)"
   exit 1
 fi
-
-for index in "${!ORG_LIST[@]}"; do
-  ORG="${ORG_LIST[$index]}"
-  PORT="${PORT_MAP[$index]}"
+ORG_NAMES=( "${ORG_NAMES[@]:1}" )
+CA_PORTS=( "${CA_PORTS[@]:1}" )
+for index in "${!ORG_NAMES[@]}"; do
+  ORG="${ORG_NAMES[$index]}"
+  PORT="${CA_PORTS[$index]}"
   ORG_CAP="$(echo "$ORG" | tr '[:lower:]' '[:upper:]')"
 
   ORG_DOMAIN="${ORG}.rono.com"
