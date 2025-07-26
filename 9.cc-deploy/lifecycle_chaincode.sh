@@ -21,7 +21,7 @@ if [ ! -f "$PACKAGE_FILE" ]; then
 fi
 
 echo " Approving chaincode from each org's CLI pod..."
-
+ORG_NAMES=( "${ORG_NAMES[@]:1}" )
 for i in "${!ORG_NAMES[@]}"; do
   ORG="${ORG_NAMES[$i]}"
   PORT="${PEER_PORTS[$i]}"

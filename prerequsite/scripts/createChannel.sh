@@ -1,4 +1,13 @@
 
+#!/bin/bash
+set -e
+if [[ -f /scripts/config.env ]]; then
+  source /scripts/config.env
+  echo "✅ config.env file found at /scripts/config.env"
+else
+  echo "❌ config.env file not found at /scripts/config.env(createChannel)"
+  exit 1
+fi
 CHANNEL_NAME="$1"
 DELAY="$2"
 MAX_RETRY="$3"
@@ -27,9 +36,8 @@ createChannelTx() {
 
 
 createAnchorPeerTx() {
-  declare -a MSP_IDS=("AfrinicMSP" "ApnicMSP" "ArinMSP" "RipenccMSP" "LacnicMSP" "RonoMSP")
 
-  for ORG_MSP in "${MSP_IDS[@]}"; do
+  for ORG_MSP in "${MSPS[@]}"; do
     echo "🔧 Generating anchor peer update transaction for ${ORG_MSP}..."
     set -x
     configtxgen -profile TwoOrgsChannel \

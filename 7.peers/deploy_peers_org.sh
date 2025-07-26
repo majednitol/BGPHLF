@@ -8,6 +8,7 @@ else
   exit 1
 fi
 
+ORG_NAMES=( "${ORG_NAMES[@]:1}" )
 for i in "${!ORG_NAMES[@]}"; do
   ORG=${ORG_NAMES[$i]}
   PEER_PORT=${PEER_PORTS[$i]}

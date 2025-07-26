@@ -10,19 +10,19 @@ else
 fi
 
 TEMPLATE_FILE="config-template.yaml"
-OUTPUT_DIR="../organizations"
+OUTPUT_DIR="../organizations/fabric-ca"
 
 mkdir -p "$OUTPUT_DIR"
 
 # Check for equal array lengths
-if [ ${#CA_NAMES[@]} -ne ${#ORG_NAMES[@]} ] || [ ${#CA_NAMES[@]} -ne ${#CA_PORTS[@]} ]; then
+if [ ${#CA_NAMES[@]} -ne ${#CA_ORG_NAMES[@]} ] || [ ${#CA_NAMES[@]} -ne ${#CA_PORTS[@]} ]; then
   echo "❌ ERROR: Mismatched array lengths in config.env!"
   exit 1
 fi
 
 for i in "${!CA_NAMES[@]}"; do
   CA_NAME="${CA_NAMES[$i]}"
-  ORG="${ORG_NAMES[$i]}"
+  ORG="${CA_ORG_NAMES[$i]}"
   PORT="${CA_PORTS[$i]}"
   CA_SERVER_NAME="${ORG}CA"
 
