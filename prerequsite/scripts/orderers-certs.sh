@@ -1,15 +1,12 @@
 #!/bin/bash
-
 set -e
-
-ORDERER_DOMAIN="rono.com"
-ORDERER_NAMES=("orderer" "orderer2" "orderer3" "orderer4" "orderer5")
-
-CA_NAME="ca-orderer"
-CA_PORT="10054"
-CA_HOST="ca-orderer"
-CA_URL="https://admin:adminpw@$CA_HOST:$CA_PORT"
-TLS_CERT_PATH="/organizations/fabric-ca/ordererOrg/tls-cert.pem"
+if [[ -f /scripts/config.env ]]; then
+  source /scripts/config.env
+  echo "✅ config.env file found at /scripts/config.env"
+else
+  echo "❌ config.env file not found at /scripts/config.env(orderers-certs.sh)"
+  exit 1
+fi
 
 export FABRIC_CA_CLIENT_HOME=/organizations/ordererOrganizations/$ORDERER_DOMAIN
 mkdir -p $FABRIC_CA_CLIENT_HOME

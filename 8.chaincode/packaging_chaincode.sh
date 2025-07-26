@@ -38,9 +38,6 @@ echo "✅ All chaincode packages created directly in packaging folders of respec
 OUT_FILE="package_identifiers.txt"
 > "$OUT_FILE"
 
-ORG_NAMES=(afrinic apnic arin lacnic ripencc rono)
-PACKAGES=(basic-afrinic.tgz basic-apnic.tgz basic-arin.tgz basic-lacnic.tgz basic-ripencc.tgz basic-rono.tgz)
-
 echo "📦 Starting chaincode installation from individual peer CLIs..."
 
 for i in "${!ORG_NAMES[@]}"; do

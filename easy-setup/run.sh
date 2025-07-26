@@ -37,8 +37,8 @@ bash "$SCRIPT_DIR/../7.peers/deploy_cli_peers.sh"
 bash "$SCRIPT_DIR/../7.peers/peer.sh"
 sleep 10
 echo "Packaging and preparing chaincode from 8.chaincode"
-bash "$SCRIPT_DIR/../8.chaincode/package.sh"
-bash "$SCRIPT_DIR/../8.chaincode/p.sh"
+
+bash "$SCRIPT_DIR/../8.chaincode/packaging_chaincode.sh"
 sleep 10
 echo "Deploying chaincode lifecycle from 9.cc-deploy"
 bash "$SCRIPT_DIR/../9.cc-deploy/deploy_chaincodes.sh"

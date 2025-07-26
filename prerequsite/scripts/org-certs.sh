@@ -1,8 +1,12 @@
 #!/bin/bash
-set -x
-
-ORG_LIST=("afrinic" "apnic" "arin" "ripencc" "lacnic" "rono")
-PORT_MAP=(7054 8054 9054 11054 12054 13054)
+set -e
+if [[ -f /scripts/config.env ]]; then
+  source /scripts/config.env
+  echo "✅ config.env file found at /scripts/config.env"
+else
+  echo "❌ config.env file not found at /scripts/config.env(org)"
+  exit 1
+fi
 
 for index in "${!ORG_LIST[@]}"; do
   ORG="${ORG_LIST[$index]}"
