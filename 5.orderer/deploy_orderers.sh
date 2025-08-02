@@ -47,7 +47,7 @@ spec:
             - name: ORDERER_GENERAL_LOGLEVEL
               value: debug
             - name: ORDERER_GENERAL_LOCALMSPDIR
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/msp
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/msp
             - name: ORDERER_GENERAL_LOCALMSPID
               value: OrdererMSP
             - name: ORDERER_GENERAL_GENESISMETHOD
@@ -57,15 +57,15 @@ spec:
             - name: ORDERER_GENERAL_TLS_ENABLED
               value: "true"
             - name: ORDERER_GENERAL_TLS_PRIVATEKEY
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/tls/server.key
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/tls/server.key
             - name: ORDERER_GENERAL_TLS_CERTIFICATE
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/tls/server.crt
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/tls/server.crt
             - name: ORDERER_GENERAL_TLS_ROOTCAS
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/tls/ca.crt
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/tls/ca.crt
             - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/tls/server.key
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/tls/server.key
             - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
-              value: /organizations/ordererOrganizations/rono.com/orderers/$FQDN/tls/server.crt
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/$FQDN/tls/server.crt
           resources:
             limits:
               memory: "400Mi"

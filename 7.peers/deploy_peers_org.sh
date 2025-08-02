@@ -93,17 +93,17 @@ spec:
             - name: CORE_PEER_LOCALMSPID
               value: ${MSP_ID}
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/msp
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/msp
             - name: FABRIC_LOGGING_SPEC
               value: debug
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.crt
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/server.crt
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.key
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/ca.crt
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/ca.crt
             - name: CORE_LEDGER_STATE_STATEDATABASE
               value: "goleveldb"
             - name: FABRIC_CFG_PATH

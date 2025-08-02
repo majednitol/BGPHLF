@@ -49,23 +49,23 @@ spec:
               cpu: "90m"
           env:
             - name: ORDERER_CA
-              value: /organizations/ordererOrganizations/rono.com/orderers/orderer.rono.com/msp/tlscacerts/tlsca.rono.com-cert.pem
+              value: /organizations/ordererOrganizations/$MAIN_DOMAIN/orderers/orderer.$MAIN_DOMAIN/msp/tlscacerts/tlsca.$MAIN_DOMAIN-cert.pem
             - name: CORE_PEER_ADDRESS
               value: ${PEER_NAME}:${PEER_PORT}
             - name: CORE_PEER_ID
-              value: cli.peer0.${ORG}.rono.com
+              value: cli.peer0.${ORG}.$MAIN_DOMAIN
             - name: CORE_PEER_LOCALMSPID
               value: ${MSP_ID}
             - name: CORE_PEER_MSPCONFIGPATH
-              value: /organizations/peerOrganizations/${ORG}.rono.com/users/Admin@${ORG}.rono.com/msp
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/users/Admin@${ORG}.$MAIN_DOMAIN/msp
             - name: CORE_PEER_TLS_ENABLED
               value: "true"
             - name: CORE_PEER_TLS_CERT_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.crt
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/server.crt
             - name: CORE_PEER_TLS_KEY_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/server.key
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/server.key
             - name: CORE_PEER_TLS_ROOTCERT_FILE
-              value: /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/ca.crt
+              value: /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/ca.crt
             - name: FABRIC_LOGGING_SPEC
               value: ERROR
             - name: GOPATH

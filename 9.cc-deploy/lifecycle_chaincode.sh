@@ -96,7 +96,7 @@ for i in "${!ORG_NAMES[@]}"; do
   ORG="${ORG_NAMES[$i]}"
   PORT="${PEER_PORTS[$i]}"
   COMMIT_CMD+=" --peerAddresses peer0-${ORG}:${PORT}"
-  COMMIT_CMD+=" --tlsRootCertFiles /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/ca.crt"
+  COMMIT_CMD+=" --tlsRootCertFiles /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/ca.crt"
 done
 
 run_in_container "$AFRINIC_POD" "$COMMIT_CMD"
@@ -125,7 +125,7 @@ for i in "${!ORG_NAMES[@]}"; do
   ORG="${ORG_NAMES[$i]}"
   PORT="${PEER_PORTS[$i]}"
   INVOKE_CMD+=" --peerAddresses peer0-${ORG}:${PORT}"
-  INVOKE_CMD+=" --tlsRootCertFiles /organizations/peerOrganizations/${ORG}.rono.com/peers/peer0.${ORG}.rono.com/tls/ca.crt"
+  INVOKE_CMD+=" --tlsRootCertFiles /organizations/peerOrganizations/${ORG}.$MAIN_DOMAIN/peers/peer0.${ORG}.$MAIN_DOMAIN/tls/ca.crt"
 done
 
 run_in_container "$AFRINIC_POD" "$INVOKE_CMD"
