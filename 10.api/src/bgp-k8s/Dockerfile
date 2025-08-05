@@ -2,7 +2,16 @@
 FROM golang:1.23-alpine AS builder
 
 # Install build tools and dependencies
-RUN apk add --no-cache git build-base libconfig-dev uthash-dev openssl-dev automake curl ca-certificates wget openssl-dev
+RUN apk add --no-cache \
+    git \
+    build-base \
+    libconfig-dev \
+    uthash-dev \
+    openssl-dev \
+    automake \
+    curl \
+    ca-certificates \
+    wget
 
 # Clone and build GoBGP v3.36.0
 WORKDIR /go/src/github.com/osrg/gobgp
@@ -12,26 +21,28 @@ RUN git clone https://github.com/osrg/gobgp . && \
     go install ./cmd/gobgp
 
 # Clone and build NIST-SRx Crypto API
+RUN mkdir -p /usr/local/go/bin
 WORKDIR /root
-RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git /go/src/github.com/usnistgov/NIST-BGP-SRx && \
-    cd /go/src/github.com/usnistgov/NIST-BGP-SRx/srx-crypto-api && \
-    ./configure --prefix=/usr/local CFLAGS="-O0 -g -I/usr/include" LDFLAGS="-L/usr/lib" && \
+RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git && \
+    cd NIST-BGP-SRx/srx-crypto-api && \
+    ./configure --prefix=/usr/local CFLAGS="-O0 -g" && \
     make -j && \
     make all install && \
     make clean
 
-# Build gobgpsrx (GoBGPsec fork using NIST BGPSRx CryptoAPI)
+# Build gobgpsrx using NIST BGPsec Crypto API
+ENV CGO_LDFLAGS="-L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib" \
+    CGO_CFLAGS="-I/usr/local/include/srx/"
+RUN git clone https://github.com/usnistgov/gobgpsrx.git && \
+    cd gobgpsrx/cmd/gobgpsrx && \
+    go build -o /usr/local/bin/gobgpsrx .
 
-RUN git clone https://github.com/usnistgov/gobgpsrx.git /go/src/github.com/usnistgov/gobgpsrx && \
-    cd /go/src/github.com/usnistgov/gobgpsrx && \
-    export CGO_LDFLAGS="-L/usr/local/lib64/srx/ -Wl,-rpath -Wl,/usr/local/lib64/srx/" && \
-    export CGO_CFLAGS="-I/usr/local/include/srx/" && \
-    go build -o /go/bin/gobgpsrx ./...
+
 
 # -------- STAGE 2: Runtime --------
 FROM alpine:3.20
 
-# Install bash and IP tools
+# Install runtime tools and libraries
 RUN apk add --no-cache \
     bash \
     iproute2 \
@@ -41,35 +52,37 @@ RUN apk add --no-cache \
     ca-certificates \
     curl \
     libconfig \
+    libconfig-dev \
     coreutils \
     busybox-extras
 
-# Copy GoBGP binaries from builder
+# Copy GoBGP binaries
 COPY --from=builder /go/bin/gobgpd /usr/local/bin/
 COPY --from=builder /go/bin/gobgp /usr/local/bin/
-COPY --from=builder /go/bin/gobgpsrx /usr/local/bin/
+COPY --from=builder /usr/local/bin/gobgpsrx /usr/local/bin/
 
-# Copy NIST-SRx CryptoAPI libs
-COPY --from=builder /usr/local/lib64/srx/ /usr/local/lib64/srx/
+# Copy NIST-SRx CryptoAPI libraries and includes
 COPY --from=builder /usr/local/lib/libsrx* /usr/local/lib/
-COPY --from=builder /usr/local/lib64/libsrx* /usr/local/lib64/
 COPY --from=builder /usr/local/include/srx /usr/local/include/srx
 
-# Set library path for runtime
-ENV LD_LIBRARY_PATH=/usr/local/lib64/srx:/usr/local/lib:$LD_LIBRARY_PATH
+# Set library path
+ENV PATH="$PATH:/usr/local/bin" \
+    LD_LIBRARY_PATH="/usr/local/lib"
 
-# Set workdir and copy config and script files (adjust as needed)
+# Set working directory
 WORKDIR /gobgp
+
+# Copy config and run script (adjust this if structure differs)
 COPY gobgp-router/*.conf ./
 COPY gobgp-router/run_routers.sh ./
 
-# Ensure script has Unix line endings and executable permissions
+# Fix line endings (for Windows users) and make script executable
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
-# Expose default GoBGP API ports (adjust as needed)
+# Expose gRPC and BGP ports (adjust if needed)
 EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067
- 
-# Entrypoint command to start routers
+
+# Entry point
 CMD ["/bin/bash", "./run_routers.sh"]
 
 
