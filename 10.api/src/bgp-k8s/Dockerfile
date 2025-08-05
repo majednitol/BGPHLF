@@ -2,7 +2,7 @@
 FROM golang:1.23-alpine AS builder
 
 # Install build tools and dependencies
-RUN apk add --no-cache git build-base libconfig-dev uthash-dev openssl-dev automake curl ca-certificates wget --no-install-recommends 
+RUN apk add --no-cache git build-base libconfig-dev uthash-dev openssl-dev automake curl ca-certificates wget openssl-dev
 
 # Clone and build GoBGP v3.36.0
 WORKDIR /go/src/github.com/osrg/gobgp
@@ -12,16 +12,16 @@ RUN git clone https://github.com/osrg/gobgp . && \
     go install ./cmd/gobgp
 
 # Clone and build NIST-SRx Crypto API
-WORKDIR /go/src/github.com/usnistgov/NIST-BGP-SRx/srx-crypto-api
+WORKDIR /root
 RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git /go/src/github.com/usnistgov/NIST-BGP-SRx && \
     cd /go/src/github.com/usnistgov/NIST-BGP-SRx/srx-crypto-api && \
-    ./configure --prefix=/usr/local CFLAGS="-O0 -g" && \
+    ./configure --prefix=/usr/local CFLAGS="-O0 -g -I/usr/include" LDFLAGS="-L/usr/lib" && \
     make -j && \
     make all install && \
     make clean
 
 # Build gobgpsrx (GoBGPsec fork using NIST BGPSRx CryptoAPI)
-WORKDIR /go/src/github.com/usnistgov/gobgpsrx
+
 RUN git clone https://github.com/usnistgov/gobgpsrx.git /go/src/github.com/usnistgov/gobgpsrx && \
     cd /go/src/github.com/usnistgov/gobgpsrx && \
     export CGO_LDFLAGS="-L/usr/local/lib64/srx/ -Wl,-rpath -Wl,/usr/local/lib64/srx/" && \
@@ -32,7 +32,17 @@ RUN git clone https://github.com/usnistgov/gobgpsrx.git /go/src/github.com/usnis
 FROM alpine:3.20
 
 # Install bash and IP tools
-RUN apk add --no-cache bash iproute2 openssl libstdc++
+RUN apk add --no-cache \
+    bash \
+    iproute2 \
+    iputils \
+    openssl \
+    libstdc++ \
+    ca-certificates \
+    curl \
+    libconfig \
+    coreutils \
+    busybox-extras
 
 # Copy GoBGP binaries from builder
 COPY --from=builder /go/bin/gobgpd /usr/local/bin/
