@@ -27,7 +27,7 @@ cd usr/share/nginx/html
 sudo cp -R prerequsite/* config.env ../nfs_clientshare
 sudo mv config.env scripts/
 
-sudo chmod 777 chaincode connection-profile configtx organizations scripts/config.env -R
+sudo chmod 777 chaincode connection-profile configtx organizations 
 sudo chmod +x scripts -R
 sudo rm -rf chaincode connection-profile scripts fabric-ca configtx organizations system-genesis-block scripts channel-artifacts state
 
@@ -64,6 +64,7 @@ kubectl delete deployments,services,jobs,configmaps,pv,pvc --all
 
 
 
+mv ~/Downloads/civo-damp-glade-89297174-kubeconfig ~/.kube/config
 
 
 
