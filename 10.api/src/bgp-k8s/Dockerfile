@@ -1,15 +1,5 @@
 
-# -------- STAGE 1: GoBGP Builder --------
-FROM golang:1.23 as gobgp-builder
 
-# # Build GoBGP v3.36.0
-WORKDIR /go/src/github.com/osrg/gobgp
-RUN git clone https://github.com/osrg/gobgp . && \
-    git checkout v3.36.0 && \
-    go install ./cmd/gobgpd && \
-    go install ./cmd/gobgp
-
-# -------- STAGE 2: Main Build & Runtime --------
 FROM ubuntu:24.04
 
 # Install build and runtime dependencies
@@ -59,25 +49,15 @@ RUN git clone https://github.com/usnistgov/gobgpsrx.git && \
 
 ENV PATH="$PATH:/usr/local/go/bin" LD_LIBRARY_PATH="/usr/local/lib64/srx"
 
-# Copy GoBGP binaries from builder
-COPY --from=gobgp-builder /go/bin/gobgpd /usr/local/bin/
-COPY --from=gobgp-builder /go/bin/gobgp /usr/local/bin/
-
-# Set environment variables
-
-
-# Set working directory
-WORKDIR /gobgp
-# Copy config and run script
-COPY gobgp-router/*.conf ./
-COPY gobgp-router/run_routers.sh ./
-RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
+COPY gobgp-router/*.conf /etc/
+COPY gobgp-router/run_routers.sh /etc/
+RUN sed -i 's/\r$//' /etc/run_routers.sh && chmod +x /etc/run_routers.sh
 
 # Expose gRPC and BGP ports
 EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067
 
 # Entry point
-CMD ["/bin/bash", "./run_routers.sh"]
+CMD ["/bin/bash", "/etc/run_routers.sh"]
 
 
 
