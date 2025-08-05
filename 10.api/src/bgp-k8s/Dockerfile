@@ -34,8 +34,8 @@ RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git && \
 ENV CGO_LDFLAGS="-L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib" \
     CGO_CFLAGS="-I/usr/local/include/srx/"
 RUN git clone https://github.com/usnistgov/gobgpsrx.git && \
-    cd gobgpsrx/cmd/gobgpsrx && \
-    go build -o /usr/local/bin/gobgpsrx .
+    cd gobgpsrx && \
+    go build -o /usr/local/go/bin ./...
 
 
 
@@ -66,9 +66,8 @@ COPY --from=builder /usr/local/lib/libsrx* /usr/local/lib/
 COPY --from=builder /usr/local/include/srx /usr/local/include/srx
 
 # Set library path
-ENV PATH="$PATH:/usr/local/bin" \
-    LD_LIBRARY_PATH="/usr/local/lib"
 
+ENV PATH="$PATH:/usr/local/go/bin" LD_LIBRARY_PATH="/usr/local/lib64/srx"
 # Set working directory
 WORKDIR /gobgp
 
@@ -125,5 +124,4 @@ CMD ["/bin/bash", "./run_routers.sh"]
 
 # # Start all routers
 # CMD ["/bin/bash", "./run_routers.sh"]
-
 
