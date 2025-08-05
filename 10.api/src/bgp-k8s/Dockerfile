@@ -1,28 +1,43 @@
-# -------- STAGE 1: Builder --------
-FROM golang:1.23-alpine AS builder
 
-# Install build tools and dependencies
-RUN apk add --no-cache \
-    git \
-    build-base \
-    libconfig-dev \
-    uthash-dev \
-    openssl-dev \
-    automake \
-    curl \
-    ca-certificates \
-    wget
+# -------- STAGE 1: GoBGP Builder --------
+FROM golang:1.23 as gobgp-builder
 
-# Clone and build GoBGP v3.36.0
+# # Build GoBGP v3.36.0
 WORKDIR /go/src/github.com/osrg/gobgp
 RUN git clone https://github.com/osrg/gobgp . && \
     git checkout v3.36.0 && \
     go install ./cmd/gobgpd && \
     go install ./cmd/gobgp
 
-# Clone and build NIST-SRx Crypto API
+# -------- STAGE 2: Main Build & Runtime --------
+FROM ubuntu:24.04
+
+# Install build and runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libconfig-dev \
+    uthash-dev \
+    build-essential \
+    wget \
+    libssl-dev \
+    automake \
+    autoconf \
+    pkg-config \
+    iproute2 \
+    iputils-ping \
+    curl \
+    ca-certificates \
+    bash \
+    coreutils \
+    busybox \
+    kmod \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go
 RUN mkdir -p /usr/local/go/bin
 WORKDIR /root
+
+# clone and install srx-crypto-api
 RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git && \
     cd NIST-BGP-SRx/srx-crypto-api && \
     ./configure --prefix=/usr/local CFLAGS="-O0 -g" && \
@@ -30,59 +45,41 @@ RUN git clone https://github.com/usnistgov/NIST-BGP-SRx.git && \
     make all install && \
     make clean
 
-# Build gobgpsrx using NIST BGPsec Crypto API
-ENV CGO_LDFLAGS="-L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib" \
-    CGO_CFLAGS="-I/usr/local/include/srx/"
+# install go
+RUN wget https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.23.5.linux-amd64.tar.gz && rm go1.23.5.linux-amd64.tar.gz
+ENV PATH="$PATH:/usr/local/go/bin:/root/go/bin"
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+# install gobgpsrx
+ENV CGO_LDFLAGS="-L/usr/local/lib64/srx/ -Wl,-rpath -Wl,/usr/local/lib64/srx/" CGO_CFLAGS="-I/usr/local/include/srx/"
 RUN git clone https://github.com/usnistgov/gobgpsrx.git && \
     cd gobgpsrx && \
     go build -o /usr/local/go/bin ./...
 
 
-
-# -------- STAGE 2: Runtime --------
-FROM alpine:3.20
-
-# Install runtime tools and libraries
-RUN apk add --no-cache \
-    bash \
-    iproute2 \
-    iputils \
-    openssl \
-    libstdc++ \
-    ca-certificates \
-    curl \
-    libconfig \
-    libconfig-dev \
-    coreutils \
-    busybox-extras
-
-# Copy GoBGP binaries
-COPY --from=builder /go/bin/gobgpd /usr/local/bin/
-COPY --from=builder /go/bin/gobgp /usr/local/bin/
-COPY --from=builder /usr/local/bin/gobgpsrx /usr/local/bin/
-
-# Copy NIST-SRx CryptoAPI libraries and includes
-COPY --from=builder /usr/local/lib/libsrx* /usr/local/lib/
-COPY --from=builder /usr/local/include/srx /usr/local/include/srx
-
-# Set library path
-
 ENV PATH="$PATH:/usr/local/go/bin" LD_LIBRARY_PATH="/usr/local/lib64/srx"
+
+# Copy GoBGP binaries from builder
+COPY --from=gobgp-builder /go/bin/gobgpd /usr/local/bin/
+COPY --from=gobgp-builder /go/bin/gobgp /usr/local/bin/
+
+# Set environment variables
+
+
 # Set working directory
 WORKDIR /gobgp
-
-# Copy config and run script (adjust this if structure differs)
+# Copy config and run script
 COPY gobgp-router/*.conf ./
 COPY gobgp-router/run_routers.sh ./
-
-# Fix line endings (for Windows users) and make script executable
 RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
-# Expose gRPC and BGP ports (adjust if needed)
+# Expose gRPC and BGP ports
 EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067
 
 # Entry point
 CMD ["/bin/bash", "./run_routers.sh"]
+
+
 
 
 
@@ -124,4 +121,10 @@ CMD ["/bin/bash", "./run_routers.sh"]
 
 # # Start all routers
 # CMD ["/bin/bash", "./run_routers.sh"]
+
+
+##############################################################
+# Dockerfile to build GoBGPSec container images
+# Based on ubuntu 24.04
+##############################################################
 
