@@ -2,7 +2,7 @@
 FROM golang:1.23-alpine AS builder
 
 # Install build tools and dependencies
-RUN apk add --no-cache git build-base libconfig-dev uthash-dev openssl-dev automake autoconf autoconf-dev curl
+RUN apk add --no-cache git build-base libconfig-dev uthash-dev openssl-dev automake curl ca-certificates wget --no-install-recommends 
 
 # Clone and build GoBGP v3.36.0
 WORKDIR /go/src/github.com/osrg/gobgp
