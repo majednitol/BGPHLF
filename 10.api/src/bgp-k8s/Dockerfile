@@ -58,7 +58,7 @@ RUN sed -i 's/\r$//' run_routers.sh && chmod +x run_routers.sh
 
 # Expose default GoBGP API ports (adjust as needed)
 EXPOSE 50051 50052 50053 50054 50055 50056 50057 50058 50059 50060 50061 50062 50063 50064 50065 50066 50067
-
+ 
 # Entrypoint command to start routers
 CMD ["/bin/bash", "./run_routers.sh"]
 
