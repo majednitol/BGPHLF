@@ -19,3 +19,8 @@ gobgp global rib add 5.6.7.0/24 origin igp aspath 300 -p 50052
 ➤ Validate:
 gobgp -p 50053 neighbor 127.0.0.12 adj-in 5.6.7.0/24 validation
 
+
+
+docker build -t majedur708/hlf-api:300.107 .
+
+docker run --rm -it --privileged --name router4 majedur708/hlf-api:300.107
