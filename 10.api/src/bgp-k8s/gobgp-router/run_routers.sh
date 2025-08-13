@@ -42,7 +42,7 @@ for ip in "${ips[@]}"; do
     echo "IP $ip already assigned to dummy0"
   fi
 done
-
+ 
 # Bring dummy0 up
 ip link set dummy0 up
 
@@ -64,24 +64,24 @@ echo "Injecting static routes..."
 
 # --- Router1 (AS 13335) ---
 echo "→ Router1 (AS 13335)"
-gobgp -p 50051 global rib add 45.192.224.0/24 origin igp
-gobgp -p 50051 global rib add 156.243.83.0/24 origin igp
+gobgp -p 50051 global rib add 45.192.224.0/24 bgpsec
+gobgp -p 50051 global rib add 156.243.83.0/24 bgpsec
 
 # --- Router2 (AS 15169) ---
 echo "→ Router2 (AS 15169)"
-gobgp -p 50052 global rib add 45.192.224.0/24 origin igp
-gobgp -p 50052 global rib add 142.250.0.0/15 origin igp
-gobgp -p 50052 global rib add 199.36.154.0/23 origin igp
+gobgp -p 50052 global rib add 45.192.224.0/24 bgpsec
+gobgp -p 50052 global rib add 142.250.0.0/15 bgpsec
+gobgp -p 50052 global rib add 199.36.154.0/23 bgpsec
 
 # --- Router3 (AS 7018) ---
 # echo "→ Router3 (AS 7018)"
-gobgp -p 50053 global rib add 142.250.0.0/15 origin igp
-gobgp -p 50053 global rib add 107.129.0.0/18 origin igp
+gobgp -p 50053 global rib add 142.250.0.0/15 bgpsec
+gobgp -p 50053 global rib add 107.129.0.0/18 bgpsec
 
 # --- Router4 (AS 52320) ---
 echo "→ Router4 (AS 52320)"
-gobgp -p 50054 global rib add 200.16.68.0/22 origin igp
-gobgp -p 50054 global rib add 156.243.83.0/24 origin igp
+gobgp -p 50054 global rib add 200.16.68.0/22 bgpsec
+gobgp -p 50054 global rib add 156.243.83.0/24 bgpsec
 
 
 # --- Router5 (AS 6471) ---
