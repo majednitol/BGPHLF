@@ -47,7 +47,7 @@ done
 ip link set dummy0 up
 
 # Start routers
-for i in {1..2}; do
+for i in {1..17}; do
   echo "Starting router$i..."
   port=$((50050 + i))
   gobgpd -f "/etc/router$i.conf" \
