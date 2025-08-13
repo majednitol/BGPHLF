@@ -20,7 +20,7 @@
 ## NFS Client (MacOS)
 
 1. mkdir nfs_clientshare
-2. sudo mount -o nolocks -t nfs 212.2.247.23:/mnt/nfs_share ./nfs_clientshare
+2. sudo mount -o nolocks -t nfs 74.220.21.187:/mnt/nfs_share ./nfs_clientshare
 
 cd usr/share/nginx/html
 
@@ -53,8 +53,8 @@ civo kubernetes create bgphlf \
  civo kubernetes remove bgphlf --region LON1 --yes
 civo instance create bgphlf ubuntu --size g4s.small --wait
 
-ssh civo@212.2.247.23
-vm ELrmo3Qq1t
+ssh civo@74.220.21.187
+vm kOIf6GHgrK
 ./scripts/ccp.sh 
 
 
