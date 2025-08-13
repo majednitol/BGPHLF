@@ -56,7 +56,7 @@ for i in {1..17}; do
 done
 
 echo "Waiting for all routers to start..."
-sleep 3  # Ensure gobgpd instances are up before injecting routes
+sleep 10  # Ensure gobgpd instances are up before injecting routes
 
 # ✅ Inject Static Routes
 echo "Injecting static routes..."
