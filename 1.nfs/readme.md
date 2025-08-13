@@ -27,7 +27,7 @@ cd usr/share/nginx/html
 sudo cp -R prerequsite/* config.env ../nfs_clientshare
 sudo mv config.env scripts/
 
-sudo chmod 777 chaincode connection-profile configtx organizations 
+sudo chmod 777 -R chaincode connection-profile configtx organizations 
 sudo chmod +x scripts -R
 sudo rm -rf chaincode connection-profile scripts fabric-ca configtx organizations system-genesis-block scripts channel-artifacts state
 
