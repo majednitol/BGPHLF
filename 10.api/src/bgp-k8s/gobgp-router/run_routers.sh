@@ -65,6 +65,7 @@ echo "Injecting static routes..."
 echo "→ Router1 (AS 13335)"
 gobgp -p 50051 global rib add 45.192.224.0/24 bgpsec
 gobgp -p 50051 global rib add 156.243.83.0/24 bgpsec
+gobgp -p 50051 global rib add 209.55.246.0/23 bgpsec
 
 # --- Router2 (AS 15169) ---
 echo "→ Router2 (AS 15169)"
@@ -81,7 +82,7 @@ gobgp -p 50053 global rib add 107.202.0.0/18 bgpsec
 echo "→ Router4 (AS 52320)"
 gobgp -p 50054 global rib add 200.16.68.0/22 bgpsec
 gobgp -p 50054 global rib add 156.243.83.0/24 bgpsec
-
+gobgp -p 50054 global rib add 209.55.246.0/23 bgpsec
 
 # --- Router5 (AS 6471) ---
 echo "→ Router5 (AS 6471 )" 
