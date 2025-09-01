@@ -17,12 +17,12 @@ bash "$SCRIPT_DIR/../2.ca/deploy_ca.sh"
 
 echo "Running certificate creation job from 3.certificates"
 kubectl apply -f "$SCRIPT_DIR/../3.certifcates/job.yaml"
-sleep 10
+sleep 20
 kubectl logs job/create-certs -f
 
 echo "Running artifact generation job from 4.artifacts"
 kubectl apply -f "$SCRIPT_DIR/../4.artifacts/job.yaml"
-sleep 10
+sleep 20
 kubectl logs job/artifacts -f
 
 echo "Deploying Orderer components from 5.orderer"
