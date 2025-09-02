@@ -77,12 +77,13 @@ gobgp -p 50052 global rib add 199.36.154.0/23 bgpsec
 echo "→ Router3 (AS 7018)"
 gobgp -p 50053 global rib add 142.250.0.0/15 bgpsec
 gobgp -p 50053 global rib add 107.202.0.0/18 bgpsec
+gobgp -p 50053 global rib add 209.55.246.0/23 bgpsec
 
 # # --- Router4 (AS 52320) ---
 echo "→ Router4 (AS 52320)"
 gobgp -p 50054 global rib add 200.16.68.0/22 bgpsec
 gobgp -p 50054 global rib add 156.243.83.0/24 bgpsec
-gobgp -p 50054 global rib add 209.55.246.0/23 bgpsec
+# gobgp -p 50054 global rib add 209.55.246.0/23 bgpsec
 
 # # --- Router5 (AS 6471) ---
 # echo "→ Router5 (AS 6471 )" 
