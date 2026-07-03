@@ -20,7 +20,7 @@
 ## NFS Client (MacOS)
 
 1. mkdir nfs_clientshare
-2. sudo mount -o nolocks -t nfs 74.220.21.187:/mnt/nfs_share ./nfs_clientshare
+2. sudo mount -o nolocks -t nfs 74.220.17.192:/mnt/nfs_share ./nfs_clientshare
 
 cd usr/share/nginx/html
 
@@ -46,15 +46,14 @@ minikube stop
 
 civo kubernetes create bgphlf \
   --size g4s.kube.large \
-  --nodes 3 \
+  --nodes 4 \
   --region LON1 \
   --save
 
  civo kubernetes remove bgphlf --region LON1 --yes
-civo instance create bgphlf ubuntu --size g4s.small --wait
-
-ssh civo@74.220.21.187
-vm kOIf6GHgrK
+civo instance create bgphlf ubuntu --size g4s.medium --wait
+ssh ubuntu@74.220.17.192
+vm gEk7EHA4#P
 ./scripts/ccp.sh 
 
 
