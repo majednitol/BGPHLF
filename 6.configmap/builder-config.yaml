@@ -4,7 +4,7 @@ metadata:
     name: builders-config
 data:
     detect: |
-        #!/bin/sh
+        #!/bin/bash
 
         # The bin/detect script is responsible for determining whether or not a buildpack 
         # should be used to build a chaincode package and launch it. 
@@ -31,7 +31,7 @@ data:
         exit 1
 
     build: |
-        #!/bin/sh
+        #!/bin/bash
 
         # The bin/build script is responsible for building, compiling, or transforming the contents 
         # of a chaincode package into artifacts that can be used by release and run.
@@ -67,7 +67,7 @@ data:
         exit 0
 
     release: |
-        #!/bin/sh
+        #!/bin/bash
 
         # The bin/release script is responsible for providing chaincode metadata to the peer. 
         # bin/release is optional. If it is not provided, this step is skipped. 

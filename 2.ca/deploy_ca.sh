@@ -35,7 +35,7 @@ spec:
             claimName: mypvc
       containers:
         - name: "$CA_NAME"
-          image: hyperledger/fabric-ca:1.5.13
+          image: hyperledger/fabric-ca:1.5.17
           imagePullPolicy: IfNotPresent
           command:
             - fabric-ca-server

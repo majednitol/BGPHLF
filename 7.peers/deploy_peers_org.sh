@@ -63,7 +63,7 @@ spec:
                 mode: 0544
       containers:
         - name: peer
-          image: hyperledger/fabric-peer:2.4.9
+          image: hyperledger/fabric-peer:2.5.16
           command: ["sh", "-c", "peer node start"]
           env:
             - name: CORE_PEER_ADDRESSAUTODETECT
